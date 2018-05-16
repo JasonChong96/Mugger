@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bojio.mugger.MainActivity;
@@ -40,6 +42,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         signIn();
         setContentView(R.layout.activity_google_login);
+        ProgressBar pgsBar = (ProgressBar)findViewById(R.id.progressBar);
+        pgsBar.setVisibility(View.GONE);
     }
 
     private void signIn() {
@@ -58,12 +62,14 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
-
-                Toast.makeText(this, mAuth.getCurrentUser() != null ? "Success" : "Fail", Toast.LENGTH_SHORT).show();
-                if (mAuth.getCurrentUser() != null) {
-                    Intent intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
-                }
+                ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
+                mAuth.addAuthStateListener(firebaseAuth -> {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null) {
+                        Intent intent = new Intent(this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
@@ -83,7 +89,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
+
+                     //   FirebaseUser user = mAuth.getCurrentUser();
                     //    updateUI(user);
                     } else {
                         // If sign in fails, display a message to the user.
