@@ -21,14 +21,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        FirebaseUser acc = mAuth.getCurrentUser();
         setContentView(R.layout.activity_main);
-        if (account == null) { // Not logged in
+        if (acc == null) { // Not logged in
             Intent intent = new Intent(MainActivity.this, GoogleLoginActivity.class);
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(this, "Logged in to " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
-            ((TextView) findViewById(R.id.textView)).setText("Logged in to " + account.getDisplayName() + " " + account.getId());
+            Toast.makeText(this, "Logged in to " + acc.getDisplayName(), Toast.LENGTH_SHORT).show();
+            ((TextView) findViewById(R.id.textView)).setText("Logged in to " + acc.getDisplayName() + " " + acc.getUid());
+            Intent intent = new Intent(this, Main2Activity.class);
+            startActivity(intent);
             //account.getDisplayName()
         }
     }

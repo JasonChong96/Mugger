@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "292230336625",
+    "firebase_url": "https://mugger-dcc6c.firebaseio.com",
+    "project_id": "mugger-dcc6c",
+    "storage_bucket": "mugger-dcc6c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292230336625:android:5bcbe0ffdd6b39a6",
+        "android_client_info": {
+          "package_name": "com.bojio.mugger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292230336625-1jh1jrdgvq7308tis9kkqq3bimqlso0a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bojio.mugger",
+            "certificate_hash": "ef447ab05cc7e0edc8eee3d7140a3473c3d0a60f"
+          }
+        },
+        {
+          "client_id": "292230336625-pa93l9untqrvad2mc6m3i77kckjkk4k1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsUS2DelzBHcC-4RoSBhikczxge5yEGXk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "292230336625-pa93l9untqrvad2mc6m3i77kckjkk4k1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -33,7 +34,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("292230336625-1jh1jrdgvq7308tis9kkqq3bimqlso0a.apps.googleusercontent.com")
+                .requestIdToken("292230336625-pa93l9untqrvad2mc6m3i77kckjkk4k1.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -59,7 +60,10 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
 
                 Toast.makeText(this, mAuth.getCurrentUser() != null ? "Success" : "Fail", Toast.LENGTH_SHORT).show();
-
+                if (mAuth.getCurrentUser() != null) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                }
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
