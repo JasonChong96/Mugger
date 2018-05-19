@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,6 +32,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
     private static final String TAG = "GoogleLoginActivity";
     private FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +44,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         signIn();
         setContentView(R.layout.activity_google_login);
-        ProgressBar pgsBar = (ProgressBar)findViewById(R.id.progressBar);
+        ProgressBar pgsBar = findViewById(R.id.progressBar);
         pgsBar.setVisibility(View.GONE);
     }
 
@@ -54,7 +56,6 @@ public class GoogleLoginActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "hi:");
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -62,43 +63,37 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
-                ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
-                mAuth.addAuthStateListener(firebaseAuth -> {
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                (findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
+                mAuth.addAuthStateListener(auth -> {
+                    FirebaseUser user = auth.getCurrentUser();
                     if (user != null) {
-                        Intent intent = new Intent(this, MainActivity.class);
+                        Intent intent = new Intent(this, Main2Activity.class);
                         startActivity(intent);
+                        finish();
                     }
                 });
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
+                // Google Sign In failed,
                 Log.w(TAG, "Google sign in failed", e);
-                // [START_EXCLUDE]
-              //  updateUI(null);
-                // [END_EXCLUDE]
-                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Sign in failed", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish();
             }
         }
     }
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
-
-                     //   FirebaseUser user = mAuth.getCurrentUser();
-                    //    updateUI(user);
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // Sign in fails
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        //Snackbar.make(findViewById(R.id.), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                       // updateUI(null);
                     }
-
                     // ...
                 });
     }
