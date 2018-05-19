@@ -33,6 +33,10 @@ public class GoogleLoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
 
+    /**
+     * {@inheritDoc}
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +52,21 @@ public class GoogleLoginActivity extends AppCompatActivity {
         pgsBar.setVisibility(View.GONE);
     }
 
+    /**
+     * Opens google authentication.
+     */
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    /**
+     * Attempt to sign in using google authentication. If login is successful,
+     * brings user to the listings page.
+     * @param requestCode requestCode
+     * @param resultCode resultCode
+     * @param data data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -68,6 +82,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
                     FirebaseUser user = auth.getCurrentUser();
                     if (user != null) {
                         Intent intent = new Intent(this, Main2Activity.class);
+                        // Clears back stack
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
                     }
@@ -94,7 +110,6 @@ public class GoogleLoginActivity extends AppCompatActivity {
                         // Sign in fails
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                     }
-                    // ...
                 });
     }
 }

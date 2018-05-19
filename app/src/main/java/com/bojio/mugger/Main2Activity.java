@@ -1,32 +1,39 @@
 package com.bojio.mugger;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.bojio.mugger.authentication.GoogleLoginActivity;
+import com.bojio.mugger.fragments.BlankFragment;
+import com.bojio.mugger.fragments.ItemFragment;
+import com.bojio.mugger.listings.Listing;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        BlankFragment.OnFragmentInteractionListener,
+        ItemFragment.OnListFragmentInteractionListener{
 
     private FirebaseAuth mAuth;
     @Override
@@ -36,36 +43,35 @@ public class Main2Activity extends AppCompatActivity
         if (user == null) { // Not logged in, go back to login
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
+            finish();
+            return;
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show());
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        navigationView.setCheckedItem(R.id.nav_available_listings);
+        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
 
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -106,7 +112,12 @@ public class Main2Activity extends AppCompatActivity
         switch (id) {
             case R.id.logout:
                 this.signOut();
-
+                break;
+            case R.id.nav_available_listings:
+                Fragment fragment = new ItemFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.container, fragment);
+                ft.commit();
                 break;
             default:
                 break;
@@ -115,6 +126,16 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(Listing listing) {
+        Toast.makeText(this, "Clicked...", Toast.LENGTH_SHORT).show();
     }
 
     private void signOut() {
@@ -131,6 +152,7 @@ public class Main2Activity extends AppCompatActivity
                 task -> {
                     Intent intent = new Intent(Main2Activity.this, MainActivity.class);
                     startActivity(intent);
+                    finish();
                 });
     }
 }
