@@ -5,25 +5,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bojio.mugger.fragments.AvailableListingsFragments;
 import com.bojio.mugger.fragments.BlankFragment;
-import com.bojio.mugger.fragments.ItemFragment;
 import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.listings.MakeListingActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,7 +30,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BlankFragment.OnFragmentInteractionListener,
-        ItemFragment.OnListFragmentInteractionListener{
+        AvailableListingsFragments.OnListFragmentInteractionListener{
 
     private FirebaseAuth mAuth;
     @Override
@@ -52,8 +49,10 @@ public class Main2Activity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(this, MakeListingActivity.class);
+            startActivity(intent);
+        });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -114,7 +113,7 @@ public class Main2Activity extends AppCompatActivity
                 this.signOut();
                 break;
             case R.id.nav_available_listings:
-                Fragment fragment = new ItemFragment();
+                Fragment fragment = new AvailableListingsFragments();
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.container, fragment);
                 ft.commit();

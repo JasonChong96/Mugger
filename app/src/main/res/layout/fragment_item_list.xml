@@ -9,5 +9,5 @@
     android:layout_marginRight="16dp"
     android:clipChildren="false"
     android:clipToPadding="false"
-    tools:context=".fragments.ItemFragment"
+    tools:context=".fragments.AvailableListingsFragments"
     tools:listitem="@layout/listing_card_view" />

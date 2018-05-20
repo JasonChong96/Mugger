@@ -42,6 +42,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.firebaseui:firebase-ui-firestore:3.3.1'
+    implementation 'com.android.support:mediarouter-v7:27.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

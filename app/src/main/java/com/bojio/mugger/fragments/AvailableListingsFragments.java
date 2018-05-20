@@ -10,12 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.listings.ListingsViewHolder;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -33,13 +34,14 @@ import butterknife.ButterKnife;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment {
+public class AvailableListingsFragments extends Fragment {
 
     @BindView(R.id.list)
     RecyclerView mRecyclerView;
 
     // TODO: Customize parameter argument names
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth mAuth;
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
@@ -49,12 +51,12 @@ public class ItemFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemFragment() {
+    public AvailableListingsFragments() {
     }
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount) {
-        ItemFragment fragment = new ItemFragment();
+    public static AvailableListingsFragments newInstance(int columnCount) {
+        AvailableListingsFragments fragment = new AvailableListingsFragments();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -73,6 +75,7 @@ public class ItemFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mAuth = FirebaseAuth.getInstance();
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
         ButterKnife.bind(this, view);
         // Set the adapter
@@ -125,6 +128,7 @@ public class ItemFragment extends Fragment {
     }
 
     private void initListings() {
+
         Query mQuery = db.collection("listings")
                 .orderBy("startTime", Query.Direction.ASCENDING);
 
@@ -146,7 +150,11 @@ public class ItemFragment extends Fragment {
         FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Listing, ListingsViewHolder>(options) {
             @Override
             public void onBindViewHolder(ListingsViewHolder holder, int position, Listing listing) {
-                holder.moduleCode.setText(listing.getModuleCode());
+                String title = listing.getModuleCode();
+                if (listing.getOwnerId().equals(mAuth.getCurrentUser().getUid())) {
+                    title += " (Yours)";
+                }
+                holder.moduleCode.setText(title);
                 holder.venue.setText(listing.getVenue());
                 DateFormat df = new SimpleDateFormat("dd/MM HH:mm", Locale.US);
                 holder.dateTime.setText(new StringBuilder()
@@ -154,7 +162,7 @@ public class ItemFragment extends Fragment {
                         .append(" - ")
                         .append(df.format(new Date(listing.getEndTime())))
                         .toString());
-               // holder.moduleCode.setOnClickListener(view -> Toast.makeText(ItemFragment.this.getActivity(), "Clicked", Toast.LENGTH_SHORT).show());
+               // holder.moduleCode.setOnClickListener(view -> Toast.makeText(AvailableListingsFragments.this.getActivity(), "Clicked", Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -169,18 +177,5 @@ public class ItemFragment extends Fragment {
         };
         mRecyclerView.setAdapter(adapter);
         adapter.startListening();
-    }
-
-    public class ListingsViewHolder extends RecyclerView.ViewHolder {
-        public TextView moduleCode;
-        public TextView dateTime;
-        public TextView venue;
-
-        ListingsViewHolder(View view) {
-            super(view);
-            moduleCode = view.findViewById(R.id.module_code);
-            dateTime = view.findViewById(R.id.date_time);
-            venue = view.findViewById(R.id.venue);
-        }
     }
 }
