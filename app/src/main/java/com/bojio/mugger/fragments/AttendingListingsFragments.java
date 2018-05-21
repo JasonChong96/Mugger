@@ -16,7 +16,6 @@ public class AttendingListingsFragments extends ListingsFragments {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     this.mQuery = db.collection("listings")
-      //  .orderBy("startTime", Query.Direction.ASCENDING)
         .orderBy(mAuth.getUid());
   }
 }

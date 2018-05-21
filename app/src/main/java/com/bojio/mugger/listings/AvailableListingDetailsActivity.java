@@ -17,9 +17,13 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.fragments.MyListingsFragments;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +62,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_available_listing_details);
     ButterKnife.bind(this);
@@ -70,6 +75,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     java.text.DateFormat df = android.text.format.DateFormat.getDateFormat(this);
     java.text.DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(this);
     listing = b.getParcelable("listing");
+  //  db.collection("listings").document(listing.getUid()).addSnapshotListener(this, )
     moduleCode.setText(listing.getModuleCode());
     Date startDate = new Date(listing.getStartTime());
     Date endDate = new Date(listing.getEndTime());
@@ -93,10 +99,20 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     isAttending.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (mAuth.getUid().equals(listing.getOwnerId()) && !isChecked) {
-          Toast.makeText(AvailableListingDetailsActivity.this, "You must be attending listings " +
-              "that you own.", Toast.LENGTH_SHORT).show();
-          buttonView.setChecked(true);
+        DocumentReference listingRef = db.collection("listings").document(listing.getUid());
+        Map<String, Object> updates = new HashMap<>();
+        if (!isChecked) {
+          if (mAuth.getUid().equals(listing.getOwnerId())) {
+            Toast.makeText(AvailableListingDetailsActivity.this, "You must be attending listings " +
+                "that you own.", Toast.LENGTH_SHORT).show();
+            buttonView.setChecked(true);
+          } else {
+            updates.put(mAuth.getUid(), FieldValue.delete());
+            listingRef.update(updates);
+          }
+        } else {
+          updates.put(mAuth.getUid(), listing.getStartTime());
+          listingRef.update(updates);
         }
       }
     });
