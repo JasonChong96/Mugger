@@ -21,12 +21,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class GoogleLoginActivity extends AppCompatActivity {
   private static final int RC_SIGN_IN = 9001;
   private static final String TAG = "GoogleLoginActivity";
   GoogleSignInClient mGoogleSignInClient;
   private FirebaseAuth mAuth;
+  private FirebaseFirestore db;
 
   /**
    * {@inheritDoc}
@@ -37,6 +40,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mAuth = FirebaseAuth.getInstance();
+    db = FirebaseFirestore.getInstance();
     GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken("292230336625-pa93l9untqrvad2mc6m3i77kckjkk4k1.apps.googleusercontent.com")
         .requestEmail()
@@ -78,6 +82,30 @@ public class GoogleLoginActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(auth -> {
           FirebaseUser user = auth.getCurrentUser();
           if (user != null) {
+           /* db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
+              if (!task_.isSuccessful()) {
+                Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
+                    .LENGTH_SHORT);
+                mAuth.signOut();
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish();
+              } else {
+                DocumentSnapshot result = task_.getResult();
+                if (result.exists() && result.get("nusNetId") != null) {
+                  Intent intent = new Intent(this, Main2Activity.class);
+                  // Clears back stack
+                  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                  startActivity(intent);
+                  finish();
+                } else {
+                  Intent intent = new Intent(this, IvleLoginActivity.class);
+                  // Clears back stack
+                  startActivity(intent);
+                  finish();
+                }
+              }
+            });*/
             Intent intent = new Intent(this, Main2Activity.class);
             // Clears back stack
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
