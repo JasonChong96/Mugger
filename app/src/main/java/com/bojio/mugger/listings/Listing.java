@@ -3,101 +3,139 @@ package com.bojio.mugger.listings;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Listing implements Parcelable {
-    private String moduleCode;
-    private long startTime;
-    private long endTime;
-    private String description;
-    private String ownerId;
-    private String venue;
-
-    public Listing(String ownerId, String moduleCode, long startTime, long endTime, String description, String venue) {
-        this.ownerId = ownerId;
-        this.moduleCode = moduleCode;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.description = description;
-        this.venue = venue;
+  public static final Parcelable.Creator<Listing> CREATOR
+      = new Parcelable.Creator<Listing>() {
+    public Listing createFromParcel(Parcel in) {
+      return new Listing(in);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public Listing[] newArray(int size) {
+      return new Listing[size];
     }
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(ownerId);
-        dest.writeString(moduleCode);
-        dest.writeString(description);
-        dest.writeLong(startTime);
-        dest.writeLong(endTime);
-        dest.writeString(venue);
-    }
+  };
+  private String uid;
+  private String moduleCode;
+  private long startTime;
+  private long endTime;
+  private String description;
+  private String ownerId;
+  private String venue;
 
-    private Listing(Parcel source) {
-        this.ownerId = source.readString();
-        this.moduleCode = source.readString();
-        this.description = source.readString();
-        this.startTime = source.readLong();
-        this.endTime = source.readLong();
-        this.venue = source.readString();
-    }
 
-    public static final Parcelable.Creator<Listing> CREATOR
-            = new Parcelable.Creator<Listing>() {
-        public Listing createFromParcel(Parcel in) {
-            return new Listing(in);
-        }
-        public Listing[] newArray(int size) {
-            return new Listing[size];
-        }
-    };
 
-    public String getVenue() {
-        return venue;
-    }
+  private List<String> attendees;
 
-    public void setVenue(String venue) {
-        this.venue = venue;
-    }
+  public Listing(String uid, String ownerId, String moduleCode, long startTime, long endTime,
+                 String description, String venue, List<String> attendees) {
+    this.uid = uid;
+    this.ownerId = ownerId;
+    this.moduleCode = moduleCode;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.description = description;
+    this.venue = venue;
+    this.attendees = attendees;
+  }
 
-    public String getOwnerId() {
-        return ownerId;
-    }
+  private Listing(Parcel source) {
+    this.uid = source.readString();
+    this.ownerId = source.readString();
+    this.moduleCode = source.readString();
+    this.description = source.readString();
+    this.startTime = source.readLong();
+    this.endTime = source.readLong();
+    this.venue = source.readString();
+    this.attendees = new ArrayList<String>();
+    source.readStringList(this.attendees);
+  }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
-    }
+  @Override
+  public int describeContents() {
+    return 0;
+  }
 
-    public String getModuleCode() {
-        return moduleCode;
-    }
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(uid);
+    dest.writeString(ownerId);
+    dest.writeString(moduleCode);
+    dest.writeString(description);
+    dest.writeLong(startTime);
+    dest.writeLong(endTime);
+    dest.writeString(venue);
+    dest.writeStringList(this.attendees);
 
-    public void setModuleCode(String moduleCode) {
-        this.moduleCode = moduleCode;
-    }
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getVenue() {
+    return venue;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setVenue(String venue) {
+    this.venue = venue;
+  }
 
-    public long getStartTime() {
-        return startTime;
-    }
+  public String getOwnerId() {
+    return ownerId;
+  }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
+  public void setOwnerId(String ownerId) {
+    this.ownerId = ownerId;
+  }
 
-    public long getEndTime() {
-        return endTime;
-    }
+  public String getModuleCode() {
+    return moduleCode;
+  }
 
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
+  public void setModuleCode(String moduleCode) {
+    this.moduleCode = moduleCode;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public long getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(long endTime) {
+    this.endTime = endTime;
+  }
+
+  public String getUid() {
+    return uid;
+  }
+
+  public void setUid(String uid) {
+    this.uid = uid;
+  }
+
+  public List<String> getAttendees() {
+    return attendees;
+  }
+
+  public int getNumAttendees() {
+    return attendees.size();
+  }
+
+  public boolean isAttending(String uid) {
+    return attendees.contains(uid);
+  }
 }

@@ -21,7 +21,8 @@
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".listings.MakeListingActivity"></activity>
+        <activity android:name=".listings.CreateEditListingActivity" />
+        <activity android:name=".listings.AvailableListingDetailsActivity"></activity>
     </application>
 
 </manifest>

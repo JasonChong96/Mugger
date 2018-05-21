@@ -10,12 +10,14 @@ import com.google.firebase.firestore.Query;
  * Activities containing this fragment MUST implement the {@link OnListingsFragmentInteractionListener}
  * interface.
  */
-public class AvailableListingsFragments extends ListingsFragments {
+public class MyListingsFragments extends ListingsFragments {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    this.mQuery = db.collection("listings")
-        .orderBy("startTime", Query.Direction.ASCENDING);
     super.onCreate(savedInstanceState);
+    this.mQuery = db.collection("listings")
+        .orderBy("startTime", Query.Direction.ASCENDING)
+        .whereEqualTo("ownerId", mAuth.getCurrentUser().getUid());
+
   }
 }

@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".listings.MakeListingActivity">
+    android:isScrollContainer="true"
+    tools:context=".listings.CreateEditListingActivity">
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".listings.MakeListingActivity">
+        tools:context=".listings.CreateEditListingActivity">
 
 
         <ProgressBar
