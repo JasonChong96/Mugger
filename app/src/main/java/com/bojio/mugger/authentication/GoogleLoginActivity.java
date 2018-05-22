@@ -82,7 +82,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(auth -> {
           FirebaseUser user = auth.getCurrentUser();
           if (user != null) {
-           /* db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
+            db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
               if (!task_.isSuccessful()) {
                 Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
                     .LENGTH_SHORT);
@@ -105,12 +105,12 @@ public class GoogleLoginActivity extends AppCompatActivity {
                   finish();
                 }
               }
-            });*/
-            Intent intent = new Intent(this, Main2Activity.class);
+            });
+           /* Intent intent = new Intent(this, Main2Activity.class);
             // Clears back stack
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            finish();
+            finish();*/
           }
         });
       } catch (ApiException e) {

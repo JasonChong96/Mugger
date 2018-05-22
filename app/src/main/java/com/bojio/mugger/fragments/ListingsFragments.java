@@ -154,7 +154,8 @@ public abstract class ListingsFragments extends Fragment {
           view.getContext().startActivity(intent);
         });
         String title = listing.getModuleCode();
-        if (listing.getOwnerId().equals(mAuth.getCurrentUser().getUid())) {
+        if (mAuth.getCurrentUser() != null && listing.getOwnerId().equals(mAuth.getCurrentUser()
+            .getUid())) {
           title += " (Yours)";
         }
         holder.moduleCode.setText(title);

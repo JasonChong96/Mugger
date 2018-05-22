@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,16 +28,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class Main2Activity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
     ListingsFragments.OnListingsFragmentInteractionListener {
 
   private FirebaseAuth mAuth;
+  private FirebaseFirestore db;
+
+  @BindView(R.id.fab)
+  FloatingActionButton fab;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
+    db = FirebaseFirestore.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
     if (user == null) { // Not logged in, go back to login
       Intent intent = new Intent(this, MainActivity.class);
@@ -44,6 +55,7 @@ public class Main2Activity extends AppCompatActivity
       finish();
       return;
     }
+    db.collection("users").document(user.getUid()).update("displayName", user.getDisplayName());
     mAuth.addAuthStateListener(firebaseAuth -> {
       if (firebaseAuth.getCurrentUser() == null) {
         finish();
@@ -58,8 +70,7 @@ public class Main2Activity extends AppCompatActivity
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-
-    FloatingActionButton fab = findViewById(R.id.fab);
+    ButterKnife.bind(this);
     fab.setOnClickListener(view -> {
       Intent intent = new Intent(this, CreateEditListingActivity.class);
       startActivity(intent);
@@ -127,18 +138,21 @@ public class Main2Activity extends AppCompatActivity
         Fragment fragment = new AvailableListingsFragments();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
+        fab.setVisibility(View.VISIBLE);
         ft.commit();
         break;
       case R.id.nav_my_listings:
         fragment = new MyListingsFragments();
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
+        fab.setVisibility(View.VISIBLE);
         ft.commit();
         break;
       case R.id.nav_joining_listings:
         fragment = new AttendingListingsFragments();
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
+        fab.setVisibility(View.GONE);
         ft.commit();
         break;
       default:
