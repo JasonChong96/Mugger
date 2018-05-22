@@ -94,6 +94,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 DocumentSnapshot result = task_.getResult();
                 if (result.exists() && result.get("nusNetId") != null) {
                   Intent intent = new Intent(this, Main2Activity.class);
+                  MuggerUser.getInstance().setData(result.getData());
                   // Clears back stack
                   intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                   startActivity(intent);

@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.fragments.AttendingListingsFragments;
 import com.bojio.mugger.fragments.AvailableListingsFragments;
 import com.bojio.mugger.fragments.ListingsFragments;
@@ -180,11 +181,6 @@ public class Main2Activity extends AppCompatActivity
         .build();
     GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     mGoogleSignInClient.signOut();
-    /*.addOnCompleteListener(this,
-        task -> {
-          Intent intent = new Intent(Main2Activity.this, MainActivity.class);
-          startActivity(intent);
-          finish();
-        });*/
+    MuggerUser.clear();
   }
 }

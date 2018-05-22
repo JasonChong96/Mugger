@@ -7,15 +7,19 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.MuggerUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +29,7 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -33,7 +38,7 @@ import butterknife.ButterKnife;
 public class CreateEditListingActivity extends AppCompatActivity {
 
   @BindView(R.id.module_code)
-  EditText moduleCode;
+  Spinner moduleCode;
 
   @BindView(R.id.venue)
   EditText venue;
@@ -61,10 +66,16 @@ public class CreateEditListingActivity extends AppCompatActivity {
   private FirebaseAuth mAuth;
   private Bundle b;
   private Listing toEdit;
+  private List<String> moduleCodes;
+  private List<String> moduleTitles;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    moduleCodes = (List<String>) MuggerUser
+        .getInstance().getData().get("moduleCodes");
+    moduleTitles = (List<String>) MuggerUser
+        .getInstance().getData().get("moduleTitles");
     setContentView(R.layout.activity_make_listing);
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
@@ -74,6 +85,9 @@ public class CreateEditListingActivity extends AppCompatActivity {
     b = this.getIntent().getExtras();
     startDateTime = Calendar.getInstance();
     endDateTime = Calendar.getInstance();
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
+        moduleCodes);
+    moduleCode.setAdapter(adapter);
     if (b != null) {
       setTitle("Edit Listing");
       submitButton.setText("Submit Changes");
@@ -85,13 +99,15 @@ public class CreateEditListingActivity extends AppCompatActivity {
       }
       startDateTime.setTimeInMillis(toEdit.getStartTime());
       endDateTime.setTimeInMillis(toEdit.getEndTime());
-      moduleCode.setText(toEdit.getModuleCode());
+      moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
       venue.setText(toEdit.getVenue());
       description.setText(toEdit.getDescription());
     } else {
       setTitle("Add Listing");
       endDateTime.add(Calendar.HOUR_OF_DAY, 1);
     }
+
+    //Define the AutoComplete Threshold
     updateStartDateTimeDisplay();
     updateEndDateTimeDisplay();
     TimePickerDialog.OnTimeSetListener startTimeListener = new TimePickerDialog.OnTimeSetListener() {
@@ -167,8 +183,9 @@ public class CreateEditListingActivity extends AppCompatActivity {
   private void publishListing(View view) {
     //Check if all fields are filled
     submitButton.setClickable(false);
-    if (moduleCode.getText().toString().isEmpty()) {
-      showShortToast("Please fill in the module(s) the study session is for.");
+    if (moduleCode.getSelectedItem().toString() == null || moduleCode.getSelectedItem().toString()
+        .isEmpty()) {
+      showShortToast("Please select the module the study session is for.");
       submitButton.setClickable(true);
       return;
     }
@@ -198,7 +215,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
     data.put("description", description.getText().toString());
     data.put("endTime", endDateTime.getTimeInMillis());
     data.put("startTime", startTimeMillis);
-    data.put("moduleCode", moduleCode.getText().toString());
+    data.put("moduleCode", moduleCode.getSelectedItem().toString());
     data.put("ownerId", mAuth.getCurrentUser().getUid());
     data.put("venue", venue.getText().toString());
     data.put(mAuth.getUid(), startTimeMillis);

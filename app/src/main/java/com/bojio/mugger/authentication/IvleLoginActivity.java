@@ -116,6 +116,7 @@ public class IvleLoginActivity extends AppCompatActivity {
             finish();
           }
     });
+    MuggerUser.getInstance().setData(userData);
   }
 
   private boolean loadProfile(Map<String, Object> userData) {
