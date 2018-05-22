@@ -25,5 +25,11 @@
         <activity android:name=".listings.AvailableListingDetailsActivity" />
         <activity android:name=".authentication.IvleLoginActivity"></activity>
     </application>
+    <service
+        android:name=".MyFirebaseInstanceIDService">
+        <intent-filter>
+            <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+        </intent-filter>
+    </service>
 
 </manifest>
