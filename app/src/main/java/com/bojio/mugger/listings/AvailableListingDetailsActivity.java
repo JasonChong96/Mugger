@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.fragments.MyListingsFragments;
+import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class AvailableListingDetailsActivity extends AppCompatActivity {
 
@@ -118,6 +120,15 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     });
   }
 
+  @OnClick(R.id.chat_button)
+  public void onClick() {
+    Intent intent = new Intent(this, ListingChatActivity.class);
+    Bundle b = new Bundle();
+    b.putParcelable("listing", listing);
+    intent.putExtras(b);
+    startActivity(intent);
+  }
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
@@ -157,4 +168,6 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
 
     return super.onOptionsItemSelected(item);
   }
+
+
 }

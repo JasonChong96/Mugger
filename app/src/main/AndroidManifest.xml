@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bojio.mugger">
 
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,13 +25,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".listings.CreateEditListingActivity" />
         <activity android:name=".listings.AvailableListingDetailsActivity" />
-        <activity android:name=".authentication.IvleLoginActivity"></activity>
+        <activity android:name=".authentication.IvleLoginActivity" />
+        <activity android:name=".listings.chat.ListingChatActivity"></activity>
     </application>
-    <service
-        android:name=".MyFirebaseInstanceIDService">
-        <intent-filter>
-            <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-        </intent-filter>
-    </service>
 
 </manifest>

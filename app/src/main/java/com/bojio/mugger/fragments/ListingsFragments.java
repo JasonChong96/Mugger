@@ -42,8 +42,10 @@ import butterknife.ButterKnife;
 public abstract class ListingsFragments extends Fragment {
 
   private static final String ARG_COLUMN_COUNT = "column-count";
+
   @BindView(R.id.list)
   RecyclerView mRecyclerView;
+
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseAuth mAuth;
   protected Query mQuery;
@@ -175,8 +177,10 @@ public abstract class ListingsFragments extends Fragment {
             .append(" ")
             .append(dfTime.format(endDateTime))
             .toString());
+
         // holder.moduleCode.setOnClickListener(view -> Toast.makeText(AvailableListingsFragments.this.getActivity(), "Clicked", Toast.LENGTH_SHORT).show());
       }
+
 
       @Override
       public ListingsViewHolder onCreateViewHolder(ViewGroup group, int i) {
