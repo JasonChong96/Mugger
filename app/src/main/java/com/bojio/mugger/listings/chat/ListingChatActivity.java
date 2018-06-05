@@ -69,28 +69,23 @@ public class ListingChatActivity extends AppCompatActivity {
     long dayTimestamp = getDayTimestamp(timestamp);
     String body = toSendView.getText().toString().trim();
     String userUid = user.getUid();
-    Message message =
-        new Message(userUid, user.getDisplayName(), body, timestamp, dayTimestamp);
     Map<String, Object> messageData = new HashMap<>();
     messageData.put("fromUid", userUid);
     messageData.put("fromName", user.getDisplayName());
     messageData.put("content", body);
     messageData.put("time", timestamp);
     messageData.put("day", dayTimestamp);
-    /*mDatabase
-        .child("notifications")
-        .child("messages")
-        .push()
-        .setValue(message);*/
+    // Add to listing chat
     db.collection("chats").document(listing.getUid()).collection("messages").add(messageData);
-    /*if (!userUid.equals(ownerUid)) {
-      mDatabase
-          .child("messages")
-          .child(ownerUid)
-          .child(userUid)
-          .push()
-          .setValue(message);
-    }*/
+    messageData.put("listingUid", listing.getUid());
+    // Add to user's chat history
+    db.collection("users").document(userUid).collection("chatHistory").add(messageData);
+    // Add to notification db
+    messageData.remove("time");
+    messageData.remove("day");
+    messageData.put("listingOwnerUid", listing.getOwnerId());
+    db.collection("notifications").add
+        (messageData);
     toSendView.setText("");
   }
 

@@ -44,6 +44,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-firestore:3.3.1'
     implementation 'com.android.support:mediarouter-v7:27.1.1'
     implementation 'com.google.guava:guava:22.0'
+    implementation 'com.zsoltsafrany:needle:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

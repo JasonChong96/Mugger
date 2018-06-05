@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -88,6 +89,12 @@ public class Main2Activity extends AppCompatActivity
 
     navigationView.setCheckedItem(R.id.nav_available_listings);
     onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+    String instanceId = FirebaseInstanceId.getInstance().getToken();
+    if (instanceId != null) {
+      db.collection("users")
+          .document(user.getUid())
+          .update("instanceId", instanceId);
+    }
 
   }
 
