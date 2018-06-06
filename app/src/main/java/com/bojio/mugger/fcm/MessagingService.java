@@ -8,18 +8,26 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.bojio.mugger.CustomSettings;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
+import com.bojio.mugger.listings.chat.ListingChatActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MessagingService extends FirebaseMessagingService {
 
   private static final String TAG = "MessagingService";
-
+  private static AtomicInteger notificationId = new AtomicInteger(0);
   @Override
   public void onMessageReceived(RemoteMessage remoteMessage) {
     // [START_EXCLUDE]
@@ -35,7 +43,8 @@ public class MessagingService extends FirebaseMessagingService {
     // TODO(developer): Handle FCM messages here.
     // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
     Log.d(TAG, "From: " + remoteMessage.getFrom());
-
+    Map<String, String> data = remoteMessage.getData();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     // Check if message contains a data payload.
     if (remoteMessage.getData().size() > 0) {
       Log.d(TAG, "Message data payload: " + remoteMessage.getData());
@@ -51,9 +60,12 @@ public class MessagingService extends FirebaseMessagingService {
     }
 
     // Check if message contains a notification payload.
-    if (remoteMessage.getNotification() != null) {
-      sendNotification(remoteMessage.getNotification());
-      Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+    if (data.get("notification") != null) {
+      String senderUid = data.get("senderUid");
+      if (CustomSettings.NOTIFICATION_TO_SELF || senderUid == null ||
+          (user != null && senderUid.equals(user.getUid()))) {
+        sendNotification(remoteMessage.getData());
+      }
     }
 
     // Also if you intend on generating your own notifications as a result of a received FCM
@@ -83,13 +95,18 @@ public class MessagingService extends FirebaseMessagingService {
   /**
    * Create and show a simple notification containing the received FCM message.
    *
-   * @param notification FCM notification received.
+   * @param data FCM data received.
    */
-  private void sendNotification(RemoteMessage.Notification notification) {
-    String messageBody = notification.getBody();
-    Intent intent = new Intent(this, MainActivity.class);
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+  private void sendNotification(Map<String, String> data) {
+    int id = notificationId.getAndIncrement();
+    String messageBody = data.get("body");
+    String messageTitle = data.get("title");
+    Intent intent = new Intent(this, ListingChatActivity.class);
+    Bundle b = new Bundle();
+    b.putString("listingUid", data.get("listingUid"));
+    intent.putExtras(b);
+    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, id /* Request code */, intent,
         PendingIntent.FLAG_ONE_SHOT);
 
     String channelId = "aaa";
@@ -97,11 +114,12 @@ public class MessagingService extends FirebaseMessagingService {
     NotificationCompat.Builder notificationBuilder =
         new NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("FCM Message")
+            .setContentTitle(messageTitle)
             .setContentText(messageBody)
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent);
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH);
 
     NotificationManager notificationManager =
         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -114,6 +132,6 @@ public class MessagingService extends FirebaseMessagingService {
       notificationManager.createNotificationChannel(channel);
     }
 
-    notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    notificationManager.notify(id /* ID of notification */, notificationBuilder.build());
   }
 }

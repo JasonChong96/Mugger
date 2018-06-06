@@ -126,23 +126,7 @@ public abstract class ListingsFragments extends Fragment {
             // Delete outdated entries
             snapshot.getReference().delete();
           }
-          Map<String, Object> data = snapshot.getData();
-          data.remove("ownerId");
-          data.remove("moduleCode");
-          data.remove("startTime");
-          data.remove("endTime");
-          data.remove("description");
-          data.remove("venue");
-          List<String> attendeesList = new ArrayList<>(data.keySet());
-          return new Listing(snapshot.getId(),
-              (String) snapshot.get("ownerId"),
-              (String) snapshot.get("moduleCode"),
-              (long) snapshot.get("startTime"),
-              (long) snapshot.get("endTime"),
-              (String) snapshot.get("description"),
-              (String) snapshot.get("venue"),
-              attendeesList
-          );
+          return Listing.getListingFromSnapshot(snapshot);
         })
         .build();
     FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Listing, ListingsViewHolder>(options) {

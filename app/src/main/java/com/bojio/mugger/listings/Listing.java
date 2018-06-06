@@ -3,8 +3,11 @@ package com.bojio.mugger.listings;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Listing implements Parcelable {
   public static final Parcelable.Creator<Listing> CREATOR
@@ -39,6 +42,29 @@ public class Listing implements Parcelable {
     this.description = description;
     this.venue = venue;
     this.attendees = attendees;
+  }
+
+  public static Listing getListingFromSnapshot(DocumentSnapshot snapshot) {
+    if (snapshot == null || !snapshot.exists() || snapshot.getData() == null) {
+      return null;
+    }
+    Map<String, Object> data = snapshot.getData();
+    data.remove("ownerId");
+    data.remove("moduleCode");
+    data.remove("startTime");
+    data.remove("endTime");
+    data.remove("description");
+    data.remove("venue");
+    List<String> attendeesList = new ArrayList<>(data.keySet());
+    return new Listing(snapshot.getId(),
+        (String) snapshot.get("ownerId"),
+        (String) snapshot.get("moduleCode"),
+        (long) snapshot.get("startTime"),
+        (long) snapshot.get("endTime"),
+        (String) snapshot.get("description"),
+        (String) snapshot.get("venue"),
+        attendeesList
+    );
   }
 
   private Listing(Parcel source) {

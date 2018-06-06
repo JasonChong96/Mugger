@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,15 +39,19 @@ import butterknife.OnClick;
 
 public class ListingChatActivity extends AppCompatActivity {
 
-  Listing listing;
-  FirebaseFirestore db;
-  FirebaseUser user;
+  private Listing listing;
+  private String listingUid;
+  private FirebaseFirestore db;
+  private FirebaseUser user;
 
   @BindView(R.id.messages)
   RecyclerView messages;
 
   @BindView(R.id.activity_thread_input_edit_text)
   EditText toSendView;
+
+  @BindView(R.id.progressBar6)
+  ProgressBar progressBar;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +60,44 @@ public class ListingChatActivity extends AppCompatActivity {
     setContentView(R.layout.activity_listing_chat);
     ButterKnife.bind(this);
     Bundle b = getIntent().getExtras();
+    if (b == null) {
+      Toast.makeText(this, "Error: Bundle cannot be null", Toast.LENGTH_SHORT).show();
+      finish();
+      return;
+    }
     listing = b.getParcelable("listing");
+    if (listing == null) {
+      listingUid = b.getString("listingUid");
+      if (listingUid == null) {
+        Toast.makeText(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
+        finish();
+        return;
+      }
+    } else {
+      listingUid = listing.getUid();
+    }
+    if (listing == null) {
+      progressBar.setVisibility(View.VISIBLE);
+      db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {
+        Listing newListing = Listing.getListingFromSnapshot(task.getResult());
+        if (newListing == null) {
+          Toast.makeText(this, "This listing has been deleted", Toast.LENGTH_SHORT).show();
+          ListingChatActivity.this.finish();
+          return;
+        }
+        ListingChatActivity.this.setListing(newListing);
+        progressBar.setVisibility(View.GONE);
+      });
+    }
     user = FirebaseAuth.getInstance().getCurrentUser();
     if (user == null) {
       finish();
     }
     initMessages();
+  }
+
+  public void setListing(Listing newListing) {
+    listing = newListing;
   }
 
   @OnClick(R.id.activity_thread_send_fab)
@@ -76,8 +113,8 @@ public class ListingChatActivity extends AppCompatActivity {
     messageData.put("time", timestamp);
     messageData.put("day", dayTimestamp);
     // Add to listing chat
-    db.collection("chats").document(listing.getUid()).collection("messages").add(messageData);
-    messageData.put("listingUid", listing.getUid());
+    db.collection("chats").document(listingUid).collection("messages").add(messageData);
+    messageData.put("listingUid", listingUid);
     // Add to user's chat history
     db.collection("users").document(userUid).collection("chatHistory").add(messageData);
     // Add to notification db
@@ -100,7 +137,7 @@ public class ListingChatActivity extends AppCompatActivity {
   }
 
   private void initMessages() {
-    Query mQuery = db.collection("chats").document(listing.getUid()).collection("messages")
+    Query mQuery = db.collection("chats").document(listingUid).collection("messages")
         .orderBy("time", Query.Direction.DESCENDING);
     FirestoreRecyclerOptions<Message> options = new FirestoreRecyclerOptions.Builder<Message>()
         .setQuery(mQuery, snapshot -> new Message((String) snapshot.get("fromUid"),
