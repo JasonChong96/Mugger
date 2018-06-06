@@ -9,6 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.service.notification.NotificationListenerService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -111,6 +112,15 @@ public class MessagingService extends FirebaseMessagingService {
 
     String channelId = "aaa";
     Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    NotificationCompat.Builder groupBuilder =
+        new NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle(messageTitle)
+            .setContentText("a")
+            .setGroupSummary(true)
+            .setGroup(data.get("listingUid"))
+            .setStyle(new NotificationCompat.BigTextStyle().bigText("a"))
+            .setContentIntent(pendingIntent);
     NotificationCompat.Builder notificationBuilder =
         new NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -119,7 +129,8 @@ public class MessagingService extends FirebaseMessagingService {
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH);
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setGroup(data.get("listingUid"));
 
     NotificationManager notificationManager =
         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -131,7 +142,7 @@ public class MessagingService extends FirebaseMessagingService {
           NotificationManager.IMPORTANCE_DEFAULT);
       notificationManager.createNotificationChannel(channel);
     }
-
+    notificationManager.notify(id /* ID of notification */, groupBuilder.build());
     notificationManager.notify(id /* ID of notification */, notificationBuilder.build());
   }
 }
