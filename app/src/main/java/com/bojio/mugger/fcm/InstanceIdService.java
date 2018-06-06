@@ -13,8 +13,12 @@ public class InstanceIdService extends FirebaseInstanceIdService {
   @Override
   public void onTokenRefresh() {
     super.onTokenRefresh();
+    //Log.d("@@@@", "onTokenRefresh: " + instanceId);
+    updateToken();
+  }
+
+  public static void updateToken() {
     String instanceId = FirebaseInstanceId.getInstance().getToken();
-    Log.d("@@@@", "onTokenRefresh: " + instanceId);
     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     if (firebaseUser != null) {
       FirebaseFirestore.getInstance()

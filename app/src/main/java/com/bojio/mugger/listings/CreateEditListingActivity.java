@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -247,6 +248,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
             (uidToListing);
 
           }*/
+          FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
           CreateEditListingActivity.this.finish();
         }
       }

@@ -52,6 +52,7 @@ public class MessagingService extends FirebaseMessagingService {
 
     // Check if message contains a notification payload.
     if (remoteMessage.getNotification() != null) {
+      sendNotification(remoteMessage.getNotification());
       Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
     }
 
@@ -82,9 +83,10 @@ public class MessagingService extends FirebaseMessagingService {
   /**
    * Create and show a simple notification containing the received FCM message.
    *
-   * @param messageBody FCM message body received.
+   * @param notification FCM notification received.
    */
-  private void sendNotification(String messageBody) {
+  private void sendNotification(RemoteMessage.Notification notification) {
+    String messageBody = notification.getBody();
     Intent intent = new Intent(this, MainActivity.class);
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,

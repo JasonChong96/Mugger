@@ -29,9 +29,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.io.IOException;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,15 +58,18 @@ public class Main2Activity extends AppCompatActivity
     db = FirebaseFirestore.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
     if (user == null) { // Not logged in, go back to login
-      Intent intent = new Intent(this, MainActivity.class);
-      startActivity(intent);
-      finish();
+      backToHome();
       return;
     }
     db.collection("users").document(user.getUid()).update("displayName", user.getDisplayName());
     mAuth.addAuthStateListener(firebaseAuth -> {
       if (firebaseAuth.getCurrentUser() == null) {
         finish();
+        try {
+          FirebaseInstanceId.getInstance().deleteInstanceId();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
         Intent intent = new Intent(Main2Activity.this, MainActivity
             .class);
         Toast.makeText(Main2Activity.this, "Logged out " +
@@ -68,6 +77,7 @@ public class Main2Activity extends AppCompatActivity
         startActivity(intent);
       }
     });
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
@@ -95,7 +105,28 @@ public class Main2Activity extends AppCompatActivity
           .document(user.getUid())
           .update("instanceId", instanceId);
     }
+    subscribeToTopics();
+  }
 
+  private void subscribeToTopics() {
+    if (mAuth == null) {
+      return;
+    }
+    Query q  = db.collection("listings")
+        .whereGreaterThan(mAuth.getUid(), 0);
+    q.get().addOnCompleteListener(snap -> {
+      List<DocumentSnapshot> results = snap.getResult().getDocuments();
+      for (DocumentSnapshot doc : results) {
+        FirebaseMessaging.getInstance().subscribeToTopic(doc.getId());
+      }
+    });
+  }
+
+  private void backToHome() {
+    Intent intent = new Intent(this, MainActivity.class);
+    startActivity(intent);
+    finish();
+    return;
   }
 
   @Override
@@ -188,6 +219,7 @@ public class Main2Activity extends AppCompatActivity
         .build();
     GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     mGoogleSignInClient.signOut();
+
     MuggerUser.clear();
   }
 }

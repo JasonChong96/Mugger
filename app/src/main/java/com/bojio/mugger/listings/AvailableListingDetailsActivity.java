@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -59,12 +60,13 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
   Listing listing;
   FirebaseAuth mAuth;
   FirebaseFirestore db;
+  FirebaseMessaging fcm;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
-
+    fcm = FirebaseMessaging.getInstance();
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_available_listing_details);
     ButterKnife.bind(this);
@@ -110,10 +112,12 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
             buttonView.setChecked(true);
           } else {
             updates.put(mAuth.getUid(), FieldValue.delete());
+            fcm.unsubscribeFromTopic(listing.getUid());
             listingRef.update(updates);
           }
         } else {
           updates.put(mAuth.getUid(), listing.getStartTime());
+          fcm.subscribeToTopic(listing.getUid());
           listingRef.update(updates);
         }
       }
