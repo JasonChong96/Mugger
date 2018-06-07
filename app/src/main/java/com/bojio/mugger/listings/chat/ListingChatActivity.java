@@ -1,5 +1,7 @@
 package com.bojio.mugger.listings.chat;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import com.bojio.mugger.fragments.ListingsFragments;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingsViewHolder;
+import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -116,7 +119,7 @@ public class ListingChatActivity extends AppCompatActivity {
     db.collection("chats").document(listingUid).collection("messages").add(messageData);
     messageData.put("listingUid", listingUid);
     // Add to user's chat history
-    db.collection("users").document(userUid).collection("chatHistory").add(messageData);
+    //db.collection("users").document(userUid).collection("chatHistory").add(messageData);
     // Add to notification db
     messageData.remove("time");
     messageData.remove("day");
@@ -187,7 +190,26 @@ public class ListingChatActivity extends AppCompatActivity {
         DateFormat dfDate = android.text.format.DateFormat.getDateFormat(ListingChatActivity
             .this);
         holder.dateView.setText(dfDate.format(new Date(message.getTime())));
+        holder.senderView.setOnClickListener(view -> {
+          CharSequence options[] = new CharSequence[] {"View " + message.getFromName() + "'s " +
+              "profile"};
 
+          AlertDialog.Builder builder = new AlertDialog.Builder(ListingChatActivity.this);
+      //    builder.setTitle("Pick a color");
+          builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              if (which == 0) {
+                Intent intent = new Intent(ListingChatActivity.this, ProfileActivity.class);
+                Bundle b = new Bundle();
+                b.putString("profileUid", message.getFromUid());
+                intent.putExtras(b);
+                startActivity(intent);
+              }
+            }
+          });
+          builder.show();
+        });
       }
 
       @Override

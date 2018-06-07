@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bojio.mugger.Main2Activity;
+import com.bojio.mugger.Modules;
 import com.bojio.mugger.R;
 import com.google.android.gms.tasks.Task;
 import com.google.common.hash.Hashing;
@@ -26,7 +27,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -153,6 +157,9 @@ public class IvleLoginActivity extends AppCompatActivity {
             if (!data[i + 2].isEmpty())
               userData.put("secondMajor", data[i + 2]);
             break;
+          case "MatriculationYear":
+            userData.put("matriculationYear", data[i + 2]);
+            break;
           default:
             break;
         }
@@ -184,18 +191,39 @@ public class IvleLoginActivity extends AppCompatActivity {
       String s = sc.nextLine();
       s = s.substring(2, s.indexOf("]"));
       String[] dataList = s.split("\"");
+      Map<String, List<String>> modulesBySem = new HashMap<>();
       Map<String, String> modules = new TreeMap<>();
       for (int i = 0; i < dataList.length; i++) {
         if (dataList[i].equals("ModuleCode")) {
           String moduleCode = dataList[i + 2];
           String moduleTitle = dataList[i + 6];
+          if (!Modules.isRelevantModule(moduleCode, moduleTitle)) {
+            continue;
+          }
+          String year = dataList[i + 10];
+          year = year.replace("/", ".");
+          String semesterDisplay = dataList[i + 18];
+          String yearAndSem = year + " " + semesterDisplay;
+          if (!modulesBySem.containsKey(yearAndSem)) {
+            modulesBySem.put(yearAndSem, new ArrayList<>());
+          }
+          modulesBySem.get(yearAndSem).add(moduleCode);
           modules.put(moduleCode, moduleTitle);
-          i += 6;
+          i += 18;
         }
       }
-      db.collection("data").document("moduleTitles").set(modules, SetOptions.merge());
+      for (Map.Entry<String, List<String>> entry : modulesBySem.entrySet()) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("moduleCodes", entry.getValue());
+        data.put("semester", entry.getKey());
+        Task<?> task = db.collection("users").document(FirebaseAuth.getInstance().getUid())
+            .collection("semesters").document(entry.getKey()).set(data);
+      }
+      String latestSem = Collections.max(modulesBySem.keySet());
+      userData.put("latestSem", latestSem);
+      Task<?> task = db.collection("data").document("moduleTitles").set(modules, SetOptions
+          .merge());
       userData.put("moduleCodes", new ArrayList<>(modules.keySet()));
-      userData.put("moduleTitles", new ArrayList<>(modules.values()));
       return true;
     } catch (MalformedURLException e) {
       e.printStackTrace();

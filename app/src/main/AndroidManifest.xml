@@ -28,7 +28,8 @@
         <activity android:name=".listings.CreateEditListingActivity" />
         <activity android:name=".listings.AvailableListingDetailsActivity" />
         <activity android:name=".authentication.IvleLoginActivity" />
-        <activity android:name=".listings.chat.ListingChatActivity"></activity>
+        <activity android:name=".listings.chat.ListingChatActivity" />
+
         <service
             android:name=".fcm.InstanceIdService"
             tools:ignore="ExportedService">
@@ -36,7 +37,6 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".fcm.MessagingService"
             tools:ignore="ExportedService">
@@ -44,6 +44,8 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <activity android:name=".profile.ProfileActivity"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.bojio.mugger;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -24,6 +25,7 @@ import com.bojio.mugger.fragments.ListingsFragments;
 import com.bojio.mugger.fragments.MyListingsFragments;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.profile.ProfileFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -45,7 +47,8 @@ import butterknife.OnClick;
 
 public class Main2Activity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
-    ListingsFragments.OnListingsFragmentInteractionListener {
+    ListingsFragments.OnListingsFragmentInteractionListener,
+    ProfileFragment.OnProfileFragmentInteractionListener {
 
   private FirebaseAuth mAuth;
   private FirebaseFirestore db;
@@ -62,8 +65,9 @@ public class Main2Activity extends AppCompatActivity
       backToHome();
       return;
     }
-    // Updates cached display name
+    // Updates cached display name/email
     db.collection("users").document(user.getUid()).update("displayName", user.getDisplayName());
+    db.collection("users").document(user.getUid()).update("email", user.getEmail());
 
     // Set behavior when logged in state changes
     setAuthStateChangeListener();
@@ -221,6 +225,13 @@ public class Main2Activity extends AppCompatActivity
         fab.setVisibility(View.GONE);
         ft.commit();
         break;
+      case R.id.nav_profile:
+        fragment = ProfileFragment.newInstance(mAuth.getCurrentUser().getUid());
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, fragment);
+        fab.setVisibility(View.GONE);
+        ft.commit();
+        break;
       default:
         break;
     }
@@ -260,5 +271,10 @@ public class Main2Activity extends AppCompatActivity
   void onClickFab() {
     Intent intent = new Intent(this, CreateEditListingActivity.class);
     startActivity(intent);
+  }
+
+  @Override
+  public void onProfileFragmentInteraction(Uri uri) {
+
   }
 }

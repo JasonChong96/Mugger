@@ -68,15 +68,17 @@ public class CreateEditListingActivity extends AppCompatActivity {
   private Bundle b;
   private Listing toEdit;
   private List<String> moduleCodes;
-  private List<String> moduleTitles;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    moduleCodes = (List<String>) MuggerUser
-        .getInstance().getData().get("moduleCodes");
-    moduleTitles = (List<String>) MuggerUser
-        .getInstance().getData().get("moduleTitles");
+    if (MuggerUser.getInstance().getData().get("useAllPastModules") == null) {
+      moduleCodes = (List<String>) MuggerUser
+          .getInstance().getData().get("moduleCodes");
+    } else {
+      moduleCodes = (List<String>) MuggerUser
+          .getInstance().getData().get("moduleCodes");
+    }
     setContentView(R.layout.activity_make_listing);
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
