@@ -71,6 +71,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_available_listing_details);
     ButterKnife.bind(this);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
     if (b == null) {
       finish();
@@ -169,6 +170,8 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
               .LENGTH_SHORT);
         }
       });
+    } else if (id == android.R.id.home) {
+      finish();
     }
 
     return super.onOptionsItemSelected(item);

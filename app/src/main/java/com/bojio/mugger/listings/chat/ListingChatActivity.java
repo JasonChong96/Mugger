@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -62,6 +63,7 @@ public class ListingChatActivity extends AppCompatActivity {
     db = FirebaseFirestore.getInstance();
     setContentView(R.layout.activity_listing_chat);
     ButterKnife.bind(this);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
     if (b == null) {
       Toast.makeText(this, "Error: Bundle cannot be null", Toast.LENGTH_SHORT).show();
@@ -244,6 +246,18 @@ public class ListingChatActivity extends AppCompatActivity {
         messages.smoothScrollToPosition(0);
       }
     });
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      // When back button on the top left is clicked
+      case android.R.id.home:
+        finish();
+        return true;
+    }
+
+    return super.onOptionsItemSelected(item);
   }
 
   class MessageViewHolder extends RecyclerView.ViewHolder {

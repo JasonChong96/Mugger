@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -83,6 +84,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
     ButterKnife.bind(this);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     df = DateFormat.getDateFormat(this);
     dfTime = DateFormat.getTimeFormat(this);
     b = this.getIntent().getExtras();
@@ -261,5 +263,17 @@ public class CreateEditListingActivity extends AppCompatActivity {
 
   private void showShortToast(String msg) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      // When back button on the top left is clicked
+      case android.R.id.home:
+        finish();
+        return true;
+    }
+
+    return super.onOptionsItemSelected(item);
   }
 }

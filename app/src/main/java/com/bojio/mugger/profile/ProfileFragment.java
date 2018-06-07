@@ -84,9 +84,6 @@ public class ProfileFragment extends Fragment {
   @BindView(R.id.profile_button_report)
   Button reportButton;
 
-  @BindView(R.id.profile_button_message_history)
-  Button messageHistoryButton;
-
   @BindView(R.id.profile_button_view_reports)
   Button viewReportsButton;
 
