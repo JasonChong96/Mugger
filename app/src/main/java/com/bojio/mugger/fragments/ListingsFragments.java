@@ -59,7 +59,7 @@ public abstract class ListingsFragments extends Fragment {
   public ListingsFragments() {
   }
 
-  public static AvailableListingsFragments newInstance(int columnCount) {
+  public static ListingsFragments newInstance(int columnCount) {
     AvailableListingsFragments fragment = new AvailableListingsFragments();
     Bundle args = new Bundle();
     args.putInt(ARG_COLUMN_COUNT, columnCount);

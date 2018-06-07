@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bojio.mugger.DebugSettings;
 import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
@@ -50,6 +51,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
     setContentView(R.layout.activity_google_login);
     ProgressBar pgsBar = findViewById(R.id.progressBar);
     pgsBar.setVisibility(View.GONE);
+    // Sets behavior when logged in state changes
+    initAuthStateListener();
   }
 
   /**
@@ -79,41 +82,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         GoogleSignInAccount account = task.getResult(ApiException.class);
         firebaseAuthWithGoogle(account);
         (findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
-        mAuth.addAuthStateListener(auth -> {
-          FirebaseUser user = auth.getCurrentUser();
-          if (user != null) {
-            db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
-              if (!task_.isSuccessful()) {
-                Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
-                    .LENGTH_SHORT);
-                mAuth.signOut();
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
-              } else {
-                DocumentSnapshot result = task_.getResult();
-                if (result.exists() && result.get("nusNetId") != null) {
-                  Intent intent = new Intent(this, Main2Activity.class);
-                  MuggerUser.getInstance().setData(result.getData());
-                  // Clears back stack
-                  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                  startActivity(intent);
-                  finish();
-                } else {
-                  Intent intent = new Intent(this, IvleLoginActivity.class);
-                  // Clears back stack
-                  startActivity(intent);
-                  finish();
-                }
-              }
-            });
-           /* Intent intent = new Intent(this, Main2Activity.class);
-            // Clears back stack
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();*/
-          }
-        });
+
       } catch (ApiException e) {
         // Google Sign In failed,
         Log.w(TAG, "Google sign in failed", e);
@@ -138,5 +107,42 @@ public class GoogleLoginActivity extends AppCompatActivity {
             Log.w(TAG, "signInWithCredential:failure", task.getException());
           }
         });
+  }
+
+  private void initAuthStateListener() {
+    mAuth.addAuthStateListener(auth -> {
+      FirebaseUser user = auth.getCurrentUser();
+      if (user != null) {
+        // If signed in, check if user has been verified as an NUS student by checking if
+        // hashed nusnetid has been cached
+        db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
+          if (!task_.isSuccessful()) {
+            Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
+                .LENGTH_SHORT);
+            mAuth.signOut();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+          } else {
+            DocumentSnapshot result = task_.getResult();
+            if (result.exists() && result.get("nusNetId") != null && !DebugSettings
+                .ALWAYS_REDIRECT_TO_IVLE) {
+              // If already verified, then go straight to main listings page
+              Intent intent = new Intent(this, Main2Activity.class);
+              MuggerUser.getInstance().setData(result.getData());
+              // Clears back stack
+              intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+              startActivity(intent);
+              finish();
+            } else {
+              // If not cached then go to IVLE Login
+              Intent intent = new Intent(this, IvleLoginActivity.class);
+              startActivity(intent);
+              finish();
+            }
+          }
+        });
+      }
+    });
   }
 }

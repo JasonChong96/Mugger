@@ -2,6 +2,7 @@ package com.bojio.mugger.authentication;
 
 import android.content.Intent;
 import android.os.Build;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import needle.Needle;
 
 public class IvleLoginActivity extends AppCompatActivity {
 
@@ -62,16 +64,18 @@ public class IvleLoginActivity extends AppCompatActivity {
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
         if (url.startsWith("https://ivle.nus.edu.sg/api/login/muggerapp.com?token=")) {
           webView.setVisibility(View.GONE);
-          progressBar.setVisibility(View.VISIBLE);
-          Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
-              .LENGTH_SHORT).show();
+          Needle.onMainThread().execute(() -> {
+                progressBar.setVisibility(View.VISIBLE);
+           // Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
+          //      .LENGTH_SHORT).show();
+              });
           token = url.substring(54);
-      /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            CompletableFuture<?> task = CompletableFuture.runAsync(() -> loadDataFromIvle());
-            task.join();
-          } else {*/
+          // Run in parallel so the loading screen still shows for the user while data is loading.
+          Needle.onBackgroundThread().execute(() -> {
+            Looper.prepare();
             loadDataFromIvle();
-          //}
+          });
+
           return true;
         }
         return false;
@@ -88,8 +92,9 @@ public class IvleLoginActivity extends AppCompatActivity {
           .show();
       return;
     }
+    Toast.makeText(IvleLoginActivity.this, "test", Toast.LENGTH_LONG)
+        .show();
     String nusNetId = (String) userData.get("nusNetId");
-    Toast.makeText(this, nusNetId, Toast.LENGTH_LONG).show();
     userData.put("nusNetId",
         Hashing.sha256()
             .hashString(nusNetId, StandardCharsets.UTF_8)

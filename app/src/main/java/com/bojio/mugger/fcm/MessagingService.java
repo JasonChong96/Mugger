@@ -9,12 +9,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.service.notification.NotificationListenerService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.bojio.mugger.CustomSettings;
-import com.bojio.mugger.MainActivity;
+import com.bojio.mugger.DebugSettings;
 import com.bojio.mugger.R;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,7 +61,7 @@ public class MessagingService extends FirebaseMessagingService {
     // Check if message contains a notification payload.
     if (data.get("notification") != null) {
       String senderUid = data.get("senderUid");
-      if (CustomSettings.NOTIFICATION_TO_SELF || senderUid == null ||
+      if (DebugSettings.NOTIFICATION_TO_SELF || senderUid == null ||
           (user != null && senderUid.equals(user.getUid()))) {
         sendNotification(remoteMessage.getData());
       }

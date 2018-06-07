@@ -41,6 +41,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class Main2Activity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
@@ -61,7 +62,44 @@ public class Main2Activity extends AppCompatActivity
       backToHome();
       return;
     }
+    // Updates cached display name
     db.collection("users").document(user.getUid()).update("displayName", user.getDisplayName());
+
+    // Set behavior when logged in state changes
+    setAuthStateChangeListener();
+
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main2);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    ButterKnife.bind(this);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+    drawer.addDrawerListener(toggle);
+    toggle.syncState();
+
+    NavigationView navigationView = findViewById(R.id.nav_view);
+    navigationView.setNavigationItemSelectedListener(this);
+
+    navigationView.setCheckedItem(R.id.nav_available_listings);
+    onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+    String instanceId = FirebaseInstanceId.getInstance().getToken();
+    // Update instance id of this account in database
+    if (instanceId != null) {
+      db.collection("users")
+          .document(user.getUid())
+          .update("instanceId", instanceId);
+    }
+    // Subscribe to chat notifications
+    subscribeToTopics();
+  }
+
+  /**
+   * Sets the function to be invoked when log in stage is changed. i.e when user has signed out,
+   * bring him back to the login page and unsubscribe him from notifications
+   */
+  private void setAuthStateChangeListener() {
     mAuth.addAuthStateListener(firebaseAuth -> {
       if (firebaseAuth.getCurrentUser() == null) {
         finish();
@@ -77,37 +115,10 @@ public class Main2Activity extends AppCompatActivity
         startActivity(intent);
       }
     });
-
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main2);
-    Toolbar toolbar = findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    ButterKnife.bind(this);
-    fab.setOnClickListener(view -> {
-      Intent intent = new Intent(this, CreateEditListingActivity.class);
-      startActivity(intent);
-    });
-
-    DrawerLayout drawer = findViewById(R.id.drawer_layout);
-    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-    drawer.addDrawerListener(toggle);
-    toggle.syncState();
-
-    NavigationView navigationView = findViewById(R.id.nav_view);
-    navigationView.setNavigationItemSelectedListener(this);
-
-    navigationView.setCheckedItem(R.id.nav_available_listings);
-    onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
-    String instanceId = FirebaseInstanceId.getInstance().getToken();
-    if (instanceId != null) {
-      db.collection("users")
-          .document(user.getUid())
-          .update("instanceId", instanceId);
-    }
-    subscribeToTopics();
   }
-
+  /**
+   * Subscribes this client to the relevant listing notifications.
+   */
   private void subscribeToTopics() {
     if (mAuth == null) {
       return;
@@ -122,6 +133,9 @@ public class Main2Activity extends AppCompatActivity
     });
   }
 
+  /**
+   * Goes back to the start page of Mugger
+   */
   private void backToHome() {
     Intent intent = new Intent(this, MainActivity.class);
     startActivity(intent);
@@ -129,6 +143,10 @@ public class Main2Activity extends AppCompatActivity
     return;
   }
 
+  /**
+   * Invoked when back button is pressed. If the navigation drawer is opened, closes it. If not,
+   * normal behavior is invoked.
+   */
   @Override
   public void onBackPressed() {
     DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -139,6 +157,11 @@ public class Main2Activity extends AppCompatActivity
     }
   }
 
+  /**
+   * Creates the options menu (top right). Also sets the notification drawer display name and email.
+   * @param menu the menu
+   * @return
+   */
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
@@ -149,25 +172,29 @@ public class Main2Activity extends AppCompatActivity
     return true;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
+    // Handle top right menu item clicks
     int id = item.getItemId();
 
-    //noinspection SimplifiableIfStatement
     if (id == R.id.action_settings) {
+      // If settings clicked
       return true;
     }
 
     return super.onOptionsItemSelected(item);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @SuppressWarnings("StatementWithEmptyBody")
   @Override
   public boolean onNavigationItemSelected(MenuItem item) {
-    // Handle navigation view item clicks here.
+    // Handle navigation drawer item clicks here.
     int id = item.getItemId();
     switch (id) {
       case R.id.logout:
@@ -198,7 +225,7 @@ public class Main2Activity extends AppCompatActivity
         break;
     }
 
-    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
     drawer.closeDrawer(GravityCompat.START);
     return true;
   }
@@ -208,6 +235,9 @@ public class Main2Activity extends AppCompatActivity
     Toast.makeText(this, "Clicked...", Toast.LENGTH_SHORT).show();
   }
 
+  /**
+   * Signs out of the current account.
+   */
   private void signOut() {
     // Firebase sign out
     mAuth.signOut();
@@ -221,5 +251,14 @@ public class Main2Activity extends AppCompatActivity
     mGoogleSignInClient.signOut();
 
     MuggerUser.clear();
+  }
+
+  /**
+   * Invoked when Floating Action Button is clicked. Opens the create listing UI.
+   */
+  @OnClick(R.id.fab)
+  void onClickFab() {
+    Intent intent = new Intent(this, CreateEditListingActivity.class);
+    startActivity(intent);
   }
 }
