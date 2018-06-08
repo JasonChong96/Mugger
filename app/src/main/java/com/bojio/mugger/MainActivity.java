@@ -36,14 +36,13 @@ public class MainActivity extends AppCompatActivity {
     db = FirebaseFirestore.getInstance();
     FirebaseUser acc = mAuth.getCurrentUser();
     setContentView(R.layout.activity_main);
+    initGoogleSignInButton();
     ButterKnife.bind(this);
     if (acc != null) { // Logged in
       progressBar.setVisibility(View.VISIBLE);
       // Checks if user has been verified as an NUS student by checking if NUSNETID has been
       // logged before
       checkAccount(acc);
-    } else {
-      initGoogleSignInButton();
     }
   }
 

@@ -91,8 +91,6 @@ public class IvleLoginActivity extends AppCompatActivity {
           .show();
       return;
     }
-    Toast.makeText(IvleLoginActivity.this, "test", Toast.LENGTH_LONG)
-        .show();
     String nusNetId = (String) userData.get("nusNetId");
     userData.put("nusNetId",
         Hashing.sha256()

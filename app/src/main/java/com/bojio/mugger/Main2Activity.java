@@ -84,7 +84,7 @@ public class Main2Activity extends AppCompatActivity
 
     NavigationView navigationView = findViewById(R.id.nav_view);
     navigationView.setNavigationItemSelectedListener(this);
-
+    setTitle("Listings");
     navigationView.setCheckedItem(R.id.nav_available_listings);
     onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
     String instanceId = FirebaseInstanceId.getInstance().getToken();

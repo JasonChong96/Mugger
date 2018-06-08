@@ -56,7 +56,7 @@ public class Listing implements Parcelable {
     Map<String, Object> data = snapshot.getData();
     int type = 0;
     if (snapshot.contains("type")) {
-      type = (Integer) snapshot.get("type");
+      type = ((Long) snapshot.get("type")).intValue();
     }
     data.remove("ownerId");
     data.remove("moduleCode");
