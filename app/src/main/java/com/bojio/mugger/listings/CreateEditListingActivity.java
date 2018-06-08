@@ -252,7 +252,9 @@ public class CreateEditListingActivity extends AppCompatActivity {
             (uidToListing);
 
           }*/
-          FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
+         if (task.getResult() != null) {
+           FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
+         }
           CreateEditListingActivity.this.finish();
         }
       }
