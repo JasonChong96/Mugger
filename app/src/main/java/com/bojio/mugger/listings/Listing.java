@@ -30,10 +30,14 @@ public class Listing implements Parcelable {
 
 
 
+  private int type;
+
+
+
   private List<String> attendees;
 
   public Listing(String uid, String ownerId, String moduleCode, long startTime, long endTime,
-                 String description, String venue, List<String> attendees) {
+                 String description, String venue, List<String> attendees, int type) {
     this.uid = uid;
     this.ownerId = ownerId;
     this.moduleCode = moduleCode;
@@ -42,6 +46,7 @@ public class Listing implements Parcelable {
     this.description = description;
     this.venue = venue;
     this.attendees = attendees;
+    this.type = type;
   }
 
   public static Listing getListingFromSnapshot(DocumentSnapshot snapshot) {
@@ -49,6 +54,10 @@ public class Listing implements Parcelable {
       return null;
     }
     Map<String, Object> data = snapshot.getData();
+    int type = 0;
+    if (snapshot.contains("type")) {
+      type = (Integer) snapshot.get("type");
+    }
     data.remove("ownerId");
     data.remove("moduleCode");
     data.remove("startTime");
@@ -56,6 +65,7 @@ public class Listing implements Parcelable {
     data.remove("description");
     data.remove("venue");
     List<String> attendeesList = new ArrayList<>(data.keySet());
+
     return new Listing(snapshot.getId(),
         (String) snapshot.get("ownerId"),
         (String) snapshot.get("moduleCode"),
@@ -63,7 +73,8 @@ public class Listing implements Parcelable {
         (long) snapshot.get("endTime"),
         (String) snapshot.get("description"),
         (String) snapshot.get("venue"),
-        attendeesList
+        attendeesList,
+        type
     );
   }
 
@@ -77,6 +88,7 @@ public class Listing implements Parcelable {
     this.venue = source.readString();
     this.attendees = new ArrayList<String>();
     source.readStringList(this.attendees);
+    this.type = source.readInt();
   }
 
   @Override
@@ -94,7 +106,7 @@ public class Listing implements Parcelable {
     dest.writeLong(endTime);
     dest.writeString(venue);
     dest.writeStringList(this.attendees);
-
+    dest.writeInt(type);
   }
 
   public String getVenue() {
@@ -163,5 +175,13 @@ public class Listing implements Parcelable {
 
   public boolean isAttending(String uid) {
     return attendees.contains(uid);
+  }
+
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int type) {
+    this.type = type;
   }
 }

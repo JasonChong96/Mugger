@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:isScrollContainer="true"
-    tools:context=".listings.CreateEditListingActivity">
+    tools:context=".profile.ProfileFragment">
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:text="@string/profile_actions"
             android:textAppearance="@android:style/TextAppearance.Holo.Medium"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -243,6 +244,15 @@
             app:layout_constraintBottom_toBottomOf="@+id/profile_plain_text_status"
             app:layout_constraintStart_toEndOf="@+id/profile_plain_text_status"
             app:layout_constraintTop_toTopOf="@+id/profile_plain_text_status" />
+
+        <Button
+            android:id="@+id/profile_button_make_ta_prof"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Make TA/Prof"
+            app:layout_constraintStart_toEndOf="@+id/profile_button_report"
+            app:layout_constraintTop_toTopOf="@+id/profile_button_report" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

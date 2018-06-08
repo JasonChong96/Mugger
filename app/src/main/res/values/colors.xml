@@ -29,5 +29,7 @@
 
     <color name="actionbar_background">#000000</color>
     <color name="actionbar_text">#ffffff</color>
-
+    <color name="ta_listing_background">#97D3CA</color>
+    <color name="own_listing_background">#EE7877</color>
+    <color name="prof_listing_background">#9EB3ED</color>
 </resources>

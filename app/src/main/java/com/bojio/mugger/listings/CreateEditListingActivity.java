@@ -1,6 +1,7 @@
 package com.bojio.mugger.listings;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,15 +21,18 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.Roles;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -69,30 +73,83 @@ public class CreateEditListingActivity extends AppCompatActivity {
   private Bundle b;
   private Listing toEdit;
   private List<String> moduleCodes;
+  private Map<String, Byte> moduleRoles;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (MuggerUser.getInstance().getData().get("useAllPastModules") == null) {
-      moduleCodes = (List<String>) MuggerUser
-          .getInstance().getData().get("moduleCodes");
-    } else {
-      moduleCodes = (List<String>) MuggerUser
-          .getInstance().getData().get("moduleCodes");
-    }
-    setContentView(R.layout.activity_make_listing);
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
+    ProgressDialog progress = new ProgressDialog(this);
+    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    progress.setTitle("Loading");
+    progress.setMessage("Wait while loading...");
+    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+    progress.show();
+    moduleCodes = new ArrayList<>();
+    moduleRoles = new HashMap<>();
+    b = this.getIntent().getExtras();
+    db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
+      if (!task.isSuccessful()) {
+        showShortToast("Error loading current semester. Please try again later.");
+        finish();
+      } else {
+        String currentSem = ((String) task.getResult().getData().get("currentSem"));
+        db.collection("users").document(mAuth.getUid()).collection("semesters").document
+            (currentSem).get().addOnCompleteListener(taskk -> {
+              if (!taskk.isSuccessful()) {
+                showShortToast("Error loading modules. Please try again later.");
+                finish();
+              } else {
+                DocumentSnapshot result = taskk.getResult();
+                if (!result.exists()) {
+                  showShortToast("Modules for this sem has not been loaded, please refresh them " +
+                      "through your settings page.");
+                  finish();
+                } else {
+                  Map<String, Object> data = result.getData();
+                  moduleCodes = new ArrayList<>();
+                  List<String> mods = (List<String>) data.get("professor");
+                  if (mods != null) {
+                    for (String mod : mods) {
+                      moduleCodes.add(mod);
+                      moduleRoles.put(mod, Roles.PROFESSOR);
+                    }
+                  }
+                  mods = (List<String>) data.get("ta");
+                  if (mods != null) {
+                    for (String mod : mods) {
+                      moduleCodes.add(mod);
+                      moduleRoles.put(mod, Roles.TEACHING_ASSISTANT);
+                    }
+                  }
+                  mods = (List<String>) data.get("moduleCodes");
+                  if (mods != null) {
+                    for (String mod : mods) {
+                      moduleCodes.add(mod);
+                      moduleRoles.put(mod, Roles.EMPTY);
+                    }
+                  }
+                  ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
+                      moduleCodes);
+                  moduleCode.setAdapter(adapter);
+                  if (b != null) {
+                    moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
+                  }
+                  progress.dismiss();
+                }
+              }
+        });
+      }
+    });
+    setContentView(R.layout.activity_make_listing);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     df = DateFormat.getDateFormat(this);
     dfTime = DateFormat.getTimeFormat(this);
-    b = this.getIntent().getExtras();
     startDateTime = Calendar.getInstance();
     endDateTime = Calendar.getInstance();
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
-        moduleCodes);
-    moduleCode.setAdapter(adapter);
+
     if (b != null) {
       setTitle("Edit Listing");
       submitButton.setText("Submit Changes");
@@ -223,6 +280,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
     data.put("moduleCode", moduleCode.getSelectedItem().toString());
     data.put("ownerId", mAuth.getCurrentUser().getUid());
     data.put("venue", venue.getText().toString());
+    data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
     data.put(mAuth.getUid(), startTimeMillis);
     if (toEdit != null) {
       for (String attendee : toEdit.getAttendees()) {

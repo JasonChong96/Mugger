@@ -45,7 +45,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".profile.ProfileActivity"></activity>
+        <activity android:name=".profile.ProfileActivity" />
+        <activity android:name=".administration.MakeTAProfActivity"></activity>
     </application>
 
 </manifest>

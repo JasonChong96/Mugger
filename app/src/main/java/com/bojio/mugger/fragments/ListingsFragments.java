@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.Roles;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingsViewHolder;
@@ -139,10 +140,20 @@ public abstract class ListingsFragments extends Fragment {
           intent.putExtras(b);
           view.getContext().startActivity(intent);
         });
+        int type = listing.getType();
         String title = listing.getModuleCode();
-        if (mAuth.getCurrentUser() != null && listing.getOwnerId().equals(mAuth.getCurrentUser()
-            .getUid())) {
+        if (listing.getOwnerId().equals(mAuth.getCurrentUser().getUid())) {
+          holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
+              (R.color.own_listing_background));
           title += " (Yours)";
+        } else if (type == Roles.PROFESSOR) {
+          holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
+              (R.color.prof_listing_background));
+          title += " (Professor)";
+        } else if (type == Roles.TEACHING_ASSISTANT) {
+          holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
+              (R.color.ta_listing_background));
+          title += " (TA)";
         }
         holder.moduleCode.setText(title);
         holder.venue.setText(listing.getVenue());

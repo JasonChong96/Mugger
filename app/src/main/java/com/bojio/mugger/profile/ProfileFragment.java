@@ -1,6 +1,7 @@
 package com.bojio.mugger.profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.MakeTAProfActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,7 +52,7 @@ public class ProfileFragment extends Fragment {
   private String profileUid;
   private FirebaseFirestore db;
   private FirebaseAuth mAuth;
-  private List<List<String>> modulesBySem;
+  private List<List<String>> modulesBySem, modulesBySem_ta, modulesBySem_prof;
   private List<String> semesters;
   private Map<String, Object> moduleTitles;
 
@@ -172,9 +174,21 @@ public class ProfileFragment extends Fragment {
     }
     semesters = new ArrayList<>();
     modulesBySem = new ArrayList<>();
+    modulesBySem_prof = new ArrayList<>();
+    modulesBySem_ta = new ArrayList<>();
     for (DocumentSnapshot snapshot : moduless) {
       semesters.add(snapshot.getId().replace(".", "/"));
       modulesBySem.add((List<String>) snapshot.get("moduleCodes"));
+      List<String> ta = (List<String>) snapshot.get("ta");
+      if (ta == null) {
+        ta = new ArrayList<>();
+      }
+      modulesBySem_ta.add(ta);
+      List<String> prof = (List<String>) snapshot.get("professor");
+      if (prof == null) {
+        prof = new ArrayList<>();
+      }
+      modulesBySem_prof.add(prof);
     }
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
         .simple_dropdown_item_1line,
@@ -184,10 +198,24 @@ public class ProfileFragment extends Fragment {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         StringBuilder sb = new StringBuilder();
+        List<String> mods_prof = modulesBySem_prof.get(position);
+        for (int i = 0; i < mods_prof.size(); i++) {
+          String mod = mods_prof.get(i);
+          sb.append("(Prof)").append(mod).append(" ").append(moduleTitles.get(mod) == null ? "" : moduleTitles.get(mod));
+          sb.append("\n");
+        }
+        List<String> mods_ta = modulesBySem_ta.get(position);
+        for (int i = 0; i < mods_ta.size(); i++) {
+          String mod = mods_ta.get(i);
+          sb.append("(TA)").append(mod).append(" ").append(moduleTitles.get(mod) == null ? "" :
+              moduleTitles.get(mod));
+          sb.append("\n");
+        }
         List<String> mods = modulesBySem.get(position);
         for (int i = 0; i < mods.size(); i++) {
           String mod = mods.get(i);
-          sb.append(mod).append(" ").append(moduleTitles.get(mod));
+          sb.append(mod).append(" ").append(moduleTitles.get(mod) == null ? "" : moduleTitles.get
+              (mod));
           if (i < mods.size() - 1) {
             // Not last make new line
             sb.append("\n");
@@ -243,6 +271,16 @@ public class ProfileFragment extends Fragment {
                 .LENGTH_SHORT).show();
           }
         });
+  }
+
+  @OnClick(R.id.profile_button_make_ta_prof)
+  void onClick_makeTAProf() {
+    Intent intent = new Intent(this.getActivity(), MakeTAProfActivity.class);
+    Bundle b = new Bundle();
+    b.putString("name", nameView.getText().toString());
+    b.putString("userUid", profileUid);
+    intent.putExtras(b);
+    getActivity().startActivity(intent);
   }
 
   @Override
