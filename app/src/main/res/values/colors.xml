@@ -23,8 +23,11 @@
 
     <!--theme colors-->
     <color name="colorShadow">#41000000</color>
-    <color name="colorBackground">#2b2b2b</color>
+    <color name="colorBackground">#bbd7ee</color>
     <color name="colorForeground">#3A3A3A</color>
     <!--fab colors-->
+
+    <color name="actionbar_background">#000000</color>
+    <color name="actionbar_text">#ffffff</color>
 
 </resources>
