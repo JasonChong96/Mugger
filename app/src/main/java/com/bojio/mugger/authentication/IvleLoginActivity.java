@@ -1,10 +1,8 @@
 package com.bojio.mugger.authentication;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Looper;
 import android.os.StrictMode;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bojio.mugger.Main2Activity;
-import com.bojio.mugger.Modules;
+import com.bojio.mugger.constants.Modules;
 import com.bojio.mugger.R;
 import com.google.android.gms.tasks.Task;
 import com.google.common.hash.Hashing;
@@ -29,13 +27,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.FutureTask;
 
 import javax.net.ssl.HttpsURLConnection;
 

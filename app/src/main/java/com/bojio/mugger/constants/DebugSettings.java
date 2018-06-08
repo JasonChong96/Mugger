@@ -1,4 +1,4 @@
-package com.bojio.mugger;
+package com.bojio.mugger.constants;
 
 public class DebugSettings {
   public static boolean NOTIFICATION_TO_SELF = true;

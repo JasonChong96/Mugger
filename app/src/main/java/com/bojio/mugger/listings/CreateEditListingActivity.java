@@ -10,7 +10,6 @@ import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -21,8 +20,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.Roles;
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.constants.Roles;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;

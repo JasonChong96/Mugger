@@ -1,4 +1,4 @@
-package com.bojio.mugger;
+package com.bojio.mugger.constants;
 
 public class Roles {
   public static byte EMPTY = 0;

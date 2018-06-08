@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.bojio.mugger.DebugSettings;
+import com.bojio.mugger.constants.DebugSettings;
 import com.bojio.mugger.R;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;

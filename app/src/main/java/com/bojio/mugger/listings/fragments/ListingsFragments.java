@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.Roles;
+import com.bojio.mugger.constants.Roles;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingsViewHolder;

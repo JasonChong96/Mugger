@@ -1,4 +1,4 @@
-package com.bojio.mugger;
+package com.bojio.mugger.constants;
 
 import java.util.HashSet;
 import java.util.LinkedList;

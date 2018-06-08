@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.bojio.mugger.authentication.GoogleLoginActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.profile.ProfileActivity;
+import com.bojio.mugger.constants.DebugSettings;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
