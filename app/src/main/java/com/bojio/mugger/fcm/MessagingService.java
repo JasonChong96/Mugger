@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,6 +28,7 @@ public class MessagingService extends FirebaseMessagingService {
 
   private static final String TAG = "MessagingService";
   private static AtomicInteger notificationId = new AtomicInteger(0);
+  private static Map<String, Integer> chatToId = new HashMap<>();
   @Override
   public void onMessageReceived(RemoteMessage remoteMessage) {
     // [START_EXCLUDE]
@@ -97,7 +99,11 @@ public class MessagingService extends FirebaseMessagingService {
    * @param data FCM data received.
    */
   private void sendNotification(Map<String, String> data) {
-    int id = notificationId.getAndIncrement();
+    String listingUid = data.get("listingUid");
+    if (!chatToId.containsKey(listingUid)) {
+      chatToId.put(listingUid, notificationId.getAndIncrement());
+    }
+    int id = chatToId.get(listingUid);
     String messageBody = data.get("body");
     String messageTitle = data.get("title");
     Intent intent = new Intent(this, ListingChatActivity.class);
@@ -110,15 +116,6 @@ public class MessagingService extends FirebaseMessagingService {
 
     String channelId = "aaa";
     Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-    NotificationCompat.Builder groupBuilder =
-        new NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(messageTitle)
-            .setContentText(messageBody)
-            .setGroupSummary(true)
-            .setGroup(data.get("listingUid"))
-            .setStyle(new NotificationCompat.BigTextStyle().bigText("a"))
-            .setContentIntent(pendingIntent);
     NotificationCompat.Builder notificationBuilder =
         new NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -140,7 +137,6 @@ public class MessagingService extends FirebaseMessagingService {
           NotificationManager.IMPORTANCE_DEFAULT);
       notificationManager.createNotificationChannel(channel);
     }
-    notificationManager.notify(id /* ID of notification */, groupBuilder.build());
     notificationManager.notify(id /* ID of notification */, notificationBuilder.build());
   }
 }
