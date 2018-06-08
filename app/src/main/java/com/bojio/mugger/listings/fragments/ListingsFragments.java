@@ -1,4 +1,4 @@
-package com.bojio.mugger.fragments;
+package com.bojio.mugger.listings.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,12 +24,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

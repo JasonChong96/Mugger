@@ -1,4 +1,4 @@
-package com.bojio.mugger.fragments;
+package com.bojio.mugger.listings.fragments;
 
 import android.os.Bundle;
 

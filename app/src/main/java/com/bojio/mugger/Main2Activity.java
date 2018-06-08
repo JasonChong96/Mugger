@@ -19,10 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.fragments.AttendingListingsFragments;
-import com.bojio.mugger.fragments.AvailableListingsFragments;
-import com.bojio.mugger.fragments.ListingsFragments;
-import com.bojio.mugger.fragments.MyListingsFragments;
+import com.bojio.mugger.listings.fragments.AttendingListingsFragments;
+import com.bojio.mugger.listings.fragments.AvailableListingsFragments;
+import com.bojio.mugger.listings.fragments.ListingsFragments;
+import com.bojio.mugger.listings.fragments.MyListingsFragments;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileFragment;
@@ -34,7 +34,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 

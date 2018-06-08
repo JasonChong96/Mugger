@@ -1,8 +1,6 @@
-package com.bojio.mugger.fragments;
+package com.bojio.mugger.listings.fragments;
 
 import android.os.Bundle;
-
-import com.google.firebase.firestore.Query;
 
 /**
  * A fragment representing a list of Items.
