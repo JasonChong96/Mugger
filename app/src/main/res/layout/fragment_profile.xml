@@ -13,6 +13,8 @@
         android:id="@+id/profile_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         tools:context=".profile.ProfileFragment">
 
         <ProgressBar
@@ -189,7 +191,7 @@
             android:layout_marginTop="8dp"
             android:hint="@string/profile_status_hint"
             android:textAppearance="@android:style/TextAppearance.Holo.Small"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintStart_toStartOf="@+id/profile_text_view_status_title"
             app:layout_constraintTop_toBottomOf="@+id/profile_text_view_status_title" />
 
@@ -229,6 +231,17 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profile_text_view_name" />
+
+        <Button
+            android:id="@+id/profile_button_update_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Update Status"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/profile_plain_text_status"
+            app:layout_constraintStart_toEndOf="@+id/profile_plain_text_status"
+            app:layout_constraintTop_toTopOf="@+id/profile_plain_text_status" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

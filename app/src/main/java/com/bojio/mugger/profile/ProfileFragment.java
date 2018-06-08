@@ -5,11 +5,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,6 +36,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,6 +98,9 @@ public class ProfileFragment extends Fragment {
 
   @BindView(R.id.divider4)
   View divider4;
+
+  @BindView(R.id.profile_button_update_status)
+  Button updateStatusButton;
 
 
   private OnProfileFragmentInteractionListener mListener;
@@ -219,6 +225,23 @@ public class ProfileFragment extends Fragment {
     if (mListener != null) {
       mListener.onProfileFragmentInteraction(uri);
     }
+  }
+
+  @OnClick(R.id.profile_button_update_status)
+  void onClick_updateStatus() {
+    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context
+        .INPUT_METHOD_SERVICE);
+    imm.hideSoftInputFromWindow(this.getView().getWindowToken(), 0);
+    db.collection("users").document(profileUid).update("status", editStatusView.getText()
+        .toString())
+        .addOnCompleteListener(task -> {
+          if (!task.isSuccessful()) {
+            Snackbar.make(this.getView(), "Error updating status.", Snackbar.LENGTH_SHORT).show();
+          } else {
+            Snackbar.make(this.getView(), "Your status has been updated successfully", Snackbar
+                .LENGTH_SHORT).show();
+          }
+        });
   }
 
   @Override
