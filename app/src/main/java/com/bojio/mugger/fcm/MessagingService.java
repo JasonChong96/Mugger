@@ -114,7 +114,7 @@ public class MessagingService extends FirebaseMessagingService {
         new NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(messageTitle)
-            .setContentText("a")
+            .setContentText(messageBody)
             .setGroupSummary(true)
             .setGroup(data.get("listingUid"))
             .setStyle(new NotificationCompat.BigTextStyle().bigText("a"))
