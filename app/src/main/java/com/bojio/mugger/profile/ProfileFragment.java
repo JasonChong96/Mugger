@@ -214,6 +214,7 @@ public class ProfileFragment extends Fragment {
           .BOTTOM,8);
       constraintSet.applyTo(layout);
       editStatusView.setText((String) profileData.get("status"));
+      updateStatusButton.setVisibility(View.VISIBLE);
     } else {
       statusView.setText((String) profileData.get("status"));
     }
