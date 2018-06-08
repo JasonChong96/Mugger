@@ -86,9 +86,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
         progress.dismiss();
       }
     });
-    StringBuilder sb = new StringBuilder("Promote ");
-    sb.append(b.getString("name")).append(" to: ");
-    titleView.setText(sb.toString());
+    titleView.setText(b.getString("name"));
     radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(RadioGroup group, int checkedId) {
