@@ -3,6 +3,7 @@ package com.bojio.mugger.listings.chat;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.icu.text.TimeZoneFormat;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -130,6 +132,7 @@ public class ListingChatActivity extends AppCompatActivity {
 
   private long getDayTimestamp(long timestamp) {
     Calendar calendar = Calendar.getInstance();
+    calendar.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
     calendar.setTimeInMillis(timestamp);
     calendar.set(Calendar.MILLISECOND, 0);
     calendar.set(Calendar.HOUR_OF_DAY, 0);

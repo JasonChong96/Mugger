@@ -20,12 +20,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.constants.Roles;
+import com.bojio.mugger.constants.ModuleRoles;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -111,21 +112,21 @@ public class CreateEditListingActivity extends AppCompatActivity {
                   if (mods != null) {
                     for (String mod : mods) {
                       moduleCodes.add(mod);
-                      moduleRoles.put(mod, Roles.PROFESSOR);
+                      moduleRoles.put(mod, ModuleRoles.PROFESSOR);
                     }
                   }
                   mods = (List<String>) data.get("ta");
                   if (mods != null) {
                     for (String mod : mods) {
                       moduleCodes.add(mod);
-                      moduleRoles.put(mod, Roles.TEACHING_ASSISTANT);
+                      moduleRoles.put(mod, ModuleRoles.TEACHING_ASSISTANT);
                     }
                   }
                   mods = (List<String>) data.get("moduleCodes");
                   if (mods != null) {
                     for (String mod : mods) {
                       moduleCodes.add(mod);
-                      moduleRoles.put(mod, Roles.EMPTY);
+                      moduleRoles.put(mod, ModuleRoles.EMPTY);
                     }
                   }
                   ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
@@ -280,10 +281,12 @@ public class CreateEditListingActivity extends AppCompatActivity {
     data.put("venue", venue.getText().toString());
     data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
     data.put(mAuth.getUid(), startTimeMillis);
+    data.put(moduleCode.getSelectedItem().toString(), startTimeMillis);
     if (toEdit != null) {
       for (String attendee : toEdit.getAttendees()) {
         data.put(attendee, startTimeMillis);
       }
+      data.put(toEdit.getModuleCode(), FieldValue.delete());
     }
     Task<?> addedDocRef;
     if (b == null) {

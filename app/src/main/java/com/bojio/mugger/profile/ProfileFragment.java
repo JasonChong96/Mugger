@@ -17,13 +17,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
+import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.constants.MuggerRole;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,8 +66,8 @@ public class ProfileFragment extends Fragment {
   @BindView(R.id.profile_text_view_email)
   TextView emailView;
 
-  @BindView(R.id.profile_text_view_sex)
-  TextView sexView;
+  @BindView(R.id.profile_image_view_sex)
+  ImageView sexView;
 
   @BindView(R.id.profile_text_view_faculty)
   TextView facultyView;
@@ -92,8 +96,14 @@ public class ProfileFragment extends Fragment {
   @BindView(R.id.profile_button_view_reports)
   Button viewReportsButton;
 
+  @BindView(R.id.profile_button_make_ta_prof)
+  Button makeTAProfButton;
+
   @BindView(R.id.profile_button_ban)
-  Button ban;
+  Button banButton;
+
+  @BindView(R.id.profile_button_change_mugger_role)
+  Button changeRoleButton;
 
   @BindView(R.id.progressBar7)
   ProgressBar progressBar;
@@ -163,7 +173,9 @@ public class ProfileFragment extends Fragment {
     nameView.setText((String) profileData.get("displayName"));
 
     emailView.setText((String) profileData.get("email"));
-    sexView.setText((String) profileData.get("sex"));
+    if (((String) profileData.get("sex")).equals("Female")) {
+      sexView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.gender_female));
+    }
     facultyView.setText((String) profileData.get("faculty"));
     firstMajorView.setText((String) profileData.get("firstMajor"));
     String secondMajor = (String) profileData.get("secondMajor");
@@ -245,6 +257,27 @@ public class ProfileFragment extends Fragment {
       updateStatusButton.setVisibility(View.VISIBLE);
     } else {
       statusView.setText((String) profileData.get("status"));
+    }
+    MuggerRole ownRole = MuggerUser.getInstance().getRole();
+    MuggerRole profileRole = MuggerRole.getByRoleId((Long) profileData.get("roleId"));
+    if (MuggerRole.ADMIN.check(ownRole)) {
+      makeTAProfButton.setVisibility(View.VISIBLE);
+      if (!profileUid.equals(mAuth.getUid()) && ownRole.checkSuperiorityTo(profileRole)) {
+        changeRoleButton.setVisibility(View.VISIBLE);
+        changeRoleButton.setOnClickListener(view -> {
+          Intent intent = new Intent(this.getActivity(), ChangeMuggerRoleActivity.class);
+          Bundle b = new Bundle();
+          b.putString("uid", profileUid);
+          b.putInt("currentRole", profileRole.getRoleId());
+          intent.putExtras(b);
+          getActivity().startActivity(intent);
+          getActivity().finish();
+        });
+      }
+    }
+    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+      viewReportsButton.setVisibility(View.VISIBLE);
+      banButton.setVisibility(View.VISIBLE);
     }
     progressBar.setVisibility(View.GONE);
   }

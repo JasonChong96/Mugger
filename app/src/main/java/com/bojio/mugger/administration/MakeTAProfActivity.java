@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.constants.Roles;
+import com.bojio.mugger.constants.ModuleRoles;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -90,13 +90,13 @@ public class MakeTAProfActivity extends AppCompatActivity {
       public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch(checkedId) {
           case R.id.make_ta_prof_radio_prof:
-            newRole = Roles.PROFESSOR;
+            newRole = ModuleRoles.PROFESSOR;
             break;
           case R.id.make_ta_prof_radio_ta:
-            newRole = Roles.TEACHING_ASSISTANT;
+            newRole = ModuleRoles.TEACHING_ASSISTANT;
             break;
           case R.id.make_ta_prof_radio_remove:
-            newRole = Roles.REMOVE;
+            newRole = ModuleRoles.REMOVE;
             break;
         }
       }
@@ -108,7 +108,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
     String module = editTextModule.getText().toString();
     if (module.isEmpty()) {
       Toast.makeText(this, "Please fill in a module code.", Toast.LENGTH_SHORT).show();
-    } else if (newRole == Roles.EMPTY) {
+    } else if (newRole == ModuleRoles.EMPTY) {
       Toast.makeText(this, "Please choose a role.", Toast.LENGTH_SHORT).show();
     } else {
       ProgressDialog progress = new ProgressDialog(this);
@@ -117,8 +117,8 @@ public class MakeTAProfActivity extends AppCompatActivity {
       progress.setMessage("Wait while loading...");
       progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
       progress.show();
-      Boolean remove = newRole == Roles.REMOVE;
-      String role = newRole == Roles.PROFESSOR ? "professor" : "ta";
+      Boolean remove = newRole == ModuleRoles.REMOVE;
+      String role = newRole == ModuleRoles.PROFESSOR ? "professor" : "ta";
       DocumentReference docRef = db.collection("users").document(userUid).collection("semesters")
           .document(semesterView.getText().toString().replace("/", "."));
       docRef.get().addOnCompleteListener(task -> {

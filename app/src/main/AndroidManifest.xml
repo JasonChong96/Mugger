@@ -48,7 +48,8 @@
         </service>
 
         <activity android:name=".profile.ProfileActivity" />
-        <activity android:name=".administration.MakeTAProfActivity"></activity>
+        <activity android:name=".administration.MakeTAProfActivity" />
+        <activity android:name=".administration.ChangeMuggerRoleActivity"></activity>
     </application>
 
 </manifest>

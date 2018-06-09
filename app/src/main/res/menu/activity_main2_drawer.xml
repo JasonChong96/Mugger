@@ -7,14 +7,14 @@
             android:id="@+id/nav_available_listings"
             android:title="Available Listings" />
         <item
-            android:id="@+id/nav_profile"
-            android:title="My Profile" />
-        <item
             android:id="@+id/nav_joining_listings"
             android:title="Listings I'm Joining" />
         <item
             android:id="@+id/nav_my_listings"
             android:title="My Listings" />
+        <item
+            android:id="@+id/nav_profile"
+            android:title="My Profile" />
     </group>
 
     <item android:title="Actions">

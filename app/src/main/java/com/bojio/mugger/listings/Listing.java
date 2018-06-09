@@ -36,8 +36,8 @@ public class Listing implements Parcelable {
 
   private List<String> attendees;
 
-  public Listing(String uid, String ownerId, String moduleCode, long startTime, long endTime,
-                 String description, String venue, List<String> attendees, int type) {
+  private Listing(String uid, String ownerId, String moduleCode, long startTime, long endTime,
+                  String description, String venue, List<String> attendees, int type) {
     this.uid = uid;
     this.ownerId = ownerId;
     this.moduleCode = moduleCode;
@@ -64,6 +64,8 @@ public class Listing implements Parcelable {
     data.remove("endTime");
     data.remove("description");
     data.remove("venue");
+    data.remove("type");
+    data.remove((String) snapshot.get("moduleCode"));
     List<String> attendeesList = new ArrayList<>(data.keySet());
 
     return new Listing(snapshot.getId(),

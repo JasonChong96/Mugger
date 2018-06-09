@@ -209,6 +209,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.VISIBLE);
         ft.commit();
+        setTitle("Listings");
         break;
       case R.id.nav_my_listings:
         fragment = new MyListingsFragments();
@@ -216,6 +217,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.VISIBLE);
         ft.commit();
+        setTitle("My Listings");
         break;
       case R.id.nav_joining_listings:
         fragment = new AttendingListingsFragments();
@@ -223,6 +225,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.GONE);
         ft.commit();
+        setTitle("Listings That I'm Joining");
         break;
       case R.id.nav_profile:
         fragment = ProfileFragment.newInstance(mAuth.getCurrentUser().getUid());
@@ -230,6 +233,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.GONE);
         ft.commit();
+        setTitle("My Profile");
         break;
       default:
         break;

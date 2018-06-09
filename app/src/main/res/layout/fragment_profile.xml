@@ -17,6 +17,38 @@
         android:focusableInTouchMode="true"
         tools:context=".profile.ProfileFragment">
 
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/profile_text_view_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/profile_image_view_sex"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/gender_male"
+                app:layout_constraintBottom_toBottomOf="@+id/profile_text_view_name"
+                app:layout_constraintStart_toEndOf="@+id/profile_text_view_name"
+                app:layout_constraintTop_toTopOf="@+id/profile_text_view_name" />
+        </android.support.constraint.ConstraintLayout>
+
         <ProgressBar
             android:id="@+id/progressBar7"
             style="?android:attr/progressBarStyleLarge"
@@ -38,6 +70,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/profile_actions"
             android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider4" />
@@ -47,55 +80,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textSize="18sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profile_text_view_faculty" />
 
         <TextView
             android:id="@+id/profile_text_view_second_major"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_marginTop="8dp"
-            android:textSize="18sp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_first_major" />
-
-        <TextView
-            android:id="@+id/profile_text_view_name"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@android:style/TextAppearance.Holo.Large"
-            android:textSize="30sp"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/profile_text_view_sex"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_email" />
+            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_first_major" />
 
         <TextView
             android:id="@+id/profile_text_view_faculty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textSize="18sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_sex" />
+            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_email" />
 
         <View
             android:id="@+id/divider2"
@@ -144,6 +155,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/profile_modules_heading"
             android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider2" />
@@ -155,6 +167,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/profile_status_heading"
             android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/profile_text_view_modules"
             app:layout_constraintTop_toBottomOf="@+id/divider3" />
@@ -211,6 +224,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@string/profile_ban"
+            android:visibility="gone"
             app:layout_constraintStart_toEndOf="@+id/profile_button_view_reports"
             app:layout_constraintTop_toTopOf="@+id/profile_button_view_reports" />
 
@@ -220,6 +234,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/profile_view_reports"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/profile_button_report"
             app:layout_constraintTop_toBottomOf="@+id/profile_button_report" />
 
@@ -231,7 +246,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_name" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
         <Button
             android:id="@+id/profile_button_update_status"
@@ -251,8 +266,21 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Make TA/Prof"
+            android:visibility="gone"
             app:layout_constraintStart_toEndOf="@+id/profile_button_report"
             app:layout_constraintTop_toTopOf="@+id/profile_button_report" />
+
+        <Button
+            android:id="@+id/profile_button_change_mugger_role"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Change Mugger Role"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/profile_button_view_reports"
+            app:layout_constraintTop_toBottomOf="@+id/profile_button_view_reports" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
