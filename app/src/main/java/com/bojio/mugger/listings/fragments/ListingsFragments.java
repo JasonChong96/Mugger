@@ -129,6 +129,9 @@ public abstract class ListingsFragments extends Fragment {
     FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Listing, ListingsViewHolder>(options) {
       @Override
       public void onBindViewHolder(ListingsViewHolder holder, int position, Listing listing) {
+        if (mAuth.getCurrentUser()== null) {
+          return;
+        }
         holder.itemView.setOnClickListener((view) -> {
           Intent intent = new Intent(view.getContext(), AvailableListingDetailsActivity.class);
           Bundle b = new Bundle();
@@ -136,12 +139,15 @@ public abstract class ListingsFragments extends Fragment {
           intent.putExtras(b);
           view.getContext().startActivity(intent);
         });
+
         int type = listing.getType();
         String title = listing.getModuleCode();
         if (listing.isAttending(mAuth.getCurrentUser().getUid())) {
           holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
               (R.color.own_listing_background));
-          title += " (Yours)";
+          if (listing.getOwnerId().equals(mAuth.getCurrentUser().getUid())) {
+            title += " (Yours)";
+          }
         } else if (type == ModuleRoles.PROFESSOR) {
           holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
               (R.color.prof_listing_background));

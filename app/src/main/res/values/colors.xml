@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#4A849F</color>
+    <color name="colorPrimaryDark">#1B3440</color>
     <color name="colorAccent">#FF4081</color>
     <!--system colors-->
     <color name="colorAccentPressed">#eaa60c</color>
@@ -23,13 +23,13 @@
 
     <!--theme colors-->
     <color name="colorShadow">#41000000</color>
-    <color name="colorBackground">#bbd7ee</color>
+    <color name="colorBackground">#B4D6C6</color>
     <color name="colorForeground">#3A3A3A</color>
     <!--fab colors-->
 
     <color name="actionbar_background">#000000</color>
     <color name="actionbar_text">#ffffff</color>
     <color name="ta_listing_background">#97D3CA</color>
-    <color name="own_listing_background">#EE7877</color>
+    <color name="own_listing_background">#F2845C</color>
     <color name="prof_listing_background">#9EB3ED</color>
 </resources>
