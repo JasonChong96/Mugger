@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,8 +12,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRoles;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.Listing;
@@ -25,6 +31,7 @@ import com.google.firebase.firestore.Query;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -42,6 +49,12 @@ public abstract class ListingsFragments extends Fragment {
 
   @BindView(R.id.list)
   RecyclerView mRecyclerView;
+
+  @BindView(R.id.listings_fragments_spinner)
+  Spinner spinner;
+
+  @BindView(R.id.listings_fragments_constraint_layout_2)
+  ConstraintLayout constraintLayout2;
 
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseAuth mAuth;
@@ -79,22 +92,18 @@ public abstract class ListingsFragments extends Fragment {
 
     View view = inflater.inflate(R.layout.fragment_available_listings, container, false);
     ButterKnife.bind(this, view);
-    // Set the adapter
 
-    if (view instanceof RecyclerView) {
+
       Context context = view.getContext();
-      RecyclerView recyclerView = (RecyclerView) view;
       if (mColumnCount <= 1) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
       } else {
-        recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
       }
-    }
 
     initListings();
     return view;
   }
-
 
   @Override
   public void onAttach(Context context) {
@@ -113,10 +122,7 @@ public abstract class ListingsFragments extends Fragment {
     mListener = null;
   }
 
-  private void initListings() {
-
-
-
+  protected void initListings() {
     FirestoreRecyclerOptions<Listing> options = new FirestoreRecyclerOptions.Builder<Listing>()
         .setQuery(mQuery, snapshot -> {
           if ((Long) snapshot.get("endTime") < System.currentTimeMillis()) {
@@ -147,6 +153,8 @@ public abstract class ListingsFragments extends Fragment {
               (R.color.own_listing_background));
           if (listing.getOwnerId().equals(mAuth.getCurrentUser().getUid())) {
             title += " (Yours)";
+          } else {
+            title += " (Attending)";
           }
         } else if (type == ModuleRoles.PROFESSOR) {
           holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
@@ -191,8 +199,9 @@ public abstract class ListingsFragments extends Fragment {
         return new ListingsViewHolder(view);
       }
     };
-    mRecyclerView.setAdapter(adapter);
     adapter.startListening();
+    mRecyclerView.setAdapter(adapter);
+
   }
 
   /**

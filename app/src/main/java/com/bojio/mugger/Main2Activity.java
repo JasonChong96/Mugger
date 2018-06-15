@@ -19,12 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.listings.CreateEditListingActivity;
+import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.fragments.AttendingListingsFragments;
 import com.bojio.mugger.listings.fragments.AvailableListingsFragments;
 import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.bojio.mugger.listings.fragments.MyListingsFragments;
-import com.bojio.mugger.listings.CreateEditListingActivity;
-import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;

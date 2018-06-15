@@ -8,10 +8,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.bojio.mugger.constants.DebugSettings;
 import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
+import com.bojio.mugger.constants.DebugSettings;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;

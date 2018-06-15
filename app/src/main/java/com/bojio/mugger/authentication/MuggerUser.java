@@ -1,6 +1,7 @@
 package com.bojio.mugger.authentication;
 
 import com.bojio.mugger.constants.MuggerRole;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 public class MuggerUser {
   private static MuggerUser user;
   private MuggerRole role;
+  private QuerySnapshot modules;
 
   public void setData(Map<String, Object> data) {
     this.data = data;

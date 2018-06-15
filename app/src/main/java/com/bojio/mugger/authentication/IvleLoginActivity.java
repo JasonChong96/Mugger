@@ -1,10 +1,10 @@
 package com.bojio.mugger.authentication;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Looper;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -12,8 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bojio.mugger.Main2Activity;
-import com.bojio.mugger.constants.Modules;
 import com.bojio.mugger.R;
+import com.bojio.mugger.constants.Modules;
 import com.google.android.gms.tasks.Task;
 import com.google.common.hash.Hashing;
 import com.google.firebase.auth.FirebaseAuth;
