@@ -34,8 +34,8 @@ public class AvailableListingsFragments extends ListingsFragments {
                            Bundle savedInstanceState) {
     View view = super.onCreateView(inflater, container, savedInstanceState);
     constraintLayout2.setVisibility(View.VISIBLE);
-    List<String> modules = new ArrayList<>((List<String>) MuggerUser.getInstance().getData().get
-        ("moduleCodes"));
+    List<String> modules = new ArrayList<>(MuggerUser.getInstance().getModules().firstEntry()
+        .getValue().keySet());
     modules.add(0, "Show all modules");
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
         .simple_dropdown_item_1line, modules);

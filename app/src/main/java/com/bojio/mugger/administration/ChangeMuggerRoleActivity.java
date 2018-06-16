@@ -1,6 +1,6 @@
 package com.bojio.mugger.administration;
 
-import android.app.ProgressDialog;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
@@ -22,6 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
 
 public class ChangeMuggerRoleActivity extends AppCompatActivity {
 
@@ -65,16 +66,17 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
 
   @OnClick(R.id.change_role_submit)
   void onClick_submit() {
-    ProgressDialog progress = new ProgressDialog(this);
-    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-    progress.setTitle("Loading");
-    progress.setMessage("Wait while loading...");
-    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-    progress.show();
+    AlertDialog dialog = new SpotsDialog
+        .Builder()
+        .setContext(this)
+        .setMessage("Changing role...")
+        .setCancelable(false)
+        .build();
+    dialog.show();
     FirebaseFirestore.getInstance().collection("users").document(uid).update("roleId",
         MuggerRole.valueOf((String) spinner.getSelectedItem()).getRoleId()).addOnCompleteListener
         (task -> {
-          progress.dismiss();
+          dialog.dismiss();
           if (!task.isSuccessful()) {
             Snackbar.make(layout, "Failed to update, please try again.", Snackbar.LENGTH_SHORT)
                 .show();

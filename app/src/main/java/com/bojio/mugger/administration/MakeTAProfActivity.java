@@ -1,6 +1,6 @@
 package com.bojio.mugger.administration;
 
-import android.app.ProgressDialog;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.constants.ModuleRoles;
+import com.bojio.mugger.constants.ModuleRole;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -26,6 +26,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
 
 public class MakeTAProfActivity extends AppCompatActivity {
 
@@ -61,12 +62,13 @@ public class MakeTAProfActivity extends AppCompatActivity {
     setContentView(R.layout.activity_make_taprof);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    ProgressDialog progress = new ProgressDialog(this);
-    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-    progress.setTitle("Loading");
-    progress.setMessage("Wait while loading...");
-    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-    progress.show();
+    AlertDialog dialog = new SpotsDialog
+        .Builder()
+        .setContext(this)
+        .setMessage("Fetching current semester...")
+        .setCancelable(false)
+        .build();
+    dialog.show();
     Bundle b = getIntent().getExtras();
     if (b == null) {
       Toast.makeText(this, "Error: Missing user data", Toast.LENGTH_SHORT).show();
@@ -81,7 +83,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
         finish();
       } else {
         semesterView.setText(((String) task.getResult().get("currentSem")).replace(".", "/"));
-        progress.dismiss();
+        dialog.dismiss();
       }
     });
     titleView.setText(b.getString("name"));
@@ -90,13 +92,13 @@ public class MakeTAProfActivity extends AppCompatActivity {
       public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch(checkedId) {
           case R.id.make_ta_prof_radio_prof:
-            newRole = ModuleRoles.PROFESSOR;
+            newRole = ModuleRole.PROFESSOR;
             break;
           case R.id.make_ta_prof_radio_ta:
-            newRole = ModuleRoles.TEACHING_ASSISTANT;
+            newRole = ModuleRole.TEACHING_ASSISTANT;
             break;
           case R.id.make_ta_prof_radio_remove:
-            newRole = ModuleRoles.REMOVE;
+            newRole = ModuleRole.REMOVE;
             break;
         }
       }
@@ -108,22 +110,23 @@ public class MakeTAProfActivity extends AppCompatActivity {
     String module = editTextModule.getText().toString();
     if (module.isEmpty()) {
       Toast.makeText(this, "Please fill in a module code.", Toast.LENGTH_SHORT).show();
-    } else if (newRole == ModuleRoles.EMPTY) {
+    } else if (newRole == ModuleRole.EMPTY) {
       Toast.makeText(this, "Please choose a role.", Toast.LENGTH_SHORT).show();
     } else {
-      ProgressDialog progress = new ProgressDialog(this);
-      progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-      progress.setTitle("Loading");
-      progress.setMessage("Wait while loading...");
-      progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-      progress.show();
-      Boolean remove = newRole == ModuleRoles.REMOVE;
-      String role = newRole == ModuleRoles.PROFESSOR ? "professor" : "ta";
+      AlertDialog dialog = new SpotsDialog
+          .Builder()
+          .setContext(this)
+          .setMessage("Changing role...")
+          .setCancelable(false)
+          .build();
+      dialog.show();
+      Boolean remove = newRole == ModuleRole.REMOVE;
+      String role = newRole == ModuleRole.PROFESSOR ? "professor" : "ta";
       DocumentReference docRef = db.collection("users").document(userUid).collection("semesters")
           .document(semesterView.getText().toString().replace("/", "."));
       docRef.get().addOnCompleteListener(task -> {
         if (!task.isSuccessful()) {
-          progress.dismiss();
+          dialog.dismiss();
           Toast.makeText(this, "Error, please try again", Toast.LENGTH_SHORT).show();
         } else {
           if (!remove) {
@@ -138,7 +141,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
             Map<String, Object> data = new HashMap<>();
             data.put(role, existing);
             docRef.set(data, SetOptions.merge()).addOnCompleteListener(taskk -> {
-              progress.dismiss();
+              dialog.dismiss();
               if (!taskk.isSuccessful()) {
                 Toast.makeText(this, "Error, please try again", Toast.LENGTH_SHORT).show();
               } else {
@@ -163,7 +166,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
               }
             }
             docRef.set(data, SetOptions.merge()).addOnCompleteListener(taskk -> {
-              progress.dismiss();
+              dialog.dismiss();
               if (!taskk.isSuccessful()) {
                 Toast.makeText(this, "Error, please try again", Toast.LENGTH_SHORT).show();
               } else {

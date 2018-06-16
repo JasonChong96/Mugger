@@ -29,6 +29,9 @@ public class Listing implements Parcelable {
   private String venue;
 
 
+  private String ownerName;
+
+
 
   private int type;
 
@@ -36,9 +39,11 @@ public class Listing implements Parcelable {
 
   private List<String> attendees;
 
-  private Listing(String uid, String ownerId, String moduleCode, long startTime, long endTime,
-                  String description, String venue, List<String> attendees, int type) {
+  private Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
+                  long endTime, String description, String venue, List<String> attendees, int type)
+  {
     this.uid = uid;
+    this.ownerName = ownerName;
     this.ownerId = ownerId;
     this.moduleCode = moduleCode;
     this.startTime = startTime;
@@ -65,10 +70,12 @@ public class Listing implements Parcelable {
     data.remove("description");
     data.remove("venue");
     data.remove("type");
+    data.remove("ownerName");
     data.remove((String) snapshot.get("moduleCode"));
     List<String> attendeesList = new ArrayList<>(data.keySet());
 
     return new Listing(snapshot.getId(),
+        (String) snapshot.get("ownerName"),
         (String) snapshot.get("ownerId"),
         (String) snapshot.get("moduleCode"),
         (long) snapshot.get("startTime"),
@@ -82,6 +89,7 @@ public class Listing implements Parcelable {
 
   private Listing(Parcel source) {
     this.uid = source.readString();
+    this.ownerName = source.readString();
     this.ownerId = source.readString();
     this.moduleCode = source.readString();
     this.description = source.readString();
@@ -101,6 +109,7 @@ public class Listing implements Parcelable {
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(uid);
+    dest.writeString(ownerName);
     dest.writeString(ownerId);
     dest.writeString(moduleCode);
     dest.writeString(description);
@@ -186,4 +195,13 @@ public class Listing implements Parcelable {
   public void setType(int type) {
     this.type = type;
   }
+
+  public String getOwnerName() {
+    return ownerName;
+  }
+
+  public void setOwnerName(String ownerName) {
+    this.ownerName = ownerName;
+  }
+
 }

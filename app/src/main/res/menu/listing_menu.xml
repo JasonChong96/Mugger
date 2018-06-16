@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/edit_listing"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="Edit"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_baseline_create_24px"
+        app:showAsAction="always"
+        android:title="Edit" />
     <item
         android:id="@+id/delete_listing"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="Delete"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_baseline_delete_24px"
+        app:showAsAction="ifRoom"
+        android:title="Delete" />
 </menu>

@@ -1,5 +1,6 @@
 package com.bojio.mugger.authentication;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -36,6 +37,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 import needle.Needle;
 
 public class IvleLoginActivity extends AppCompatActivity {
@@ -64,7 +66,13 @@ public class IvleLoginActivity extends AppCompatActivity {
         if (url.startsWith("https://ivle.nus.edu.sg/api/login/muggerapp.com?token=")) {
           webView.setVisibility(View.GONE);
           Needle.onMainThread().execute(() -> {
-                progressBar.setVisibility(View.VISIBLE);
+            AlertDialog dialog = new SpotsDialog
+                .Builder()
+                .setContext(IvleLoginActivity.this)
+                .setMessage("Loading data from IVLE...")
+                .setCancelable(false)
+                .build();
+            dialog.show();
            // Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
           //      .LENGTH_SHORT).show();
               });

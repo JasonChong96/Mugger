@@ -2,6 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
+    <item android:title="Browse Listings">
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_available_listings"
@@ -12,11 +13,15 @@
         <item
             android:id="@+id/nav_my_listings"
             android:title="My Listings" />
-        <item
-            android:id="@+id/nav_profile"
-            android:title="My Profile" />
     </group>
-
+    </item>
+    <item android:title="Community">
+        <menu>
+            <item
+                android:id="@+id/nav_profile"
+                android:title="My Profile" />
+        </menu>
+    </item>
     <item android:title="Actions">
         <menu>
             <item

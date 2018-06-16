@@ -12,11 +12,15 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.DebugSettings;
+import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -29,6 +33,9 @@ public class MessagingService extends FirebaseMessagingService {
   private static final String TAG = "MessagingService";
   private static AtomicInteger notificationId = new AtomicInteger(0);
   private static Map<String, Integer> chatToId = new HashMap<>();
+  public static String CHAT_NOTIFICATION = "chat";
+  public static String DELETED_NOTIFICATION = "delete";
+  public static String CREATED_NOTIFICATION = "create";
   @Override
   public void onMessageReceived(RemoteMessage remoteMessage) {
     // [START_EXCLUDE]
@@ -100,19 +107,44 @@ public class MessagingService extends FirebaseMessagingService {
    */
   private void sendNotification(Map<String, String> data) {
     String listingUid = data.get("listingUid");
+    String type = data.get("type");
+    Map<String, Object> cache = MuggerUser.getInstance().getData();
+    if (cache == null) {
+      return;
+    } else if (type.equals(CHAT_NOTIFICATION) && cache.get(CHAT_NOTIFICATION) != null && ((Long)
+        cache.get(CHAT_NOTIFICATION)).equals(Long.valueOf(0))) {
+      return;
+    } else if (type.equals(CREATED_NOTIFICATION) && cache.get(CREATED_NOTIFICATION) != null && ((Long)
+        cache.get(CREATED_NOTIFICATION)).equals(Long.valueOf(0))) {
+      return;
+    } else if (type.equals(DELETED_NOTIFICATION) && cache.get(DELETED_NOTIFICATION) != null && ((Long)
+        cache.get(DELETED_NOTIFICATION)).equals(Long.valueOf(0))) {
+      return;
+    }
     if (!chatToId.containsKey(listingUid)) {
       chatToId.put(listingUid, notificationId.getAndIncrement());
     }
     int id = chatToId.get(listingUid);
     String messageBody = data.get("body");
     String messageTitle = data.get("title");
-    Intent intent = new Intent(this, ListingChatActivity.class);
-    Bundle b = new Bundle();
-    b.putString("listingUid", data.get("listingUid"));
-    intent.putExtras(b);
+    Intent intent;
+    if (data.get("type").equals(MessagingService.CHAT_NOTIFICATION)) {
+      intent = new Intent(this, ListingChatActivity.class);
+      Bundle b = new Bundle();
+      b.putString("listingUid", data.get("listingUid"));
+      intent.putExtras(b);
+    } else if (data.get("type").equals(MessagingService.CREATED_NOTIFICATION)) {
+      intent = new Intent(this, AvailableListingDetailsActivity.class);
+      Bundle b = new Bundle();
+      b.putString("listingUid", data.get("listingUid"));
+      intent.putExtras(b);
+    } else if (data.get("type").equals(MessagingService.DELETED_NOTIFICATION)) {
+      intent = null;
+    } else {
+      return;
+    }
     //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    PendingIntent pendingIntent = PendingIntent.getActivity(this, id /* Request code */, intent,
-        PendingIntent.FLAG_ONE_SHOT);
+
 
     String channelId = "aaa";
     Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -123,10 +155,13 @@ public class MessagingService extends FirebaseMessagingService {
             .setContentText(messageBody)
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setGroup(data.get("listingUid"));
-
+    if (intent != null) {
+      PendingIntent pendingIntent = PendingIntent.getActivity(this, id /* Request code */, intent,
+          PendingIntent.FLAG_ONE_SHOT);
+      notificationBuilder.setContentIntent(pendingIntent);
+    }
     NotificationManager notificationManager =
         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

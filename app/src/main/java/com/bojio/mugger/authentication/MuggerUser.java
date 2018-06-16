@@ -1,15 +1,16 @@
 package com.bojio.mugger.authentication;
 
+import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerRole;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class MuggerUser {
   private static MuggerUser user;
   private MuggerRole role;
-  private QuerySnapshot modules;
+  private TreeMap<String, TreeMap<String, Byte>> modules;
 
   public void setData(Map<String, Object> data) {
     this.data = data;
@@ -43,5 +44,13 @@ public class MuggerUser {
 
   public void setRole(MuggerRole role) {
     this.role = role;
+  }
+
+  public TreeMap<String, TreeMap<String, Byte>> getModules() {
+    return modules;
+  }
+
+  public void setModules(TreeMap<String, TreeMap<String, Byte>> modules) {
+    this.modules = modules;
   }
 }

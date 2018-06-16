@@ -1,5 +1,6 @@
 package com.bojio.mugger.authentication;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import dmax.dialog.SpotsDialog;
 
 public class GoogleLoginActivity extends AppCompatActivity {
   private static final int RC_SIGN_IN = 9001;
@@ -81,7 +84,13 @@ public class GoogleLoginActivity extends AppCompatActivity {
         // Google Sign In was successful, authenticate with Firebase
         GoogleSignInAccount account = task.getResult(ApiException.class);
         firebaseAuthWithGoogle(account);
-        (findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
+        AlertDialog dialog = new SpotsDialog
+            .Builder()
+            .setContext(this)
+            .setMessage("Signing in...")
+            .setCancelable(false)
+            .build();
+        dialog.show();
 
       } catch (ApiException e) {
         // Google Sign In failed,

@@ -3,7 +3,6 @@ package com.bojio.mugger;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -20,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,7 +39,12 @@ public class MainActivity extends AppCompatActivity {
     initGoogleSignInButton();
     ButterKnife.bind(this);
     if (acc != null) { // Logged in
-      progressBar.setVisibility(View.VISIBLE);
+      SpotsDialog.Builder dialog = new SpotsDialog
+          .Builder()
+          .setContext(this)
+          .setMessage("Signing in...")
+          .setCancelable(false);
+      dialog.build().show();
       // Checks if user has been verified as an NUS student by checking if NUSNETID has been
       // logged before
       checkAccount(acc);

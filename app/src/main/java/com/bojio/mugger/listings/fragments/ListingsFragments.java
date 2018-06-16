@@ -12,14 +12,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.ModuleRoles;
+import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingsViewHolder;
@@ -31,7 +27,6 @@ import com.google.firebase.firestore.Query;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -156,11 +151,11 @@ public abstract class ListingsFragments extends Fragment {
           } else {
             title += " (Attending)";
           }
-        } else if (type == ModuleRoles.PROFESSOR) {
+        } else if (type == ModuleRole.PROFESSOR) {
           holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
               (R.color.prof_listing_background));
           title += " (Professor)";
-        } else if (type == ModuleRoles.TEACHING_ASSISTANT) {
+        } else if (type == ModuleRole.TEACHING_ASSISTANT) {
           holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
               (R.color.ta_listing_background));
           title += " (TA)";

@@ -1,5 +1,6 @@
 package com.bojio.mugger;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,17 +19,24 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.constants.MuggerRole;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.fragments.AttendingListingsFragments;
 import com.bojio.mugger.listings.fragments.AvailableListingsFragments;
 import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.bojio.mugger.listings.fragments.MyListingsFragments;
+import com.bojio.mugger.profile.ProfileActivity;
 import com.bojio.mugger.profile.ProfileFragment;
+import com.bojio.mugger.settings.SettingsActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -38,11 +46,16 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
 
 public class Main2Activity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
@@ -70,7 +83,54 @@ public class Main2Activity extends AppCompatActivity
 
     // Set behavior when logged in state changes
     setAuthStateChangeListener();
-
+    if (MuggerUser.getInstance().getModules() == null) {
+      AlertDialog dialog = new SpotsDialog
+          .Builder()
+          .setContext(this)
+          .setMessage("Loading module data and notifications...")
+          .setCancelable(false)
+          .build();
+      dialog.show();
+      db.collection("users").document(user.getUid()).collection("semesters").get()
+          .addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+              Toast.makeText(this, "Unable to load module data, please log in again.", Toast
+                  .LENGTH_SHORT).show();
+            } else {
+              List<DocumentSnapshot> docs = task.getResult().getDocuments();
+              TreeMap<String, TreeMap<String, Byte>> modules = new TreeMap<>(Collections.reverseOrder());
+              for (DocumentSnapshot doc : docs) {
+                TreeMap<String, Byte> mods = new TreeMap<>();
+                modules.put(doc.getId().replace(".", "/"), mods);
+                for (String mod : (List<String>) doc.get("moduleCodes")) {
+                  mods.put(mod, ModuleRole.EMPTY);
+                }
+                List<String> ta = (List<String>) doc.get("ta");
+                if (ta != null) {
+                  for (String mod : ta) {
+                    mods.put(mod, ModuleRole.TEACHING_ASSISTANT);
+                  }
+                }
+                List<String> prof = (List<String>) doc.get("professor");
+                if (prof != null) {
+                  for (String mod : (List<String>) doc.get("professor")) {
+                    mods.put(mod, ModuleRole.PROFESSOR);
+                  }
+                }
+              }
+              MuggerUser.getInstance().setModules(modules);
+              for (String mod : modules.firstEntry().getValue().keySet()) {
+                FirebaseMessaging.getInstance().subscribeToTopic(mod);
+              }
+              NavigationView navigationView = findViewById(R.id.nav_view);
+              navigationView.setNavigationItemSelectedListener(this);
+              setTitle("Listings");
+              navigationView.setCheckedItem(R.id.nav_available_listings);
+              onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+            }
+            dialog.dismiss();
+          });
+    }
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
@@ -82,11 +142,7 @@ public class Main2Activity extends AppCompatActivity
     drawer.addDrawerListener(toggle);
     toggle.syncState();
 
-    NavigationView navigationView = findViewById(R.id.nav_view);
-    navigationView.setNavigationItemSelectedListener(this);
-    setTitle("Listings");
-    navigationView.setCheckedItem(R.id.nav_available_listings);
-    onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+
     String instanceId = FirebaseInstanceId.getInstance().getToken();
     // Update instance id of this account in database
     if (instanceId != null) {
@@ -111,7 +167,7 @@ public class Main2Activity extends AppCompatActivity
         } catch (IOException e) {
           e.printStackTrace();
         }
-        Intent intent = new Intent(Main2Activity.this, MainActivity
+        Intent intent = new Intent(this, MainActivity
             .class);
         Toast.makeText(Main2Activity.this, "Logged out " +
             "successfully", Toast.LENGTH_LONG).show();
@@ -184,7 +240,8 @@ public class Main2Activity extends AppCompatActivity
     int id = item.getItemId();
 
     if (id == R.id.action_settings) {
-      // If settings clicked
+      Intent intent = new Intent(this, SettingsActivity.class);
+      startActivity(intent);
       return true;
     }
 
@@ -228,12 +285,11 @@ public class Main2Activity extends AppCompatActivity
         setTitle("Listings That I'm Joining");
         break;
       case R.id.nav_profile:
-        fragment = ProfileFragment.newInstance(mAuth.getCurrentUser().getUid());
-        ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, fragment);
-        fab.setVisibility(View.GONE);
-        ft.commit();
-        setTitle("My Profile");
+        Intent intent = new Intent(this, ProfileActivity.class);
+        Bundle b = new Bundle();
+        b.putString("profileUid", mAuth.getUid());
+        intent.putExtras(b);
+        startActivity(intent);
         break;
       default:
         break;

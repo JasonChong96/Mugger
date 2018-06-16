@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -38,6 +39,7 @@ import java.util.TimeZone;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
 
 public class ListingChatActivity extends AppCompatActivity {
 
@@ -80,7 +82,13 @@ public class ListingChatActivity extends AppCompatActivity {
       listingUid = listing.getUid();
     }
     if (listing == null) {
-      progressBar.setVisibility(View.VISIBLE);
+      AlertDialog dialog = new SpotsDialog
+          .Builder()
+          .setContext(this)
+          .setMessage("Loading...")
+          .setCancelable(false)
+          .build();
+      dialog.show();
       db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {
         Listing newListing = Listing.getListingFromSnapshot(task.getResult());
         if (newListing == null) {
@@ -89,7 +97,7 @@ public class ListingChatActivity extends AppCompatActivity {
           return;
         }
         ListingChatActivity.this.setListing(newListing);
-        progressBar.setVisibility(View.GONE);
+        dialog.dismiss();
       });
     }
     user = FirebaseAuth.getInstance().getCurrentUser();
@@ -105,28 +113,40 @@ public class ListingChatActivity extends AppCompatActivity {
 
   @OnClick(R.id.activity_thread_send_fab)
   public void onClick() {
-    long timestamp = System.currentTimeMillis();
-    long dayTimestamp = getDayTimestamp(timestamp);
-    String body = toSendView.getText().toString().trim();
-    String userUid = user.getUid();
-    Map<String, Object> messageData = new HashMap<>();
-    messageData.put("fromUid", userUid);
-    messageData.put("fromName", user.getDisplayName());
-    messageData.put("content", body);
-    messageData.put("time", timestamp);
-    messageData.put("day", dayTimestamp);
-    // Add to listing chat
-    db.collection("chats").document(listingUid).collection("messages").add(messageData);
-    messageData.put("listingUid", listingUid);
-    // Add to user's chat history
-    //db.collection("users").document(userUid).collection("chatHistory").add(messageData);
-    // Add to notification db
-    messageData.remove("time");
-    messageData.remove("day");
-    messageData.put("listingOwnerUid", listing.getOwnerId());
-    db.collection("notifications").add
-        (messageData);
-    toSendView.setText("");
+    String message = toSendView.getText().toString().trim();
+    if (!message.isEmpty()) {
+      long timestamp = System.currentTimeMillis();
+      long dayTimestamp = getDayTimestamp(timestamp);
+      String userUid = user.getUid();
+      Map<String, Object> messageData = new HashMap<>();
+      messageData.put("fromUid", userUid);
+      messageData.put("fromName", user.getDisplayName());
+      messageData.put("content", message);
+      messageData.put("time", timestamp);
+      messageData.put("day", dayTimestamp);
+      // Add to listing chat
+      db.collection("chats").document(listingUid).collection("messages").add(messageData);
+      Map<String, Object> notificationData = new HashMap<>();
+      notificationData.put("topicUid", listingUid);
+      StringBuilder content = new StringBuilder("(Latest Message) ");
+      content.append(user.getDisplayName()).append(" : ").append(message);
+      notificationData.put("body", content.toString());
+      StringBuilder title = new StringBuilder();
+      title.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode()).append(" " +
+          "Listing");
+      notificationData.put("title", title.toString());
+      notificationData.put("type", MessagingService.CHAT_NOTIFICATION);
+      notificationData.put("fromUid", user.getUid());
+      // Add to user's chat history
+      //db.collection("users").document(userUid).collection("chatHistory").add(messageData);
+      // Add to notification db
+      messageData.remove("time");
+      messageData.remove("day");
+      messageData.put("listingOwnerUid", listing.getOwnerId());
+      db.collection("notifications").add
+          (notificationData);
+      toSendView.setText("");
+    }
   }
 
   private long getDayTimestamp(long timestamp) {

@@ -1,7 +1,7 @@
 package com.bojio.mugger.listings;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,7 +20,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.constants.ModuleRoles;
+import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +40,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 
 public class CreateEditListingActivity extends AppCompatActivity {
 
@@ -79,12 +81,13 @@ public class CreateEditListingActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
-    ProgressDialog progress = new ProgressDialog(this);
-    progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-    progress.setTitle("Loading");
-    progress.setMessage("Wait while loading...");
-    progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-    progress.show();
+    AlertDialog dialog = new SpotsDialog
+        .Builder()
+        .setContext(this)
+        .setMessage("Loading modules...")
+        .setCancelable(false)
+        .build();
+    dialog.show();
     moduleCodes = new ArrayList<>();
     moduleRoles = new HashMap<>();
     b = this.getIntent().getExtras();
@@ -112,21 +115,21 @@ public class CreateEditListingActivity extends AppCompatActivity {
                   if (mods != null) {
                     for (String mod : mods) {
                       moduleCodes.add(mod);
-                      moduleRoles.put(mod, ModuleRoles.PROFESSOR);
+                      moduleRoles.put(mod, ModuleRole.PROFESSOR);
                     }
                   }
                   mods = (List<String>) data.get("ta");
                   if (mods != null) {
                     for (String mod : mods) {
                       moduleCodes.add(mod);
-                      moduleRoles.put(mod, ModuleRoles.TEACHING_ASSISTANT);
+                      moduleRoles.put(mod, ModuleRole.TEACHING_ASSISTANT);
                     }
                   }
                   mods = (List<String>) data.get("moduleCodes");
                   if (mods != null) {
                     for (String mod : mods) {
                       moduleCodes.add(mod);
-                      moduleRoles.put(mod, ModuleRoles.EMPTY);
+                      moduleRoles.put(mod, ModuleRole.EMPTY);
                     }
                   }
                   ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
@@ -135,7 +138,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
                   if (b != null) {
                     moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
                   }
-                  progress.dismiss();
+                  dialog.dismiss();
                 }
               }
         });
@@ -161,6 +164,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
       startDateTime.setTimeInMillis(toEdit.getStartTime());
       endDateTime.setTimeInMillis(toEdit.getEndTime());
       moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
+      moduleCode.setEnabled(false);
       venue.setText(toEdit.getVenue());
       description.setText(toEdit.getDescription());
     } else {
@@ -270,7 +274,13 @@ public class CreateEditListingActivity extends AppCompatActivity {
       submitButton.setClickable(true);
       return;
     }
-    progressBar.setVisibility(View.VISIBLE);
+    AlertDialog dialog = new SpotsDialog
+        .Builder()
+        .setContext(this)
+        .setMessage(b == null ? "Publishing listing..." : "Submitting changes...")
+        .setCancelable(false)
+        .build();
+    dialog.show();
     Map<String, Object> data = new HashMap<>();
     long startTimeMillis = startDateTime.getTimeInMillis();
     data.put("description", description.getText().toString());
@@ -278,6 +288,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
     data.put("startTime", startTimeMillis);
     data.put("moduleCode", moduleCode.getSelectedItem().toString());
     data.put("ownerId", mAuth.getCurrentUser().getUid());
+    data.put("ownerName", mAuth.getCurrentUser().getDisplayName());
     data.put("venue", venue.getText().toString());
     data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
     data.put(mAuth.getUid(), startTimeMillis);
@@ -300,7 +311,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
         if (!task.isSuccessful()) {
           CreateEditListingActivity.this.showShortToast("Failed to publish listing, please try again later.");
           submitButton.setClickable(true);
-          progressBar.setVisibility(View.GONE);
+          dialog.dismiss();
           return;
         } else {
          /* if (b == null) {
@@ -313,6 +324,20 @@ public class CreateEditListingActivity extends AppCompatActivity {
           }*/
          if (task.getResult() != null) {
            FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
+         }
+         if (b == null) {
+           Map<String, Object> notificationData = new HashMap<>();
+           notificationData.put("title", "Listing Created");
+           StringBuilder body = new StringBuilder();
+           body.append(mAuth.getCurrentUser().getDisplayName()).append(" has created a Listing for ")
+               .append(moduleCode.getSelectedItem().toString())
+               .append(".");
+           notificationData.put("body", body.toString());
+           notificationData.put("type", MessagingService.CREATED_NOTIFICATION);
+           notificationData.put("fromUid", mAuth.getUid());
+           notificationData.put("topicUid", moduleCode.getSelectedItem().toString());
+           notificationData.put("listingUid", task.getResult().getId());
+           db.collection("notifications").add(notificationData);
          }
           CreateEditListingActivity.this.finish();
         }

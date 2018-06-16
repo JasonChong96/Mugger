@@ -1,5 +1,6 @@
 package com.bojio.mugger.profile;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -41,6 +41,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -103,9 +104,6 @@ public class ProfileFragment extends Fragment {
   @BindView(R.id.profile_button_change_mugger_role)
   Button changeRoleButton;
 
-  @BindView(R.id.progressBar7)
-  ProgressBar progressBar;
-
   @BindView(R.id.divider4)
   View divider4;
 
@@ -151,25 +149,33 @@ public class ProfileFragment extends Fragment {
     super.onCreate(savedInstanceState);
     View view = inflater.inflate(R.layout.fragment_profile, container, false);
     ButterKnife.bind(this, view);
-
     Task<DocumentSnapshot> profileTask = db.collection("users").document(profileUid).get();
     Task<DocumentSnapshot> moduleTitlesTask = db.collection("data").document("moduleTitles").get();
     Task<QuerySnapshot> modulesTask = db.collection("users").document(profileUid)
         .collection("semesters").orderBy("semester", Query.Direction.DESCENDING).get();
-
+    AlertDialog dialog = new SpotsDialog
+        .Builder()
+        .setContext(this.getActivity())
+        .setMessage("Loading profile...")
+        .setCancelable(false)
+        .build();
+    dialog.show();
     Tasks.whenAll(profileTask, modulesTask, moduleTitlesTask).addOnCompleteListener
         (task -> {
       ProfileFragment.this.moduleTitles = moduleTitlesTask.getResult().getData();
       ProfileFragment.this.loadProfile(profileTask.getResult(), modulesTask.getResult().getDocuments
           ());
+          dialog.dismiss();
     });
     return view;
   }
 
   private void loadProfile(DocumentSnapshot profile, List<DocumentSnapshot> moduless) {
-    Map<String, Object> profileData = profile.getData();
-    nameView.setText((String) profileData.get("displayName"));
 
+    Map<String, Object> profileData = profile.getData();
+    String displayName = (String) profileData.get("displayName");
+    nameView.setText(displayName);
+    getActivity().setTitle(displayName + "'s Profile");
     emailView.setText((String) profileData.get("email"));
     if (((String) profileData.get("sex")).equals("Female")) {
       sexView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.gender_female));
@@ -277,7 +283,7 @@ public class ProfileFragment extends Fragment {
       viewReportsButton.setVisibility(View.VISIBLE);
       banButton.setVisibility(View.VISIBLE);
     }
-    progressBar.setVisibility(View.GONE);
+
   }
 
   // TODO: Rename method, update argument and hook method into UI event
