@@ -34,7 +34,7 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main2"
-        android:background="@color/colorWhite"
+        android:background="@color/colorBackground"
         app:menu="@menu/activity_main2_drawer">
 
     </android.support.design.widget.NavigationView>
