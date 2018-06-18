@@ -7,7 +7,14 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/colorBackground</item>
     </style>
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme.Admin" parent="AppTheme">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimaryAdmin</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkAdmin</item>
+        <item name="colorAccent">@color/colorAccentAdmin</item>
+        <item name="android:colorBackground">@color/colorBackgroundAdmin</item>
+    </style>
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

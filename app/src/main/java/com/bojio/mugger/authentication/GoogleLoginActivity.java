@@ -127,7 +127,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
           if (!task_.isSuccessful()) {
             Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
-                .LENGTH_SHORT);
+                .LENGTH_SHORT).show();
             mAuth.signOut();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

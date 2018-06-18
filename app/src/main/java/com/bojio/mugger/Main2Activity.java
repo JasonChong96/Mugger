@@ -1,11 +1,13 @@
 package com.bojio.mugger;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +21,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.bojio.mugger.administration.feedback.MakeFeedbackActivity;
+import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
@@ -32,6 +37,7 @@ import com.bojio.mugger.listings.fragments.MyListingsFragments;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.bojio.mugger.profile.ProfileFragment;
 import com.bojio.mugger.settings.SettingsActivity;
+import com.bojio.mugger.settings.SettingsActivity2;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -40,6 +46,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -67,6 +74,9 @@ public class Main2Activity extends AppCompatActivity
 
   @BindView(R.id.fab)
   FloatingActionButton fab;
+
+  @BindView(android.R.id.content)
+  View activityView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -226,8 +236,11 @@ public class Main2Activity extends AppCompatActivity
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main2, menu);
     FirebaseUser user = mAuth.getCurrentUser();
-    ((TextView) findViewById(R.id.username)).setText(user.getDisplayName());
-    ((TextView) findViewById(R.id.email)).setText(user.getEmail());
+    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+      MenuItem menuItem = ((NavigationView) findViewById(R.id.nav_view)).getMenu()
+          .findItem(R.id.nav_admin_tools);
+      menuItem.setVisible(true);
+    }
     return true;
   }
 
@@ -240,7 +253,7 @@ public class Main2Activity extends AppCompatActivity
     int id = item.getItemId();
 
     if (id == R.id.action_settings) {
-      Intent intent = new Intent(this, SettingsActivity.class);
+      Intent intent = new Intent(this, SettingsActivity2.class);
       startActivity(intent);
       return true;
     }
@@ -290,6 +303,53 @@ public class Main2Activity extends AppCompatActivity
         b.putString("profileUid", mAuth.getUid());
         intent.putExtras(b);
         startActivity(intent);
+        break;
+      case R.id.refresh_logout:
+        db.collection("users").document(mAuth.getUid()).update("nusNetId", FieldValue.delete())
+            .addOnCompleteListener(task -> {
+              signOut();
+              Toast.makeText(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
+            });
+        break;
+      case R.id.submit_feedback:
+        intent = new Intent(this, MakeFeedbackActivity.class);
+        startActivity(intent);
+        break;
+      case R.id.nav_admin_tools:
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Administrative Tools Available");
+        builder.setItems(new CharSequence[]
+                {"View Reports", "View Feedback", "View Prof/TA Requests"},
+            new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int which) {
+                // The 'which' argument contains the index position
+                // of the selected item
+                switch (which) {
+                  case 0:
+                    Toast.makeText(Main2Activity.this, "clicked 1", Toast.LENGTH_SHORT).show();
+                    break;
+                  case 1:
+                    Toast.makeText(Main2Activity.this, "clicked 2", Toast.LENGTH_SHORT).show();
+                    break;
+                  case 2:
+                    Toast.makeText(Main2Activity.this, "clicked 3", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+              }
+            });
+        builder.create().show();*/
+        new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
+            "access?").items("View Reports", "View Feedback", "View Prof/TA Requests")
+            .itemsCallback((dialog, itemView, position, text) -> {
+              switch (position) {
+                case 1:
+                  startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                  break;
+                default:
+                  Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
+                  break;
+              }
+            }).build().show();
         break;
       default:
         break;

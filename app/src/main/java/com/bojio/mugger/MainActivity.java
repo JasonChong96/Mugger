@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     db.collection("users").document(acc.getUid()).get().addOnCompleteListener(task_ -> {
       if (!task_.isSuccessful()) {
         Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
-            .LENGTH_SHORT);
+            .LENGTH_SHORT).show();
         mAuth.signOut();
         // Go back to login page
         Intent intent = new Intent(this, MainActivity.class);

@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#4A849F</color>
     <color name="colorPrimaryDark">#1B3440</color>
-    <color name="colorAccent">#F2845C</color>
+    <color name="colorAccent">#824732</color>
     <!--system colors-->
     <color name="colorAccentPressed">#eaa60c</color>
     <color name="colorAccentIcons">#edb537</color>
@@ -32,4 +32,10 @@
     <color name="ta_listing_background">#97D3CA</color>
     <color name="own_listing_background">#F2845C</color>
     <color name="prof_listing_background">#9EB3ED</color>
+    <color name="colorButton">#f5f1d5</color>
+
+    <color name="colorBackgroundAdmin">#f5f1d5</color>
+    <color name="colorPrimaryAdmin">#F2845C</color>
+    <color name="colorPrimaryDarkAdmin">#824732</color>
+    <color name="colorAccentAdmin">#1B3440</color>
 </resources>

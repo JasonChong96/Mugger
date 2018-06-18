@@ -80,7 +80,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     Bundle b = getIntent().getExtras();
     if (b == null) {
       finish();
-      Toast.makeText(this, "Error fetching listing details.", Toast.LENGTH_SHORT);
+      Toast.makeText(this, "Error fetching listing details.", Toast.LENGTH_SHORT).show();
       return;
     }
 

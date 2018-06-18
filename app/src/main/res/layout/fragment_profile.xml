@@ -43,7 +43,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:src="@drawable/gender_male"
+                app:srcCompat="@drawable/gender_male"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_text_view_name"
                 app:layout_constraintStart_toEndOf="@+id/profile_text_view_name"
                 app:layout_constraintTop_toTopOf="@+id/profile_text_view_name" />
