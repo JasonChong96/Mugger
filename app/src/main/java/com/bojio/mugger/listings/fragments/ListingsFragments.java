@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.ModuleRole;
@@ -50,6 +51,9 @@ public abstract class ListingsFragments extends Fragment {
 
   @BindView(R.id.listings_fragments_constraint_layout_2)
   ConstraintLayout constraintLayout2;
+
+  @BindView(R.id.listings_fragments_empty_text)
+  TextView emptyTextView;
 
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseAuth mAuth;
@@ -128,6 +132,15 @@ public abstract class ListingsFragments extends Fragment {
         })
         .build();
     FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Listing, ListingsViewHolder>(options) {
+      @Override
+      public void onDataChanged() {
+        if (this.getItemCount() == 0) {
+          emptyTextView.setVisibility(View.VISIBLE);
+        } else if (emptyTextView.getVisibility() == View.VISIBLE) {
+          emptyTextView.setVisibility(View.GONE);
+        }
+      }
+
       @Override
       public void onBindViewHolder(ListingsViewHolder holder, int position, Listing listing) {
         if (mAuth.getCurrentUser()== null) {

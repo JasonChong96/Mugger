@@ -83,7 +83,7 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
         holder.descriptionView.setText(feedback.getDescription());
         StringBuilder nameTime = new StringBuilder("Posted By ");
         nameTime.append(feedback.getUserName());
-        holder.nameTimeView.setText(feedback.getUserName());
+        holder.nameTimeView.setText(nameTime.toString());
         holder.profileButton.setOnClickListener(view -> {
           Intent intent = new Intent(ViewAllFeedbackActivity.this, ProfileActivity.class);
           Bundle b = new Bundle();
@@ -92,34 +92,6 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
           startActivity(intent);
         });
         holder.deleteButton.setOnClickListener(view -> {
-          DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which) {
-              case DialogInterface.BUTTON_POSITIVE:
-
-                AlertDialog dialogg = new SpotsDialog
-                    .Builder()
-                    .setContext(ViewAllFeedbackActivity.this)
-                    .setMessage("Deleting Feedback...")
-                    .setCancelable(false)
-                    .build();
-                dialogg.show();
-                feedback.getDocRef().delete().addOnCompleteListener(task -> {
-                  dialogg.dismiss();
-                  if (!task.isSuccessful()) {
-                    Snackbar.make(activityView, "Error deleting feedback, please try again " +
-                        "later", Snackbar.LENGTH_SHORT).show();
-                  } else {
-                    Snackbar.make(activityView, "Successfully deleted feedback. " +
-                        "later", Snackbar.LENGTH_SHORT).show();
-                  }
-                });
-                break;
-
-              case DialogInterface.BUTTON_NEGATIVE:
-                //No button clicked
-                break;
-            }
-          };
           new MaterialDialog.Builder(ViewAllFeedbackActivity.this).title("Confirmation").content
               ("Are you sure you want to delete this feedback?").positiveText("Yes").negativeText("No")
               .onPositive((dialog, which) -> {
@@ -141,9 +113,6 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
                   }
                 });
               }).show();
-         /* AlertDialog.Builder builder = new AlertDialog.Builder(ViewAllFeedbackActivity.this);
-          builder.setMessage("Are you sure you want to delete this feedback?").setPositiveButton
-              ("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();*/
         });
       }
     };

@@ -258,6 +258,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
                           for (DocumentSnapshot snap : taskk.getResult().getDocuments()) {
                             batch.update(snap.getReference(), "ownerName", stringValue);
                           }
+
                           batch.commit().addOnCompleteListener(taskkk -> {
                             if (!taskk.isSuccessful()) {
                               snackbar.setText("Failed to change display name, please try again later")

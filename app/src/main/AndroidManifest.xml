@@ -48,17 +48,27 @@
         </service>
 
         <activity android:name=".profile.ProfileActivity" />
-        <activity android:name=".administration.MakeTAProfActivity"
-            android:theme="@style/AppTheme.Admin"/>
-        <activity android:name=".administration.ChangeMuggerRoleActivity"
-            android:theme="@style/AppTheme.Admin"/>
+        <activity
+            android:name=".administration.MakeTAProfActivity"
+            android:theme="@style/AppTheme.Admin" />
+        <activity
+            android:name=".administration.ChangeMuggerRoleActivity"
+            android:theme="@style/AppTheme.Admin" />
         <activity android:name=".settings.SettingsActivity" />
         <activity
             android:name=".settings.SettingsActivity2"
             android:label="@string/title_activity_settings2" />
-        <activity android:name=".administration.feedback.MakeFeedbackActivity" />
-        <activity android:name=".administration.feedback.ViewAllFeedbackActivity"
-            android:theme="@style/AppTheme.Admin"/>
+        <activity android:name=".administration.feedback.MakeFeedbackActivity"
+            android:label="Submit App Feedback"/>
+        <activity
+            android:name=".administration.feedback.ViewAllFeedbackActivity"
+            android:theme="@style/AppTheme.Admin" />
+        <activity
+            android:name=".administration.requests.MakeProfTARequestActivity"
+            android:label="Request Professor / TA Role"/>
+        <activity android:name=".administration.requests.ViewAllProfTARequestActivity"
+            android:theme="@style/AppTheme.Admin"
+            android:label="Professor / TA Role Requests"/>
     </application>
 
 </manifest>

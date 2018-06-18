@@ -35,11 +35,11 @@
         <menu>
             <item
                 android:icon="@drawable/ic_baseline_feedback_24px"
-                android:id="@+id/submit_feedback"
+                android:id="@+id/nav_submit_feedback"
                 android:title="Submit Feedback" />
             <item
                 android:icon="@drawable/ic_outline_feedback_24px"
-                android:id="@+id/request_role"
+                android:id="@+id/nav_request_role"
                 android:title="Request TA / Prof Role" />
             <item
                 android:icon="@drawable/ic_baseline_exit_to_app_24px"

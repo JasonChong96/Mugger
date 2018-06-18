@@ -1,7 +1,6 @@
 package com.bojio.mugger;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,13 +17,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.administration.feedback.MakeFeedbackActivity;
 import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
-import com.bojio.mugger.authentication.IvleLoginActivity;
+import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
+import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerRole;
@@ -36,13 +35,10 @@ import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.bojio.mugger.listings.fragments.MyListingsFragments;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.bojio.mugger.profile.ProfileFragment;
-import com.bojio.mugger.settings.SettingsActivity;
 import com.bojio.mugger.settings.SettingsActivity2;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -54,10 +50,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -311,39 +305,24 @@ public class Main2Activity extends AppCompatActivity
               Toast.makeText(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
             });
         break;
-      case R.id.submit_feedback:
+      case R.id.nav_submit_feedback:
         intent = new Intent(this, MakeFeedbackActivity.class);
         startActivity(intent);
         break;
+      case R.id.nav_request_role:
+        intent = new Intent(this, MakeProfTARequestActivity.class);
+        startActivity(intent);
+        break;
       case R.id.nav_admin_tools:
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Administrative Tools Available");
-        builder.setItems(new CharSequence[]
-                {"View Reports", "View Feedback", "View Prof/TA Requests"},
-            new DialogInterface.OnClickListener() {
-              public void onClick(DialogInterface dialog, int which) {
-                // The 'which' argument contains the index position
-                // of the selected item
-                switch (which) {
-                  case 0:
-                    Toast.makeText(Main2Activity.this, "clicked 1", Toast.LENGTH_SHORT).show();
-                    break;
-                  case 1:
-                    Toast.makeText(Main2Activity.this, "clicked 2", Toast.LENGTH_SHORT).show();
-                    break;
-                  case 2:
-                    Toast.makeText(Main2Activity.this, "clicked 3", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-              }
-            });
-        builder.create().show();*/
         new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
             "access?").items("View Reports", "View Feedback", "View Prof/TA Requests")
             .itemsCallback((dialog, itemView, position, text) -> {
               switch (position) {
                 case 1:
                   startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                  break;
+                case 2:
+                  startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
                   break;
                 default:
                   Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
