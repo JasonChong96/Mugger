@@ -26,7 +26,7 @@
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Main2" />
         <activity android:name=".listings.CreateEditListingActivity" />
         <activity android:name=".listings.AvailableListingDetailsActivity" />
         <activity android:name=".authentication.IvleLoginActivity" />

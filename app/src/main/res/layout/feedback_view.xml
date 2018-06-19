@@ -66,7 +66,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:background="@color/colorBackground"
+        
         android:drawableLeft="@drawable/ic_baseline_delete_24px"
         android:text="Delete"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"

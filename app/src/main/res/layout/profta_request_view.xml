@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
-        android:background="@color/colorBackground"
+        
         android:drawableStart="@drawable/ic_baseline_person_24px"
         android:text="Profile"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:background="@color/colorBackground"
+        
         android:drawableStart="@drawable/ic_baseline_delete_24px"
         android:text="Delete"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"

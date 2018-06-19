@@ -314,21 +314,25 @@ public class Main2Activity extends AppCompatActivity
         startActivity(intent);
         break;
       case R.id.nav_admin_tools:
-        new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
-            "access?").items("View Reports", "View Feedback", "View Prof/TA Requests")
-            .itemsCallback((dialog, itemView, position, text) -> {
-              switch (position) {
-                case 1:
-                  startActivity(new Intent(this, ViewAllFeedbackActivity.class));
-                  break;
-                case 2:
-                  startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
-                  break;
-                default:
-                  Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
-                  break;
-              }
-            }).build().show();
+        if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+          String[] moderator = {"View Reports"};
+          String[] admin = {"View Reports", "View Feedback", "View Prof/TA Requests"};
+          new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
+              "access?").items(MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole()) ? admin
+              : moderator).itemsCallback((dialog, itemView, position, text) -> {
+                switch (position) {
+                  case 1:
+                    startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                    break;
+                  case 2:
+                    startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
+                    break;
+                  default:
+                    Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
+                    break;
+                }
+              }).build().show();
+        }
         break;
       default:
         break;

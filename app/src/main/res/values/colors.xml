@@ -38,4 +38,9 @@
     <color name="colorPrimaryAdmin">#F2845C</color>
     <color name="colorPrimaryDarkAdmin">#824732</color>
     <color name="colorAccentAdmin">#1B3440</color>
+
+    <color name="colorPrimarySunStream">#7DA1C4</color>
+    <color name="colorPrimaryDarkSunStream">#26547C</color>
+    <color name="colorBackgroundSunStream">#EDD7A8</color>
+    <color name="colorAccentSunStream">#ED8B00</color>
 </resources>
