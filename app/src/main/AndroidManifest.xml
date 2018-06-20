@@ -58,17 +58,29 @@
         <activity
             android:name=".settings.SettingsActivity2"
             android:label="@string/title_activity_settings2" />
-        <activity android:name=".administration.feedback.MakeFeedbackActivity"
-            android:label="Submit App Feedback"/>
+        <activity
+            android:name=".administration.feedback.MakeFeedbackActivity"
+            android:label="Submit App Feedback" />
         <activity
             android:name=".administration.feedback.ViewAllFeedbackActivity"
             android:theme="@style/AppTheme.Admin" />
         <activity
             android:name=".administration.requests.MakeProfTARequestActivity"
-            android:label="Request Professor / TA Role"/>
-        <activity android:name=".administration.requests.ViewAllProfTARequestActivity"
-            android:theme="@style/AppTheme.Admin"
-            android:label="Professor / TA Role Requests"/>
+            android:label="Request Professor / TA Role" />
+        <activity
+            android:name=".administration.requests.ViewAllProfTARequestActivity"
+            android:label="Professor / TA Role Requests"
+            android:theme="@style/AppTheme.Admin" />
+        <activity android:name=".administration.reports.MakeReportActivity" />
+        <activity
+            android:name=".administration.reports.ViewAllReportsActivity"
+            android:label="View All Reports"
+            android:theme="@style/AppTheme.Admin" />
+        <activity
+            android:name=".administration.reports.ChatReportDetailsActivity"
+            android:label="Chat Report Details"
+            android:theme="@style/AppTheme.Admin" />
+        <activity android:name=".administration.reports.ListingReportDetailsActivity"></activity>
     </application>
 
 </manifest>

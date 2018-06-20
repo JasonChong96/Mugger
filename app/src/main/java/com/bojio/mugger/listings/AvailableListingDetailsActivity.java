@@ -14,6 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.reports.MakeReportActivity;
+import com.bojio.mugger.administration.reports.Report;
+import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.constants.MuggerRole;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.android.gms.tasks.Continuation;
@@ -36,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class AvailableListingDetailsActivity extends AppCompatActivity {
 
@@ -80,7 +85,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     Bundle b = getIntent().getExtras();
     if (b == null) {
       finish();
-      Toast.makeText(this, "Error fetching listing details.", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Error fetching listing details.", Toast.LENGTH_SHORT).show();
       return;
     }
 
@@ -95,17 +100,22 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
       dialog.show();
       String listingUid = b.getString("listingUid");
       if (listingUid == null) {
-        Toast.makeText(this, "Missing Listing UID", Toast.LENGTH_SHORT).show();
+        Toasty.error(this, "Missing Listing UID", Toast.LENGTH_SHORT).show();
         finish();
         return;
       }
       Task<DocumentSnapshot> listingTask = db.collection("listings").document(listingUid).get()
           .addOnCompleteListener(task -> {
         if (!task.isSuccessful()) {
-          Toast.makeText(this, "Error fetching listing data", Toast.LENGTH_SHORT).show();
+          Toasty.error(this, "Error fetching listing data", Toast.LENGTH_SHORT).show();
           finish();
           return;
         } else {
+          if (!task.getResult().exists()) {
+            Toasty.info(this, "Listing no longer exists").show();
+            finish();
+            return;
+          }
           listing = Listing.getListingFromSnapshot(task.getResult());
           init();
           dialog.dismiss();
@@ -133,7 +143,8 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     // Inflate the menu; this adds items to the action bar if it is present.
 
     FirebaseUser user = mAuth.getCurrentUser();
-    if (listing != null && user.getUid().equals(listing.getOwnerId())) {
+    if (listing != null && (user.getUid().equals(listing.getOwnerId()) || MuggerRole.MODERATOR
+        .check(MuggerUser.getInstance().getRole()))) {
       getMenuInflater().inflate(R.menu.listing_menu, menu);
     }
     return true;
@@ -175,7 +186,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
           finish();
         } else {
           dialog.dismiss();
-          Toast.makeText(this, "Failed to delete listing, please try again later", Toast
+          Toasty.error(this, "Failed to delete listing, please try again later", Toast
               .LENGTH_SHORT).show();
         }
       });
@@ -216,7 +227,8 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
         Map<String, Object> updates = new HashMap<>();
         if (!isChecked) {
           if (mAuth.getUid().equals(listing.getOwnerId())) {
-            Toast.makeText(AvailableListingDetailsActivity.this, "You must be attending listings " +
+            Toasty.error(AvailableListingDetailsActivity.this, "You must be attending " +
+                "listings " +
                 "that you own.", Toast.LENGTH_SHORT).show();
             buttonView.setChecked(true);
           } else {
@@ -233,4 +245,14 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     });
   }
 
+  @OnClick(R.id.listing_details_report)
+  public void onClick_report() {
+    Intent intent = new Intent(this, MakeReportActivity.class);
+    Bundle b = new Bundle();
+    b.putParcelable("listing", listing);
+    b.putString("reportType", Report.ReportType.LISTING.name());
+    b.putString("listingUid", listing.getUid());
+    intent.putExtras(b);
+    startActivity(intent);
+  }
 }

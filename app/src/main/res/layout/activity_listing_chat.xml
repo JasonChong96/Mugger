@@ -58,10 +58,10 @@
             android:layout_margin="@dimen/simple_padding_small"
             android:layout_toStartOf="@id/activity_thread_send_fab"
             android:background="@drawable/chip_chat"
-            android:hint="Hint"
+            android:hint="Input message here"
             android:inputType="textCapSentences|textAutoComplete|textAutoCorrect"
             android:padding="@dimen/simple_padding_largish"
-            android:textColor="@color/colorTextPrimary"
+            android:textColor="@color/colorBlack"
             android:textSize="@dimen/text_size_secondary" />
 
     </RelativeLayout>

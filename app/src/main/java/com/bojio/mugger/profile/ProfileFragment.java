@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
@@ -35,12 +36,14 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 
 /**
@@ -89,11 +92,8 @@ public class ProfileFragment extends Fragment {
   @BindView(R.id.profile_plain_text_status)
   EditText editStatusView;
 
-  @BindView(R.id.profile_button_report)
-  Button reportButton;
-
-  @BindView(R.id.profile_button_view_reports)
-  Button viewReportsButton;
+  @BindView(R.id.profile_button_mute)
+  Button muteButton;
 
   @BindView(R.id.profile_button_make_ta_prof)
   Button makeTAProfButton;
@@ -109,6 +109,9 @@ public class ProfileFragment extends Fragment {
 
   @BindView(R.id.profile_button_update_status)
   Button updateStatusButton;
+
+  @BindView(R.id.profile_text_view_actions_title)
+  TextView adminLabelView;
 
 
   private OnProfileFragmentInteractionListener mListener;
@@ -175,6 +178,10 @@ public class ProfileFragment extends Fragment {
     Map<String, Object> profileData = profile.getData();
     String displayName = (String) profileData.get("displayName");
     nameView.setText(displayName);
+    if (profileData.get("muted") != null && (Long) profileData.get("muted") > System
+        .currentTimeMillis()) {
+      nameView.setText(String.format("%s (Muted)", nameView.getText().toString()));
+    }
     getActivity().setTitle(displayName + "'s Profile");
     emailView.setText((String) profileData.get("email"));
     if (((String) profileData.get("sex")).equals("Female")) {
@@ -264,6 +271,75 @@ public class ProfileFragment extends Fragment {
     }
     MuggerRole ownRole = MuggerUser.getInstance().getRole();
     MuggerRole profileRole = MuggerRole.getByRoleId((Long) profileData.get("roleId"));
+    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+      adminLabelView.setVisibility(View.VISIBLE);
+      muteButton.setVisibility(View.VISIBLE);
+      muteButton.setOnClickListener((View v) -> {
+        new MaterialDialog.Builder(this.getContext())
+            .title("How many hours should " + displayName + " be muted for? (0 to unmute)")
+            .input("Whole numbers only", "", new MaterialDialog.InputCallback
+                () {
+              @Override
+              public void onInput(MaterialDialog dialog, CharSequence input) {
+                AlertDialog dialogg = new SpotsDialog
+                    .Builder()
+                    .setContext(ProfileFragment.this.getContext())
+                    .setMessage("Muting...")
+                    .setCancelable(false)
+                    .build();
+                dialogg.show();
+                String hoursString = input.toString();
+                int hours = 0;
+                try {
+                  hours = Integer.parseInt(hoursString);
+                } catch (NumberFormatException nfe) {
+                  dialogg.dismiss();
+                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
+                      ("Please input a valid whole number.").error().show();
+                  return;
+                }
+                if (hours >= 0) {
+                  List<Task<?>> tasks = new ArrayList<>();
+                  long until = hours * 3600000 + System.currentTimeMillis();
+                  tasks.add(profile.getReference().update("muted", until));
+                  Map<String, Object> notificationData = new HashMap<>();
+                  if (profileData.get("instanceId") != null) {
+                    int duration = Integer.parseInt(hoursString);
+                    notificationData.put("instanceId", profileData.get("instanceId"));
+                    notificationData.put("duration", Integer.toString(duration));
+                    notificationData.put("fromUid", "");
+                    notificationData.put("topicUid", "");
+                    notificationData.put("type", hours == 0 ? "unmute" : "mute");
+                    notificationData.put("until", Long.toString(until));
+                    tasks.add(db.collection("notifications").add(notificationData));
+                  }
+                  Tasks.whenAll(tasks).addOnCompleteListener(task -> {
+                    dialogg.dismiss();
+                    if (!task.isSuccessful()) {
+                      Snacky.builder()
+                          .setActivity(ProfileFragment.this.getActivity())
+                          .setText("Failed to mute, please try again.")
+                          .error()
+                          .show();
+                    } else {
+                      Snacky.builder()
+                          .setActivity(ProfileFragment.this.getActivity())
+                          .setText("Successfully muted! Thanks for making Mugger a better place.")
+                          .success()
+                          .show();
+                    }
+                  });
+
+                } else if (hours < 0) {
+                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
+                      ("Please input a valid positive whole number").error().show();
+                  return;
+                }
+              }
+            }).show();
+      });
+    //  banButton.setVisibility(View.VISIBLE);
+    }
     if (MuggerRole.ADMIN.check(ownRole)) {
       makeTAProfButton.setVisibility(View.VISIBLE);
       if (!profileUid.equals(mAuth.getUid()) && ownRole.checkSuperiorityTo(profileRole)) {
@@ -279,10 +355,7 @@ public class ProfileFragment extends Fragment {
         });
       }
     }
-    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
-      viewReportsButton.setVisibility(View.VISIBLE);
-      banButton.setVisibility(View.VISIBLE);
-    }
+
 
   }
 
@@ -309,6 +382,8 @@ public class ProfileFragment extends Fragment {
           }
         });
   }
+
+
 
   @OnClick(R.id.profile_button_make_ta_prof)
   void onClick_makeTAProf() {

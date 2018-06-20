@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 
+import es.dmoral.toasty.Toasty;
+
 public class ProfileActivity extends AppCompatActivity
     implements ProfileFragment.OnProfileFragmentInteractionListener {
 
@@ -20,7 +22,7 @@ public class ProfileActivity extends AppCompatActivity
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
     if (b == null || b.getString("profileUid") == null) {
-      Toast.makeText(this, "Error: Missing profileUid", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Error: Missing profileUid", Toast.LENGTH_SHORT).show();
       finish();
       return;
     }

@@ -23,7 +23,9 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class MakeFeedbackActivity extends AppCompatActivity {
 
@@ -84,10 +86,10 @@ public class MakeFeedbackActivity extends AppCompatActivity {
     db.collection("feedback").add(feedback).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         dialog.dismiss();
-        Snackbar.make(view, "Failed to submit feedback, please try again later.", Snackbar
-            .LENGTH_SHORT).show();
+        Snacky.builder().setActivity(this).setText("Failed to submit feedback, please try again" +
+            " later.").error().show();
       } else {
-        Toast.makeText(this, "Successfully submitted feedback.", Toast.LENGTH_SHORT).show();
+        Toasty.success(this, "Successfully submitted feedback.", Toast.LENGTH_SHORT).show();
         finish();
       }
     });

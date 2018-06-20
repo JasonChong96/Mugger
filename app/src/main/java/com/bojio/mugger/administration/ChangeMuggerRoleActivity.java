@@ -23,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class ChangeMuggerRoleActivity extends AppCompatActivity {
 
@@ -45,7 +46,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
     if (b == null) {
-      Toast.makeText(this, "Error missing bundle data", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Error missing bundle data", Toast.LENGTH_SHORT).show();
       finish();
       return;
     }
@@ -81,7 +82,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
             Snackbar.make(layout, "Failed to update, please try again.", Snackbar.LENGTH_SHORT)
                 .show();
           } else {
-            Toast.makeText(this, "Successfully updated. Please get the user to relogin.", Toast
+            Toasty.info(this, "Successfully updated. Please get the user to relogin.", Toast
                 .LENGTH_SHORT).show();
             finish();
           }

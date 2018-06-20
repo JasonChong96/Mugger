@@ -192,8 +192,6 @@ public abstract class ListingsFragments extends Fragment {
             .toString());
         holder.numAttendees.setText(String.format(Locale.getDefault(), "%d",listing.getNumAttendees
             ()));
-
-        // holder.moduleCode.setOnClickListener(view -> Toast.makeText(AvailableListingsFragments.this.getActivity(), "Clicked", Toast.LENGTH_SHORT).show());
       }
 
 

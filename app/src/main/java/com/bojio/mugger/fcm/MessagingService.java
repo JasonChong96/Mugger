@@ -66,6 +66,14 @@ public class MessagingService extends FirebaseMessagingService {
       }
 
     }
+    Log.d(TAG, "Message received");
+    if (user != null) {
+      if (data.get("type").equals("mute")) {
+        MuggerUser.getInstance().getData().put("muted", Long.parseLong((String) data.get("until")));
+      } else if (data.get("type").equals("unmute")) {
+        MuggerUser.getInstance().getData().remove("muted");
+      }
+    }
 
     // Check if message contains a notification payload.
     if (data.get("notification") != null) {
@@ -141,7 +149,7 @@ public class MessagingService extends FirebaseMessagingService {
     } else if (data.get("type").equals(MessagingService.DELETED_NOTIFICATION)) {
       intent = null;
     } else {
-      return;
+      intent = null;
     }
     //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 

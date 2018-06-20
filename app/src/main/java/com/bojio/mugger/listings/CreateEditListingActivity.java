@@ -20,6 +20,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +42,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class CreateEditListingActivity extends AppCompatActivity {
 
@@ -88,6 +90,15 @@ public class CreateEditListingActivity extends AppCompatActivity {
         .setCancelable(false)
         .build();
     dialog.show();
+    MuggerUser cache = MuggerUser.getInstance();
+    if (cache.isMuted() > 0) {
+      double hours = (double) cache.isMuted() / 3600000D;
+      Toasty.error(this, "You cannot do this while muted. Time left: " + String.format("%.2f " +
+              "hours",
+          hours)).show();
+      finish();
+      return;
+    }
     moduleCodes = new ArrayList<>();
     moduleRoles = new HashMap<>();
     b = this.getIntent().getExtras();
@@ -339,6 +350,9 @@ public class CreateEditListingActivity extends AppCompatActivity {
            notificationData.put("listingUid", task.getResult().getId());
            db.collection("notifications").add(notificationData);
          }
+         Toasty.success(CreateEditListingActivity.this, b == null ? "Listing successfully " +
+             "created!" : "Listing " +
+             "successfully edited!").show();
           CreateEditListingActivity.this.finish();
         }
       }
@@ -348,7 +362,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
   }
 
   private void showShortToast(String msg) {
-    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    Toasty.error(this, msg, Toast.LENGTH_SHORT).show();
   }
 
   @Override

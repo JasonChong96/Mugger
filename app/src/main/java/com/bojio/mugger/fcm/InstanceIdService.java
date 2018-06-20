@@ -24,5 +24,6 @@ public class InstanceIdService extends FirebaseInstanceIdService {
           .document(firebaseUser.getUid())
           .update("instanceId", instanceId);
     }
+
   }
 }

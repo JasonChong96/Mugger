@@ -27,6 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class MakeProfTARequestActivity extends AppCompatActivity {
   private static String[] roles = {"Click here to choose a role.", "Teaching Assistant",
@@ -56,7 +57,7 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
     user = FirebaseAuth.getInstance().getCurrentUser();
     if (user == null) {
       finish();
-      Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+      Toasty.info(this, "Not logged in", Toast.LENGTH_SHORT).show();
       return;
     }
     super.onCreate(savedInstanceState);
@@ -106,7 +107,7 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
         Snackbar.make(view, "Failed to submit request, please try again later.", Snackbar
             .LENGTH_SHORT).show();
       } else {
-        Toast.makeText(this, "Successfully submitted request.", Toast.LENGTH_SHORT)
+        Toasty.success(this, "Successfully submitted request.", Toast.LENGTH_SHORT)
             .show();
         finish();
       }

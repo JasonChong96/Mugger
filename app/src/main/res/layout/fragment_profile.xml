@@ -59,6 +59,7 @@
             android:textAppearance="@android:style/TextAppearance.Holo.Medium"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
@@ -197,33 +198,14 @@
             app:layout_constraintTop_toBottomOf="@+id/profile_text_view_status_title" />
 
         <Button
-            android:id="@+id/profile_button_report"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/report"
-            app:layout_constraintStart_toStartOf="@+id/profile_text_view_status"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_actions_title" />
-
-        <Button
             android:id="@+id/profile_button_ban"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:text="@string/profile_ban"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@+id/profile_button_view_reports"
-            app:layout_constraintTop_toTopOf="@+id/profile_button_view_reports" />
-
-        <Button
-            android:id="@+id/profile_button_view_reports"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/profile_view_reports"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/profile_button_report"
-            app:layout_constraintTop_toBottomOf="@+id/profile_button_report" />
+            app:layout_constraintStart_toStartOf="@+id/profile_text_view_actions_title"
+            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_actions_title" />
 
         <TextView
             android:id="@+id/profile_text_view_email"
@@ -251,23 +233,35 @@
             android:id="@+id/profile_button_make_ta_prof"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:text="Make TA/Prof"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@+id/profile_button_report"
-            app:layout_constraintTop_toTopOf="@+id/profile_button_report" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/profile_button_mute"
+            app:layout_constraintTop_toBottomOf="@+id/profile_button_mute" />
 
         <Button
             android:id="@+id/profile_button_change_mugger_role"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
             android:text="Change Mugger Role"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/profile_button_view_reports"
-            app:layout_constraintTop_toBottomOf="@+id/profile_button_view_reports" />
+            app:layout_constraintStart_toEndOf="@+id/profile_button_make_ta_prof"
+            app:layout_constraintTop_toTopOf="@+id/profile_button_make_ta_prof" />
+
+        <Button
+            android:id="@+id/profile_button_mute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:text="Mute this user"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@+id/profile_button_ban"
+            app:layout_constraintTop_toTopOf="@+id/profile_button_ban" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

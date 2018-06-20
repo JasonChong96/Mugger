@@ -17,7 +17,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.reports.MakeReportActivity;
+import com.bojio.mugger.administration.reports.Report;
+import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileActivity;
@@ -40,6 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class ListingChatActivity extends AppCompatActivity {
 
@@ -47,6 +52,7 @@ public class ListingChatActivity extends AppCompatActivity {
   private String listingUid;
   private FirebaseFirestore db;
   private FirebaseUser user;
+  private MuggerUser cache;
 
   @BindView(R.id.messages)
   RecyclerView messages;
@@ -60,13 +66,14 @@ public class ListingChatActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    cache = MuggerUser.getInstance();
     db = FirebaseFirestore.getInstance();
     setContentView(R.layout.activity_listing_chat);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
     if (b == null) {
-      Toast.makeText(this, "Error: Bundle cannot be null", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Error: Bundle cannot be null", Toast.LENGTH_SHORT).show();
       finish();
       return;
     }
@@ -74,7 +81,7 @@ public class ListingChatActivity extends AppCompatActivity {
     if (listing == null) {
       listingUid = b.getString("listingUid");
       if (listingUid == null) {
-        Toast.makeText(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
+        Toasty.error(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
         finish();
         return;
       }
@@ -92,7 +99,7 @@ public class ListingChatActivity extends AppCompatActivity {
       db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {
         Listing newListing = Listing.getListingFromSnapshot(task.getResult());
         if (newListing == null) {
-          Toast.makeText(this, "This listing has been deleted", Toast.LENGTH_SHORT).show();
+          Toasty.error(this, "This listing has been deleted", Toast.LENGTH_SHORT).show();
           ListingChatActivity.this.finish();
           return;
         }
@@ -114,7 +121,15 @@ public class ListingChatActivity extends AppCompatActivity {
   @OnClick(R.id.activity_thread_send_fab)
   public void onClick() {
     String message = toSendView.getText().toString().trim();
+
     if (!message.isEmpty()) {
+      if (cache.isMuted() > 0) {
+        double hours = (double) cache.isMuted() / 3600000D;
+        Toasty.error(this, "You cannot do this while muted. Time left: " + String.format("%.2f " +
+                "hours",
+            hours)).show();
+        return;
+      }
       long timestamp = System.currentTimeMillis();
       long dayTimestamp = getDayTimestamp(timestamp);
       String userUid = user.getUid();
@@ -213,23 +228,32 @@ public class ListingChatActivity extends AppCompatActivity {
         holder.dateView.setText(dfDate.format(new Date(message.getTime())));
         holder.senderView.setOnClickListener(view -> {
           CharSequence options[] = new CharSequence[] {"View " + message.getFromName() + "'s " +
-              "profile"};
-
-          AlertDialog.Builder builder = new AlertDialog.Builder(ListingChatActivity.this);
-      //    builder.setTitle("Pick a color");
-          builder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              if (which == 0) {
-                Intent intent = new Intent(ListingChatActivity.this, ProfileActivity.class);
-                Bundle b = new Bundle();
-                b.putString("profileUid", message.getFromUid());
-                intent.putExtras(b);
-                startActivity(intent);
-              }
-            }
-          });
-          builder.show();
+              "profile", "Report this message"};
+          new MaterialDialog.Builder(ListingChatActivity.this).items(options)
+              .itemsCallback((dialog, itemView, which, text) -> {
+                switch (which) {
+                  case 0:
+                    Intent intent = new Intent(ListingChatActivity.this, ProfileActivity.class);
+                    Bundle b = new Bundle();
+                    b.putString("profileUid", message.getFromUid());
+                    intent.putExtras(b);
+                    startActivity(intent);
+                    break;
+                  case 1:
+                    intent = new Intent(ListingChatActivity.this, MakeReportActivity.class);
+                    b = new Bundle();
+                    b.putString("reportType", Report.ReportType.CHAT.name());
+                    b.putString("reportedUid", message.getFromUid());
+                    b.putString("reportedName", message.getFromName());
+                    b.putString("message", message.getContent());
+                    b.putString("listingUid", listingUid);
+                    intent.putExtras(b);
+                    startActivity(intent);
+                    break;
+                  default:
+                    break;
+                }
+              }).title("Select an action: ").build().show();
         });
       }
 

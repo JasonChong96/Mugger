@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.administration.feedback.MakeFeedbackActivity;
 import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
+import com.bojio.mugger.administration.reports.ViewAllReportsActivity;
 import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
 import com.bojio.mugger.authentication.MuggerUser;
@@ -57,6 +58,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class Main2Activity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
@@ -98,8 +100,9 @@ public class Main2Activity extends AppCompatActivity
       db.collection("users").document(user.getUid()).collection("semesters").get()
           .addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
-              Toast.makeText(this, "Unable to load module data, please log in again.", Toast
-                  .LENGTH_SHORT).show();
+              Toasty.error(this, "Unable to load module data, please log in again.")
+                  .show();
+              signOut();
             } else {
               List<DocumentSnapshot> docs = task.getResult().getDocuments();
               TreeMap<String, TreeMap<String, Byte>> modules = new TreeMap<>(Collections.reverseOrder());
@@ -139,6 +142,7 @@ public class Main2Activity extends AppCompatActivity
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+    toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryAdmin));
     ButterKnife.bind(this);
     DrawerLayout drawer = findViewById(R.id.drawer_layout);
     ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -173,7 +177,7 @@ public class Main2Activity extends AppCompatActivity
         }
         Intent intent = new Intent(this, MainActivity
             .class);
-        Toast.makeText(Main2Activity.this, "Logged out " +
+        Toasty.success(Main2Activity.this, "Logged out " +
             "successfully", Toast.LENGTH_LONG).show();
         startActivity(intent);
       }
@@ -302,7 +306,7 @@ public class Main2Activity extends AppCompatActivity
         db.collection("users").document(mAuth.getUid()).update("nusNetId", FieldValue.delete())
             .addOnCompleteListener(task -> {
               signOut();
-              Toast.makeText(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
+              Toasty.success(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
             });
         break;
       case R.id.nav_submit_feedback:
@@ -321,6 +325,9 @@ public class Main2Activity extends AppCompatActivity
               "access?").items(MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole()) ? admin
               : moderator).itemsCallback((dialog, itemView, position, text) -> {
                 switch (position) {
+                  case 0:
+                    startActivity(new Intent(this, ViewAllReportsActivity.class));
+                    break;
                   case 1:
                     startActivity(new Intent(this, ViewAllFeedbackActivity.class));
                     break;
@@ -345,7 +352,7 @@ public class Main2Activity extends AppCompatActivity
 
   @Override
   public void onListingFragmentInteraction(Listing listing) {
-    Toast.makeText(this, "Clicked...", Toast.LENGTH_SHORT).show();
+    Toasty.info(this, "Clicked...", Toast.LENGTH_SHORT).show();
   }
 
   /**

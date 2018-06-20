@@ -27,6 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class MakeTAProfActivity extends AppCompatActivity {
 
@@ -71,14 +72,14 @@ public class MakeTAProfActivity extends AppCompatActivity {
     dialog.show();
     Bundle b = getIntent().getExtras();
     if (b == null) {
-      Toast.makeText(this, "Error: Missing user data", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Error: Missing user data", Toast.LENGTH_SHORT).show();
       finish();
       return;
     }
     userUid = b.getString("userUid");
     db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
-        Toast.makeText(this, "Error: Failed to fetch current semester", Toast.LENGTH_SHORT)
+        Toasty.error(this, "Error: Failed to fetch current semester", Toast.LENGTH_SHORT)
             .show();
         finish();
       } else {
@@ -109,9 +110,9 @@ public class MakeTAProfActivity extends AppCompatActivity {
   void onClick_submit() {
     String module = editTextModule.getText().toString();
     if (module.isEmpty()) {
-      Toast.makeText(this, "Please fill in a module code.", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Please fill in a module code.", Toast.LENGTH_SHORT).show();
     } else if (newRole == ModuleRole.EMPTY) {
-      Toast.makeText(this, "Please choose a role.", Toast.LENGTH_SHORT).show();
+      Toasty.error(this, "Please choose a role.", Toast.LENGTH_SHORT).show();
     } else {
       AlertDialog dialog = new SpotsDialog
           .Builder()
@@ -127,7 +128,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
       docRef.get().addOnCompleteListener(task -> {
         if (!task.isSuccessful()) {
           dialog.dismiss();
-          Toast.makeText(this, "Error, please try again", Toast.LENGTH_SHORT).show();
+          Toasty.error(this, "Error, please try again", Toast.LENGTH_SHORT).show();
         } else {
           if (!remove) {
             List<String> existing = (List<String>) task.getResult().getData().get(role);
@@ -143,9 +144,9 @@ public class MakeTAProfActivity extends AppCompatActivity {
             docRef.set(data, SetOptions.merge()).addOnCompleteListener(taskk -> {
               dialog.dismiss();
               if (!taskk.isSuccessful()) {
-                Toast.makeText(this, "Error, please try again", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Error, please try again", Toast.LENGTH_SHORT).show();
               } else {
-                Toast.makeText(this, "Successfully updated", Toast.LENGTH_SHORT).show();
+                Toasty.success(this, "Successfully updated", Toast.LENGTH_SHORT).show();
                 finish();
               }
             });
@@ -168,9 +169,9 @@ public class MakeTAProfActivity extends AppCompatActivity {
             docRef.set(data, SetOptions.merge()).addOnCompleteListener(taskk -> {
               dialog.dismiss();
               if (!taskk.isSuccessful()) {
-                Toast.makeText(this, "Error, please try again", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Error, please try again", Toast.LENGTH_SHORT).show();
               } else {
-                Toast.makeText(this, "Successfully updated. Please reload this profile page to " +
+                Toasty.success(this, "Successfully updated. Please reload this profile page to " +
                     "view changes", Toast.LENGTH_SHORT).show();
                 finish();
               }

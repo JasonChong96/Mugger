@@ -2,6 +2,9 @@ package com.bojio.mugger.authentication;
 
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerRole;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +31,20 @@ public class MuggerUser {
       user = new MuggerUser();
     }
     return user;
+  }
+
+  public long isMuted() {
+    Long mutedTill = (Long) data.get("muted");
+    if (mutedTill == null) {
+      return 0;
+    } else if (mutedTill < System.currentTimeMillis()) {
+      data.remove("muted");
+      FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance()
+          .getUid()).update("muted", FieldValue.delete());
+      return 0;
+    } else {
+      return mutedTill - System.currentTimeMillis();
+    }
   }
 
   public static void clear() {

@@ -1,6 +1,7 @@
 package com.bojio.mugger;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ProgressBar;
@@ -20,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    Toasty.Config.getInstance().setToastTypeface(Typeface.DEFAULT).apply();
     super.onCreate(savedInstanceState);
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
@@ -70,8 +73,7 @@ public class MainActivity extends AppCompatActivity {
     // logged before
     db.collection("users").document(acc.getUid()).get().addOnCompleteListener(task_ -> {
       if (!task_.isSuccessful()) {
-        Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
-            .LENGTH_SHORT).show();
+        Toasty.error(this, "Error fetching user data. Please try again later.").show();
         mAuth.signOut();
         // Go back to login page
         Intent intent = new Intent(this, MainActivity.class);
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             .ALWAYS_REDIRECT_TO_IVLE) {
           // Already have record of nus net id
           // Clears back stack
-          Toast.makeText(this, "Welcome back, " + acc.getDisplayName(), Toast.LENGTH_SHORT).show();
+          Toasty.normal(this, "Welcome back, " + acc.getDisplayName(), Toast.LENGTH_SHORT).show();
           MuggerUser.getInstance().setData(result.getData());
           Intent intent = new Intent(this, Main2Activity.class);
           startActivity(intent);

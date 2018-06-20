@@ -33,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -161,7 +162,7 @@ public class SettingsActivity extends AppCompatActivity {
         .addOnCompleteListener(task -> {
           finish();
           signOut();
-          Toast.makeText(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
+          Toasty.success(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
         });
   }
 

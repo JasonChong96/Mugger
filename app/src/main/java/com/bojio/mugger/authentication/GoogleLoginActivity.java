@@ -27,6 +27,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class GoogleLoginActivity extends AppCompatActivity {
   private static final int RC_SIGN_IN = 9001;
@@ -95,7 +96,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
       } catch (ApiException e) {
         // Google Sign In failed,
         Log.w(TAG, "Google sign in failed", e);
-        Toast.makeText(this, "Sign in failed", Toast.LENGTH_SHORT).show();
+        Toasty.error(this, "Sign in failed", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -126,7 +127,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
         // hashed nusnetid has been cached
         db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
           if (!task_.isSuccessful()) {
-            Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
+            Toasty.error(this, "Error fetching user data. Please try again later.", Toast
                 .LENGTH_SHORT).show();
             mAuth.signOut();
             Intent intent = new Intent(this, MainActivity.class);

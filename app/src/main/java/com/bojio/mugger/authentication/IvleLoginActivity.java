@@ -16,9 +16,11 @@ import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.Modules;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.common.hash.Hashing;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.io.IOException;
@@ -32,12 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 import needle.Needle;
 
 public class IvleLoginActivity extends AppCompatActivity {
@@ -94,39 +98,58 @@ public class IvleLoginActivity extends AppCompatActivity {
   private void loadDataFromIvle() {
     Map<String, Object> userData = new HashMap<>();
     if (!loadProfile(userData) || userData.get("nusNetId") == null) {
-      finish();
-      Toast.makeText(this, "An error has occurred please try again later", Toast.LENGTH_LONG)
-          .show();
+      onError();
       return;
     }
     String nusNetId = (String) userData.get("nusNetId");
-    userData.put("nusNetId",
-        Hashing.sha256()
-            .hashString(nusNetId, StandardCharsets.UTF_8)
-            .toString());
+    String hashedId = Hashing.sha256().hashString(nusNetId, StandardCharsets.UTF_8).toString();
+    Task<QuerySnapshot> checkTask = db.collection("users").whereEqualTo("nusNetId", hashedId)
+        .get();
+    try {
+      Tasks.await(checkTask);
+    } catch (ExecutionException | InterruptedException e) {
+      onError();
+      return;
+    }
+    if (checkTask.isSuccessful()) {
+      if (checkTask.getResult().getDocuments().size() > 0) {
+        Toasty.error(this, "Your IVLE account is already tagged to another Mugger account. " +
+                "You are only allowed one account per person.",
+            Toast.LENGTH_LONG).show();
+        return;
+      }
+    } else {
+      onError();
+      return;
+    }
+    userData.put("nusNetId", hashedId);
     if (!getModules(nusNetId, userData) && mAuth.getCurrentUser() == null) {
-      finish();
-      Toast.makeText(this, "An error has occurred please try again later", Toast.LENGTH_LONG)
-          .show();
+      onError();
       return;
     }
     db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(userData,
         SetOptions.merge()).addOnCompleteListener(task -> {
           if (!task.isSuccessful()) {
-            Toast.makeText(IvleLoginActivity.this, "An error has occurred please try again " +
-                "later", Toast.LENGTH_LONG)
-                .show();
-            IvleLoginActivity.this.finish();
+            onError();
             return;
           } else {
-            Intent intent = new Intent(this, Main2Activity.class);
-            // Clears back stack
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
+            db.collection("users").document(FirebaseAuth.getInstance().getUid()).get()
+                .addOnCompleteListener(taskk -> {
+                  if (!task.isSuccessful()) {
+                    onError();
+                    return;
+                  } else {
+                    MuggerUser.getInstance().setData(taskk.getResult().getData());
+                    Intent intent = new Intent(this, Main2Activity.class);
+                    // Clears back stack
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                  }
+                });
+
           }
     });
-    MuggerUser.getInstance().setData(userData);
   }
 
   private boolean loadProfile(Map<String, Object> userData) {
@@ -233,5 +256,11 @@ public class IvleLoginActivity extends AppCompatActivity {
       e.printStackTrace();
       return true;
     }
+  }
+
+  private void onError() {
+    finish();
+    Toasty.error(this, "An error has occurred please try again later", Toast.LENGTH_LONG)
+        .show();
   }
 }
