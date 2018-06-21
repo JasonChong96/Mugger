@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.WebView;
@@ -12,6 +13,8 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.Modules;
@@ -64,6 +67,25 @@ public class IvleLoginActivity extends AppCompatActivity {
     ButterKnife.bind(this);
     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
     StrictMode.setThreadPolicy(policy);
+    new MaterialDialog.Builder(this)
+        .title("IVLE Login")
+        .cancelable(false)
+        .content("This IVLE login will only be done once per account (Unless your current modules" +
+            " change). Information fetched will be your modules, faculty, major, gender and a " +
+            "hashed " +
+            "version of your NUSNET ID. Your NUSNET ID in our database is hashed using SHA-256 " +
+            "for your privacy in case of data leaks. It is only stored to ensure each person " +
+            "only has one Mugger account. Rest assured that no data collected can " +
+            "be too easily traced back to a specific person. We also not store your real name. " +
+            "Your default display name will be fetched from your google account and can be " +
+            "changed in the settings page.")
+        .positiveText("Proceed")
+        .negativeText("Cancel and Quit")
+        .onNegative((dialog, which) -> {
+          finish();
+          System.exit(0);
+        })
+        .show();
     webView.setWebViewClient(new WebViewClient() {
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {

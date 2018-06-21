@@ -87,7 +87,7 @@ public class MessagingService extends FirebaseMessagingService {
     if (data.get("notification") != null) {
       String senderUid = data.get("senderUid");
       if (DebugSettings.NOTIFICATION_TO_SELF || senderUid == null ||
-          (user != null && senderUid.equals(user.getUid()))) {
+          (user != null && !senderUid.equals(user.getUid()))) {
         sendNotification(remoteMessage.getData());
       }
     }
