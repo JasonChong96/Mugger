@@ -14,10 +14,13 @@ import android.widget.Toast;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.MuggerRole;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,16 +77,29 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
         .setCancelable(false)
         .build();
     dialog.show();
-    FirebaseFirestore.getInstance().collection("users").document(uid).update("roleId",
-        MuggerRole.valueOf((String) spinner.getSelectedItem()).getRoleId()).addOnCompleteListener
+    long roleId = MuggerRole.valueOf((String) spinner.getSelectedItem()).getRoleId();
+    DocumentReference docRef = FirebaseFirestore.getInstance().collection("users").document(uid);
+    docRef.update("roleId",
+        roleId).addOnCompleteListener
         (task -> {
           dialog.dismiss();
           if (!task.isSuccessful()) {
             Snackbar.make(layout, "Failed to update, please try again.", Snackbar.LENGTH_SHORT)
                 .show();
           } else {
-            Toasty.info(this, "Successfully updated. Please get the user to relogin.", Toast
+            Toasty.info(this, "Successfully updated.", Toast
                 .LENGTH_SHORT).show();
+            docRef.get().addOnSuccessListener(taskk -> {
+              String instanceId = (String) taskk.get("instanceId");
+              Map<String, Object> notificationData = new HashMap<>();
+              notificationData.put("instanceId", instanceId);
+              notificationData.put("fromUid", "");
+              notificationData.put("topicUid", "");
+              notificationData.put("type", "role");
+              notificationData.put("newRoleName", ((String) spinner.getSelectedItem()));
+              FirebaseFirestore.getInstance().collection("notifications").add(notificationData);
+            });
+
             finish();
           }
         });

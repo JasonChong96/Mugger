@@ -237,9 +237,16 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
             listingRef.update(updates);
           }
         } else {
-          updates.put(mAuth.getUid(), listing.getStartTime());
-          fcm.subscribeToTopic(listing.getUid());
-          listingRef.update(updates);
+          if (listing.getNumAttendees() > 19) {
+            Toasty.error(AvailableListingDetailsActivity.this, "There are" +
+                "too many people attending this listing", Toast.LENGTH_SHORT)
+                .show();
+            buttonView.setChecked(false);
+          } else {
+            updates.put(mAuth.getUid(), listing.getStartTime());
+            fcm.subscribeToTopic(listing.getUid());
+            listingRef.update(updates);
+          }
         }
       }
     });

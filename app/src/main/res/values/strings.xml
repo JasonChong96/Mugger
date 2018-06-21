@@ -107,7 +107,7 @@
     <string name="profile_view_msg_hist">View Message History</string>
     <string name="profile_ban">Ban this user</string>
     <string name="profile_view_reports">View Reports</string>
-    <string name="profile_actions">Administration :</string>
+    <string name="profile_actions">Actions</string>
     <string name="title_activity_settings2">Settings</string>
 
     <!-- Strings related to Settings -->

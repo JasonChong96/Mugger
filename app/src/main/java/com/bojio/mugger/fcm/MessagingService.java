@@ -16,6 +16,7 @@ import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.DebugSettings;
+import com.bojio.mugger.constants.MuggerRole;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,10 +69,17 @@ public class MessagingService extends FirebaseMessagingService {
     }
     Log.d(TAG, "Message received");
     if (user != null) {
-      if (data.get("type").equals("mute")) {
-        MuggerUser.getInstance().getData().put("muted", Long.parseLong((String) data.get("until")));
-      } else if (data.get("type").equals("unmute")) {
-        MuggerUser.getInstance().getData().remove("muted");
+      switch (data.get("type")) {
+        case "mute":
+          MuggerUser.getInstance().getData().put("muted", Long.parseLong((String) data.get("until")));
+          break;
+        case "unmute":
+          MuggerUser.getInstance().getData().remove("muted");
+          break;
+        case "role":
+          MuggerRole newRole = MuggerRole.valueOf(data.get("newRoleName"));
+          MuggerUser.getInstance().setRole(newRole);
+          break;
       }
     }
 

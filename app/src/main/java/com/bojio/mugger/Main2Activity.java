@@ -27,6 +27,7 @@ import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.constants.MuggerConstants;
 import com.bojio.mugger.constants.MuggerRole;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
@@ -86,7 +87,19 @@ public class Main2Activity extends AppCompatActivity
     // Updates cached display name/email
     db.collection("users").document(user.getUid()).update("displayName", user.getDisplayName());
     db.collection("users").document(user.getUid()).update("email", user.getEmail());
-
+    db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
+      if (task.isSuccessful()) {
+        long min = (Long) task.getResult().getData().get("minVersion");
+        if (MuggerConstants.APP_VERSION < min) {
+          signOut();
+          Toasty.error(this, "This version is outdated, please update the app through Google " +
+              "Play", Toast.LENGTH_LONG).show();
+        }
+      } else {
+        signOut();
+        Toasty.error(this, "Error loading application version", Toast.LENGTH_LONG).show();
+      }
+    });
     // Set behavior when logged in state changes
     setAuthStateChangeListener();
     if (MuggerUser.getInstance().getModules() == null) {
@@ -326,13 +339,19 @@ public class Main2Activity extends AppCompatActivity
               : moderator).itemsCallback((dialog, itemView, position, text) -> {
                 switch (position) {
                   case 0:
-                    startActivity(new Intent(this, ViewAllReportsActivity.class));
+                    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+                      startActivity(new Intent(this, ViewAllReportsActivity.class));
+                    }
                     break;
                   case 1:
-                    startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                    if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                      startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                    }
                     break;
                   case 2:
-                    startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
+                    if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                      startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
+                    }
                     break;
                   default:
                     Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();

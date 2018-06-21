@@ -281,6 +281,10 @@ public class ProfileFragment extends Fragment {
                 () {
               @Override
               public void onInput(MaterialDialog dialog, CharSequence input) {
+                if (!MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+                  muteButton.setVisibility(View.GONE);
+                  return;
+                }
                 AlertDialog dialogg = new SpotsDialog
                     .Builder()
                     .setContext(ProfileFragment.this.getContext())
@@ -342,9 +346,13 @@ public class ProfileFragment extends Fragment {
     }
     if (MuggerRole.ADMIN.check(ownRole)) {
       makeTAProfButton.setVisibility(View.VISIBLE);
-      if (!profileUid.equals(mAuth.getUid()) && ownRole.checkSuperiorityTo(profileRole)) {
+      if (true/*!profileUid.equals(mAuth.getUid()) && ownRole.checkSuperiorityTo(profileRole)*/) {
         changeRoleButton.setVisibility(View.VISIBLE);
         changeRoleButton.setOnClickListener(view -> {
+          if (!MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+            view.setVisibility(View.GONE);
+            return;
+          }
           Intent intent = new Intent(this.getActivity(), ChangeMuggerRoleActivity.class);
           Bundle b = new Bundle();
           b.putString("uid", profileUid);
@@ -387,6 +395,10 @@ public class ProfileFragment extends Fragment {
 
   @OnClick(R.id.profile_button_make_ta_prof)
   void onClick_makeTAProf() {
+    if (!MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+      makeTAProfButton.setVisibility(View.GONE);
+      return;
+    }
     Intent intent = new Intent(this.getActivity(), MakeTAProfActivity.class);
     Bundle b = new Bundle();
     b.putString("name", nameView.getText().toString());
