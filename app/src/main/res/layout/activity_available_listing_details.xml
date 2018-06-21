@@ -57,13 +57,13 @@
 
         <TextView
             android:id="@+id/module_code"
-            android:layout_width="156dp"
-            android:layout_height="45dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="30dp"
             android:text="CS2100"
-            android:textSize="30sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.15"
@@ -117,11 +117,12 @@
             app:layout_constraintTop_toBottomOf="@+id/location" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/chat_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Chat"
+            android:drawableStart="@drawable/ic_baseline_chat_24px"
             app:layout_constraintStart_toStartOf="@+id/description_label"
             app:layout_constraintTop_toBottomOf="@+id/description" />
 
@@ -139,11 +140,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:layout_marginTop="30dp"
             android:text="TextView"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/module_code"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/module_code" />
+
+        <Button
+            android:id="@+id/listing_details_report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:drawableStart="@drawable/ic_baseline_report_problem_24px"
+            android:text="Report This Listing"
+            app:layout_constraintStart_toStartOf="@+id/chat_button"
+            app:layout_constraintTop_toBottomOf="@+id/chat_button" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

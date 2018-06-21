@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#4A849F</color>
+    <color name="colorPrimaryDark">#1B3440</color>
+    <color name="colorAccent">#824732</color>
+    <!--system colors-->
+    <color name="colorAccentPressed">#eaa60c</color>
+    <color name="colorAccentIcons">#edb537</color>
+
+    <!--text colors-->
+    <color name="colorTextPrimary">#D9FFFFFF</color>
+    <color name="colorTextPrimaryHighlighted">#F2FFFFFF</color>
+    <color name="colorTextSecondary">#8CFFFFFF</color>
+
+    <!--basic colors-->
+    <color name="colorTransparent">#00000000</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorEmptyStates">#40ffffff</color>
+    <color name="colorGrey">#BDBDBD</color>
+    <color name="colorRed">#F44336</color>
+    <color name="colorPink">#de7172</color>
+
+    <!--theme colors-->
+    <color name="colorShadow">#41000000</color>
+    <color name="colorBackground">#B4D6C6</color>
+    <color name="colorForeground">#3A3A3A</color>
+    <!--fab colors-->
+
+    <color name="actionbar_background">#000000</color>
+    <color name="actionbar_text">#ffffff</color>
+    <color name="ta_listing_background">#97D3CA</color>
+    <color name="own_listing_background">#F2845C</color>
+    <color name="prof_listing_background">#9EB3ED</color>
+    <color name="colorButton">#f5f1d5</color>
+
+    <color name="colorBackgroundAdmin">#f5f1d5</color>
+    <color name="colorPrimaryAdmin">#F2845C</color>
+    <color name="colorPrimaryDarkAdmin">#824732</color>
+    <color name="colorAccentAdmin">#1B3440</color>
+
+    <color name="colorPrimarySunStream">#7DA1C4</color>
+    <color name="colorPrimaryDarkSunStream">#26547C</color>
+    <color name="colorBackgroundSunStream">#EDD7A8</color>
+    <color name="colorAccentSunStream">#ED8B00</color>
 </resources>

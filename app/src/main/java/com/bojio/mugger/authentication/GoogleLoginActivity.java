@@ -1,5 +1,6 @@
 package com.bojio.mugger.authentication;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
+import com.bojio.mugger.constants.DebugSettings;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -23,6 +25,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class GoogleLoginActivity extends AppCompatActivity {
   private static final int RC_SIGN_IN = 9001;
@@ -50,6 +55,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
     setContentView(R.layout.activity_google_login);
     ProgressBar pgsBar = findViewById(R.id.progressBar);
     pgsBar.setVisibility(View.GONE);
+    // Sets behavior when logged in state changes
+    initAuthStateListener();
   }
 
   /**
@@ -78,46 +85,18 @@ public class GoogleLoginActivity extends AppCompatActivity {
         // Google Sign In was successful, authenticate with Firebase
         GoogleSignInAccount account = task.getResult(ApiException.class);
         firebaseAuthWithGoogle(account);
-        (findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
-        mAuth.addAuthStateListener(auth -> {
-          FirebaseUser user = auth.getCurrentUser();
-          if (user != null) {
-            db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
-              if (!task_.isSuccessful()) {
-                Toast.makeText(this, "Error fetching user data. Please try again later.", Toast
-                    .LENGTH_SHORT);
-                mAuth.signOut();
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
-              } else {
-                DocumentSnapshot result = task_.getResult();
-                if (result.exists() && result.get("nusNetId") != null) {
-                  Intent intent = new Intent(this, Main2Activity.class);
-                  MuggerUser.getInstance().setData(result.getData());
-                  // Clears back stack
-                  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                  startActivity(intent);
-                  finish();
-                } else {
-                  Intent intent = new Intent(this, IvleLoginActivity.class);
-                  // Clears back stack
-                  startActivity(intent);
-                  finish();
-                }
-              }
-            });
-           /* Intent intent = new Intent(this, Main2Activity.class);
-            // Clears back stack
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();*/
-          }
-        });
+        AlertDialog dialog = new SpotsDialog
+            .Builder()
+            .setContext(this)
+            .setMessage("Signing in...")
+            .setCancelable(false)
+            .build();
+        dialog.show();
+
       } catch (ApiException e) {
         // Google Sign In failed,
         Log.w(TAG, "Google sign in failed", e);
-        Toast.makeText(this, "Sign in failed", Toast.LENGTH_SHORT).show();
+        Toasty.error(this, "Sign in failed", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -138,5 +117,42 @@ public class GoogleLoginActivity extends AppCompatActivity {
             Log.w(TAG, "signInWithCredential:failure", task.getException());
           }
         });
+  }
+
+  private void initAuthStateListener() {
+    mAuth.addAuthStateListener(auth -> {
+      FirebaseUser user = auth.getCurrentUser();
+      if (user != null) {
+        // If signed in, check if user has been verified as an NUS student by checking if
+        // hashed nusnetid has been cached
+        db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
+          if (!task_.isSuccessful()) {
+            Toasty.error(this, "Error fetching user data. Please try again later.", Toast
+                .LENGTH_SHORT).show();
+            mAuth.signOut();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+          } else {
+            DocumentSnapshot result = task_.getResult();
+            if (result.exists() && result.get("nusNetId") != null && !DebugSettings
+                .ALWAYS_REDIRECT_TO_IVLE) {
+              // If already verified, then go straight to main listings page
+              Intent intent = new Intent(this, Main2Activity.class);
+              MuggerUser.getInstance().setData(result.getData());
+              // Clears back stack
+              intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+              startActivity(intent);
+              finish();
+            } else {
+              // If not cached then go to IVLE Login
+              Intent intent = new Intent(this, IvleLoginActivity.class);
+              startActivity(intent);
+              finish();
+            }
+          }
+        });
+      }
+    });
   }
 }

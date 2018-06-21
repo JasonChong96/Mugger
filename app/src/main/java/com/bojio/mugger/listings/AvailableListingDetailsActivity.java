@@ -1,12 +1,12 @@
 package com.bojio.mugger.listings;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
@@ -14,19 +14,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.fragments.MyListingsFragments;
+import com.bojio.mugger.administration.reports.MakeReportActivity;
+import com.bojio.mugger.administration.reports.Report;
+import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.fcm.MessagingService;
+import com.bojio.mugger.listings.chat.ListingChatActivity;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 public class AvailableListingDetailsActivity extends AppCompatActivity {
 
@@ -57,25 +71,135 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
   Listing listing;
   FirebaseAuth mAuth;
   FirebaseFirestore db;
+  FirebaseMessaging fcm;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
-
+    fcm = FirebaseMessaging.getInstance();
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_available_listing_details);
     ButterKnife.bind(this);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
     if (b == null) {
       finish();
-      Toast.makeText(this, "Error fetching listing details.", Toast.LENGTH_SHORT);
+      Toasty.error(this, "Error fetching listing details.", Toast.LENGTH_SHORT).show();
       return;
     }
+
+    listing = b.getParcelable("listing");
+    if (listing == null) {
+      AlertDialog dialog = new SpotsDialog
+          .Builder()
+          .setContext(this)
+          .setMessage("Loading listing information...")
+          .setCancelable(false)
+          .build();
+      dialog.show();
+      String listingUid = b.getString("listingUid");
+      if (listingUid == null) {
+        Toasty.error(this, "Missing Listing UID", Toast.LENGTH_SHORT).show();
+        finish();
+        return;
+      }
+      Task<DocumentSnapshot> listingTask = db.collection("listings").document(listingUid).get()
+          .addOnCompleteListener(task -> {
+        if (!task.isSuccessful()) {
+          Toasty.error(this, "Error fetching listing data", Toast.LENGTH_SHORT).show();
+          finish();
+          return;
+        } else {
+          if (!task.getResult().exists()) {
+            Toasty.info(this, "Listing no longer exists").show();
+            finish();
+            return;
+          }
+          listing = Listing.getListingFromSnapshot(task.getResult());
+          init();
+          dialog.dismiss();
+        }
+      });
+    } else {
+      init();
+    }
+
+  //  db.collection("listings").document(listing.getUid()).addSnapshotListener(this, )
+
+  }
+
+  @OnClick(R.id.chat_button)
+  public void onClick() {
+    Intent intent = new Intent(this, ListingChatActivity.class);
+    Bundle b = new Bundle();
+    b.putParcelable("listing", listing);
+    intent.putExtras(b);
+    startActivity(intent);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+
+    FirebaseUser user = mAuth.getCurrentUser();
+    if (listing != null && (user.getUid().equals(listing.getOwnerId()) || MuggerRole.MODERATOR
+        .check(MuggerUser.getInstance().getRole()))) {
+      getMenuInflater().inflate(R.menu.listing_menu, menu);
+    }
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+    int id = item.getItemId();
+
+    //noinspection SimplifiableIfStatement
+    if (id == R.id.edit_listing) {
+      Intent intent = new Intent(this, CreateEditListingActivity.class);
+      intent.putExtras(this.getIntent());
+      startActivity(intent);
+      finish();
+    } else if (id == R.id.delete_listing) {
+      AlertDialog dialog = new SpotsDialog
+          .Builder()
+          .setContext(this)
+          .setMessage("Deleting listing...")
+          .setCancelable(false)
+          .build();
+      dialog.show();
+      db.collection("listings").document(listing.getUid()).delete().addOnCompleteListener(task -> {
+        if (task.isSuccessful()) {
+          Map<String, Object> notificationData = new HashMap<>();
+          notificationData.put("title", "Listing Deleted");
+          StringBuilder body = new StringBuilder();
+          body.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode())
+              .append(" Listing has been deleted.");
+          notificationData.put("body", body.toString());
+          notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
+          notificationData.put("fromUid", mAuth.getUid());
+          notificationData.put("topicUid", listing.getUid());
+          db.collection("notifications").add(notificationData);
+          finish();
+        } else {
+          dialog.dismiss();
+          Toasty.error(this, "Failed to delete listing, please try again later", Toast
+              .LENGTH_SHORT).show();
+        }
+      });
+    } else if (id == android.R.id.home) {
+      finish();
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
+  private void init() {
     java.text.DateFormat df = android.text.format.DateFormat.getDateFormat(this);
     java.text.DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(this);
-    listing = b.getParcelable("listing");
-  //  db.collection("listings").document(listing.getUid()).addSnapshotListener(this, )
     moduleCode.setText(listing.getModuleCode());
     Date startDate = new Date(listing.getStartTime());
     Date endDate = new Date(listing.getEndTime());
@@ -103,58 +227,39 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
         Map<String, Object> updates = new HashMap<>();
         if (!isChecked) {
           if (mAuth.getUid().equals(listing.getOwnerId())) {
-            Toast.makeText(AvailableListingDetailsActivity.this, "You must be attending listings " +
+            Toasty.error(AvailableListingDetailsActivity.this, "You must be attending " +
+                "listings " +
                 "that you own.", Toast.LENGTH_SHORT).show();
             buttonView.setChecked(true);
           } else {
             updates.put(mAuth.getUid(), FieldValue.delete());
+            fcm.unsubscribeFromTopic(listing.getUid());
             listingRef.update(updates);
           }
         } else {
-          updates.put(mAuth.getUid(), listing.getStartTime());
-          listingRef.update(updates);
+          if (listing.getNumAttendees() > 19) {
+            Toasty.error(AvailableListingDetailsActivity.this, "There are" +
+                "too many people attending this listing", Toast.LENGTH_SHORT)
+                .show();
+            buttonView.setChecked(false);
+          } else {
+            updates.put(mAuth.getUid(), listing.getStartTime());
+            fcm.subscribeToTopic(listing.getUid());
+            listingRef.update(updates);
+          }
         }
       }
     });
   }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-
-    FirebaseUser user = mAuth.getCurrentUser();
-    if (user.getUid().equals(listing.getOwnerId())) {
-      getMenuInflater().inflate(R.menu.listing_menu, menu);
-    }
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
-
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.edit_listing) {
-      Intent intent = new Intent(this, CreateEditListingActivity.class);
-      intent.putExtras(this.getIntent());
-      startActivity(intent);
-      finish();
-    } else if (id == R.id.delete_listing) {
-      progressBar.setVisibility(View.VISIBLE);
-      db.collection("listings").document(listing.getUid()).delete().addOnCompleteListener(task -> {
-        if (task.isSuccessful()) {
-          finish();
-        } else {
-          progressBar.setVisibility(View.GONE);
-          Toast.makeText(this, "Failed to delete listing, please try again later", Toast
-              .LENGTH_SHORT);
-        }
-      });
-    }
-
-    return super.onOptionsItemSelected(item);
+  @OnClick(R.id.listing_details_report)
+  public void onClick_report() {
+    Intent intent = new Intent(this, MakeReportActivity.class);
+    Bundle b = new Bundle();
+    b.putParcelable("listing", listing);
+    b.putString("reportType", Report.ReportType.LISTING.name());
+    b.putString("listingUid", listing.getUid());
+    intent.putExtras(b);
+    startActivity(intent);
   }
 }

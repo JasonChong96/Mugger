@@ -3,8 +3,11 @@ package com.bojio.mugger.listings;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Listing implements Parcelable {
   public static final Parcelable.Creator<Listing> CREATOR
@@ -26,12 +29,21 @@ public class Listing implements Parcelable {
   private String venue;
 
 
+  private String ownerName;
+
+
+
+  private int type;
+
+
 
   private List<String> attendees;
 
-  public Listing(String uid, String ownerId, String moduleCode, long startTime, long endTime,
-                 String description, String venue, List<String> attendees) {
+  private Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
+                  long endTime, String description, String venue, List<String> attendees, int type)
+  {
     this.uid = uid;
+    this.ownerName = ownerName;
     this.ownerId = ownerId;
     this.moduleCode = moduleCode;
     this.startTime = startTime;
@@ -39,10 +51,45 @@ public class Listing implements Parcelable {
     this.description = description;
     this.venue = venue;
     this.attendees = attendees;
+    this.type = type;
+  }
+
+  public static Listing getListingFromSnapshot(DocumentSnapshot snapshot) {
+    if (snapshot == null || !snapshot.exists() || snapshot.getData() == null) {
+      return null;
+    }
+    Map<String, Object> data = snapshot.getData();
+    int type = 0;
+    if (snapshot.contains("type")) {
+      type = ((Long) snapshot.get("type")).intValue();
+    }
+    data.remove("ownerId");
+    data.remove("moduleCode");
+    data.remove("startTime");
+    data.remove("endTime");
+    data.remove("description");
+    data.remove("venue");
+    data.remove("type");
+    data.remove("ownerName");
+    data.remove((String) snapshot.get("moduleCode"));
+    List<String> attendeesList = new ArrayList<>(data.keySet());
+
+    return new Listing(snapshot.getId(),
+        (String) snapshot.get("ownerName"),
+        (String) snapshot.get("ownerId"),
+        (String) snapshot.get("moduleCode"),
+        (long) snapshot.get("startTime"),
+        (long) snapshot.get("endTime"),
+        (String) snapshot.get("description"),
+        (String) snapshot.get("venue"),
+        attendeesList,
+        type
+    );
   }
 
   private Listing(Parcel source) {
     this.uid = source.readString();
+    this.ownerName = source.readString();
     this.ownerId = source.readString();
     this.moduleCode = source.readString();
     this.description = source.readString();
@@ -51,6 +98,7 @@ public class Listing implements Parcelable {
     this.venue = source.readString();
     this.attendees = new ArrayList<String>();
     source.readStringList(this.attendees);
+    this.type = source.readInt();
   }
 
   @Override
@@ -61,6 +109,7 @@ public class Listing implements Parcelable {
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(uid);
+    dest.writeString(ownerName);
     dest.writeString(ownerId);
     dest.writeString(moduleCode);
     dest.writeString(description);
@@ -68,7 +117,7 @@ public class Listing implements Parcelable {
     dest.writeLong(endTime);
     dest.writeString(venue);
     dest.writeStringList(this.attendees);
-
+    dest.writeInt(type);
   }
 
   public String getVenue() {
@@ -138,4 +187,21 @@ public class Listing implements Parcelable {
   public boolean isAttending(String uid) {
     return attendees.contains(uid);
   }
+
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int type) {
+    this.type = type;
+  }
+
+  public String getOwnerName() {
+    return ownerName;
+  }
+
+  public void setOwnerName(String ownerName) {
+    this.ownerName = ownerName;
+  }
+
 }

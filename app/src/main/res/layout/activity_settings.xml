@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_constraint"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".settings.SettingsActivity">
+
+    <View
+        android:id="@+id/divider6"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_chat_notification_label" />
+
+    <Switch
+        android:id="@+id/settings_created_notification_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/settings_created_notification_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/settings_created_notification_label"
+        app:layout_constraintTop_toTopOf="@+id/settings_created_notification_label"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/settings_notifications_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Notifications"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/settings_deleted_notification_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="When a listing i joined is deleted"
+        app:layout_constraintStart_toStartOf="@+id/settings_notifications_label"
+        app:layout_constraintTop_toBottomOf="@+id/settings_notifications_label" />
+
+    <Switch
+        android:id="@+id/settings_deleted_notification_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/settings_deleted_notification_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/settings_deleted_notification_label"
+        app:layout_constraintTop_toTopOf="@+id/settings_deleted_notification_label" />
+
+    <TextView
+        android:id="@+id/settings_created_notification_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="120dp"
+        android:layout_marginTop="16dp"
+        android:text="When new listings of my current modules is created"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/settings_deleted_notification_label"
+        app:layout_constraintTop_toBottomOf="@+id/settings_deleted_notification_label" />
+
+    <TextView
+        android:id="@+id/settings_change_profile_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Profile"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider6" />
+
+    <TextView
+        android:id="@+id/settings_change_display_name_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Change Display Name"
+        app:layout_constraintStart_toStartOf="@+id/settings_change_profile_label"
+        app:layout_constraintTop_toBottomOf="@+id/settings_change_profile_label" />
+
+    <EditText
+        android:id="@+id/settings_change_display_name_edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textCapWords|textNoSuggestions"
+        android:text="Name"
+        app:layout_constraintStart_toStartOf="@+id/settings_change_display_name_label"
+        app:layout_constraintTop_toBottomOf="@+id/settings_change_display_name_label" />
+
+    <Button
+        android:id="@+id/settings_change_display_name_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Apply"
+        app:layout_constraintBottom_toBottomOf="@+id/settings_change_display_name_edittext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/settings_change_display_name_edittext"
+        app:layout_constraintTop_toTopOf="@+id/settings_change_display_name_edittext" />
+
+    <Button
+        android:id="@+id/settings_refresh_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Refresh Modules"
+        app:layout_constraintBottom_toBottomOf="@+id/settings_refresh_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/settings_refresh_label"
+        app:layout_constraintTop_toTopOf="@+id/settings_refresh_label" />
+
+    <TextView
+        android:id="@+id/settings_refresh_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="160dp"
+        android:layout_marginTop="16dp"
+        android:text="Logs you out and refreshes your modules. Use this if your modules haven't been updated on this application"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/settings_change_display_name_edittext"
+        app:layout_constraintTop_toBottomOf="@+id/settings_change_display_name_edittext" />
+
+    <TextView
+        android:id="@+id/settings_chat_notification_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="120dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Chat notifications from listings I joined"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_created_notification_label" />
+
+    <Switch
+        android:id="@+id/settings_chat_notification_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/settings_chat_notification_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/settings_chat_notification_label"
+        app:layout_constraintTop_toTopOf="@+id/settings_chat_notification_label" />
+</android.support.constraint.ConstraintLayout>
