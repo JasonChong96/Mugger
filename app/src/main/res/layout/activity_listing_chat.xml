@@ -59,7 +59,7 @@
             android:layout_toStartOf="@id/activity_thread_send_fab"
             android:background="@drawable/chip_chat"
             android:hint="Input message here"
-            android:inputType="textCapSentences|textAutoComplete|textAutoCorrect"
+            android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
             android:padding="@dimen/simple_padding_largish"
             android:textColor="@color/colorBlack"
             android:textSize="@dimen/text_size_secondary" />

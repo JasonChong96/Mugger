@@ -46,7 +46,6 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_view_all_feedback);
-    setTitle("View All Feedback");
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     initRecycler();
