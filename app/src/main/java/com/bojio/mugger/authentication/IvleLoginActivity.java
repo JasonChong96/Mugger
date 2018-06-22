@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.WebView;
@@ -13,7 +12,6 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
@@ -58,6 +56,7 @@ public class IvleLoginActivity extends AppCompatActivity {
   FirebaseFirestore db;
   String token;
   FirebaseAuth mAuth;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
@@ -99,9 +98,9 @@ public class IvleLoginActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .build();
             dialog.show();
-           // Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
-          //      .LENGTH_SHORT).show();
-              });
+            // Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
+            //      .LENGTH_SHORT).show();
+          });
           token = url.substring(54);
           // Run in parallel so the loading screen still shows for the user while data is loading.
           Needle.onBackgroundThread().execute(() -> {
@@ -151,26 +150,26 @@ public class IvleLoginActivity extends AppCompatActivity {
     }
     db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(userData,
         SetOptions.merge()).addOnCompleteListener(task -> {
-          if (!task.isSuccessful()) {
-            onError();
-            return;
-          } else {
-            db.collection("users").document(FirebaseAuth.getInstance().getUid()).get()
-                .addOnCompleteListener(taskk -> {
-                  if (!task.isSuccessful()) {
-                    onError();
-                    return;
-                  } else {
-                    MuggerUser.getInstance().setData(taskk.getResult().getData());
-                    Intent intent = new Intent(this, Main2Activity.class);
-                    // Clears back stack
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                  }
-                });
+      if (!task.isSuccessful()) {
+        onError();
+        return;
+      } else {
+        db.collection("users").document(FirebaseAuth.getInstance().getUid()).get()
+            .addOnCompleteListener(taskk -> {
+              if (!task.isSuccessful()) {
+                onError();
+                return;
+              } else {
+                MuggerUser.getInstance().setData(taskk.getResult().getData());
+                Intent intent = new Intent(this, Main2Activity.class);
+                // Clears back stack
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+              }
+            });
 
-          }
+      }
     });
   }
 
@@ -181,7 +180,7 @@ public class IvleLoginActivity extends AppCompatActivity {
     try {
 
       url = new URL(https_url + token);
-      HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+      HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
       Scanner sc = new Scanner(con.getInputStream());
       String[] data = sc.nextLine().split("\"");
@@ -231,7 +230,7 @@ public class IvleLoginActivity extends AppCompatActivity {
     try {
 
       url = new URL(https_url_modules + token);
-      HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+      HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
       Scanner sc = new Scanner(con.getInputStream());
       String s = sc.nextLine();

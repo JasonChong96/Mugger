@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.DebugSettings;
@@ -21,7 +20,6 @@ import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -32,11 +30,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MessagingService extends FirebaseMessagingService {
 
   private static final String TAG = "MessagingService";
-  private static AtomicInteger notificationId = new AtomicInteger(0);
-  private static Map<String, Integer> chatToId = new HashMap<>();
   public static String CHAT_NOTIFICATION = "chat";
   public static String DELETED_NOTIFICATION = "delete";
   public static String CREATED_NOTIFICATION = "create";
+  private static AtomicInteger notificationId = new AtomicInteger(0);
+  private static Map<String, Integer> chatToId = new HashMap<>();
+
   @Override
   public void onMessageReceived(RemoteMessage remoteMessage) {
     // [START_EXCLUDE]
@@ -71,7 +70,7 @@ public class MessagingService extends FirebaseMessagingService {
     if (user != null) {
       switch (data.get("type")) {
         case "mute":
-          MuggerUser.getInstance().getData().put("muted", Long.parseLong((String) data.get("until")));
+          MuggerUser.getInstance().getData().put("muted", Long.parseLong(data.get("until")));
           break;
         case "unmute":
           MuggerUser.getInstance().getData().remove("muted");
@@ -95,6 +94,7 @@ public class MessagingService extends FirebaseMessagingService {
     // Also if you intend on generating your own notifications as a result of a received FCM
     // message, here is where that should be initiated. See sendNotification method below.
   }
+
   /**
    * Schedule a job using FirebaseJobDispatcher.
    */
@@ -127,14 +127,11 @@ public class MessagingService extends FirebaseMessagingService {
     Map<String, Object> cache = MuggerUser.getInstance().getData();
     if (cache == null) {
       return;
-    } else if (type.equals(CHAT_NOTIFICATION) && cache.get(CHAT_NOTIFICATION) != null && ((Long)
-        cache.get(CHAT_NOTIFICATION)).equals(Long.valueOf(0))) {
+    } else if (type.equals(CHAT_NOTIFICATION) && cache.get(CHAT_NOTIFICATION) != null && cache.get(CHAT_NOTIFICATION).equals(Long.valueOf(0))) {
       return;
-    } else if (type.equals(CREATED_NOTIFICATION) && cache.get(CREATED_NOTIFICATION) != null && ((Long)
-        cache.get(CREATED_NOTIFICATION)).equals(Long.valueOf(0))) {
+    } else if (type.equals(CREATED_NOTIFICATION) && cache.get(CREATED_NOTIFICATION) != null && cache.get(CREATED_NOTIFICATION).equals(Long.valueOf(0))) {
       return;
-    } else if (type.equals(DELETED_NOTIFICATION) && cache.get(DELETED_NOTIFICATION) != null && ((Long)
-        cache.get(DELETED_NOTIFICATION)).equals(Long.valueOf(0))) {
+    } else if (type.equals(DELETED_NOTIFICATION) && cache.get(DELETED_NOTIFICATION) != null && cache.get(DELETED_NOTIFICATION).equals(Long.valueOf(0))) {
       return;
     }
     if (!chatToId.containsKey(listingUid)) {
@@ -163,7 +160,7 @@ public class MessagingService extends FirebaseMessagingService {
 
 
     String channelId = "aaa";
-    Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     NotificationCompat.Builder notificationBuilder =
         new NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)

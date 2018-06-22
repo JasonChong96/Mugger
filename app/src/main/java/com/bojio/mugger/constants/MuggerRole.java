@@ -13,18 +13,6 @@ public enum MuggerRole {
     this.roleId = roleId;
   }
 
-  public int getRoleId() {
-    return roleId;
-  }
-
-  public boolean check(MuggerRole toCheck) {
-    return toCheck.roleId >= roleId;
-  }
-
-  public boolean checkSuperiorityTo(MuggerRole toCheck) {
-    return roleId > toCheck.roleId;
-  }
-
   public static MuggerRole getByRoleId(int roleId) {
     for (MuggerRole role : values()) {
       if (role.roleId == roleId) {
@@ -45,5 +33,17 @@ public enum MuggerRole {
       }
     }
     return USER;
+  }
+
+  public int getRoleId() {
+    return roleId;
+  }
+
+  public boolean check(MuggerRole toCheck) {
+    return toCheck.roleId >= roleId;
+  }
+
+  public boolean checkSuperiorityTo(MuggerRole toCheck) {
+    return roleId > toCheck.roleId;
   }
 }

@@ -1,7 +1,6 @@
 package com.bojio.mugger.listings.chat;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -48,20 +47,17 @@ import es.dmoral.toasty.Toasty;
 
 public class ListingChatActivity extends AppCompatActivity {
 
+  @BindView(R.id.messages)
+  RecyclerView messages;
+  @BindView(R.id.activity_thread_input_edit_text)
+  EditText toSendView;
+  @BindView(R.id.progressBar6)
+  ProgressBar progressBar;
   private Listing listing;
   private String listingUid;
   private FirebaseFirestore db;
   private FirebaseUser user;
   private MuggerUser cache;
-
-  @BindView(R.id.messages)
-  RecyclerView messages;
-
-  @BindView(R.id.activity_thread_input_edit_text)
-  EditText toSendView;
-
-  @BindView(R.id.progressBar6)
-  ProgressBar progressBar;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -227,7 +223,7 @@ public class ListingChatActivity extends AppCompatActivity {
             .this);
         holder.dateView.setText(dfDate.format(new Date(message.getTime())));
         holder.senderView.setOnClickListener(view -> {
-          CharSequence options[] = new CharSequence[] {"View " + message.getFromName() + "'s " +
+          CharSequence options[] = new CharSequence[]{"View " + message.getFromName() + "'s " +
               "profile", "Report this message"};
           new MaterialDialog.Builder(ListingChatActivity.this).items(options)
               .itemsCallback((dialog, itemView, which, text) -> {
@@ -304,16 +300,16 @@ public class ListingChatActivity extends AppCompatActivity {
   }
 
   class MessageViewHolder extends RecyclerView.ViewHolder {
-    @BindView (R.id.item_message_content)
+    @BindView(R.id.item_message_content)
     TextView contentView;
 
-    @BindView (R.id.item_message_sender)
+    @BindView(R.id.item_message_sender)
     TextView senderView;
 
-    @BindView (R.id.item_message_time)
+    @BindView(R.id.item_message_time)
     TextView timeView;
 
-    @BindView (R.id.item_message_date_text_view)
+    @BindView(R.id.item_message_date_text_view)
     TextView dateView;
 
     View view;

@@ -96,7 +96,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
               notificationData.put("fromUid", "");
               notificationData.put("topicUid", "");
               notificationData.put("type", "role");
-              notificationData.put("newRoleName", ((String) spinner.getSelectedItem()));
+              notificationData.put("newRoleName", spinner.getSelectedItem());
               FirebaseFirestore.getInstance().collection("notifications").add(notificationData);
             });
 

@@ -25,11 +25,10 @@ import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity {
 
-  private FirebaseAuth mAuth;
-  private FirebaseFirestore db;
-
   @BindView(R.id.progressBar5)
   ProgressBar progressBar;
+  private FirebaseAuth mAuth;
+  private FirebaseFirestore db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
    * Checks the account and starts the appropriate activity for the account. i.e If the account
    * has not logged in to IVLE for verification before, redirect to IVLE login. If not, redirect
    * to the listings main page.
+   *
    * @param acc the account to check
    */
   private void checkAccount(FirebaseUser acc) {

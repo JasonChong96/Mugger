@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,22 +43,17 @@ import butterknife.ButterKnife;
 public abstract class ListingsFragments extends Fragment {
 
   private static final String ARG_COLUMN_COUNT = "column-count";
-
+  protected Query mQuery;
   @BindView(R.id.list)
   RecyclerView mRecyclerView;
-
   @BindView(R.id.listings_fragments_spinner)
   Spinner spinner;
-
   @BindView(R.id.listings_fragments_constraint_layout_2)
   ConstraintLayout constraintLayout2;
-
   @BindView(R.id.listings_fragments_empty_text)
   TextView emptyTextView;
-
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseAuth mAuth;
-  protected Query mQuery;
   private int mColumnCount = 1;
   private OnListingsFragmentInteractionListener mListener;
 
@@ -97,12 +90,12 @@ public abstract class ListingsFragments extends Fragment {
     ButterKnife.bind(this, view);
 
 
-      Context context = view.getContext();
-      if (mColumnCount <= 1) {
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-      } else {
-        mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-      }
+    Context context = view.getContext();
+    if (mColumnCount <= 1) {
+      mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+    } else {
+      mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+    }
 
     initListings();
     return view;
@@ -124,6 +117,7 @@ public abstract class ListingsFragments extends Fragment {
     super.onDetach();
     mListener = null;
   }
+
   /**
    * When inside a nested fragment and Activity gets recreated due to reasons like orientation
    * change, {@link android.support.v4.app.Fragment#getActivity()} returns old Activity but the top
@@ -131,9 +125,7 @@ public abstract class ListingsFragments extends Fragment {
    * recreated Activity. Hence use this method in nested fragments instead of
    * android.support.v4.app.Fragment#getActivity()
    *
-   * @param fragment
-   *  The current nested Fragment
-   *
+   * @param fragment The current nested Fragment
    * @return current Activity that fragment is hosted in
    */
   public Activity getActivity(Fragment fragment) {
@@ -168,7 +160,7 @@ public abstract class ListingsFragments extends Fragment {
 
       @Override
       public void onBindViewHolder(ListingsViewHolder holder, int position, Listing listing) {
-        if (mAuth.getCurrentUser()== null) {
+        if (mAuth.getCurrentUser() == null) {
           return;
         }
         holder.itemView.setOnClickListener((view) -> {
@@ -215,7 +207,7 @@ public abstract class ListingsFragments extends Fragment {
             .append(" ")
             .append(dfTime.format(endDateTime))
             .toString());
-        holder.numAttendees.setText(String.format(Locale.getDefault(), "%d",listing.getNumAttendees
+        holder.numAttendees.setText(String.format(Locale.getDefault(), "%d", listing.getNumAttendees
             ()));
         holder.nameView.setText(String.format("By %s", listing.getOwnerName()));
       }

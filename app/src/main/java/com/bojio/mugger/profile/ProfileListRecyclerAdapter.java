@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.listings.ViewAttendeesActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -19,25 +18,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ProfileListRecyclerAdapter extends RecyclerView.Adapter<ProfileListRecyclerAdapter.ProfileListViewHolder> {
-  private ArrayList<DocumentSnapshot> mCustomObjects;
   String ownerUid;
-
-
-  public class ProfileListViewHolder extends RecyclerView.ViewHolder {
-    @BindView(R.id.profile_list_name)
-    public TextView nameView;
-
-    @BindView(R.id.profile_list_first_major)
-    public TextView firstMajorView;
-
-    @BindView(R.id.profile_list_second_major)
-    public TextView secondMajorView;
-
-    public ProfileListViewHolder(View itemView) {
-      super(itemView);
-      ButterKnife.bind(this, itemView);
-    }
-  }
+  private ArrayList<DocumentSnapshot> mCustomObjects;
+  private OnEntryClickListener mOnEntryClickListener;
 
   public ProfileListRecyclerAdapter(ArrayList<DocumentSnapshot> arrayList, String ownerUid) {
     mCustomObjects = arrayList;
@@ -82,14 +65,27 @@ public class ProfileListRecyclerAdapter extends RecyclerView.Adapter<ProfileList
     super.onAttachedToRecyclerView(recyclerView);
   }
 
-
-  private OnEntryClickListener mOnEntryClickListener;
+  public void setOnEntryClickListener(OnEntryClickListener onEntryClickListener) {
+    mOnEntryClickListener = onEntryClickListener;
+  }
 
   public interface OnEntryClickListener {
     void onEntryClick(View view, int position);
   }
 
-  public void setOnEntryClickListener(OnEntryClickListener onEntryClickListener) {
-    mOnEntryClickListener = onEntryClickListener;
+  public class ProfileListViewHolder extends RecyclerView.ViewHolder {
+    @BindView(R.id.profile_list_name)
+    public TextView nameView;
+
+    @BindView(R.id.profile_list_first_major)
+    public TextView firstMajorView;
+
+    @BindView(R.id.profile_list_second_major)
+    public TextView secondMajorView;
+
+    public ProfileListViewHolder(View itemView) {
+      super(itemView);
+      ButterKnife.bind(this, itemView);
+    }
   }
 }

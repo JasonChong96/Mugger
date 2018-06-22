@@ -8,13 +8,6 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 public class InstanceIdService extends FirebaseInstanceIdService {
 
-  @Override
-  public void onTokenRefresh() {
-    super.onTokenRefresh();
-    //Log.d("@@@@", "onTokenRefresh: " + instanceId);
-    updateToken();
-  }
-
   public static void updateToken() {
     String instanceId = FirebaseInstanceId.getInstance().getToken();
     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -25,5 +18,12 @@ public class InstanceIdService extends FirebaseInstanceIdService {
           .update("instanceId", instanceId);
     }
 
+  }
+
+  @Override
+  public void onTokenRefresh() {
+    super.onTokenRefresh();
+    //Log.d("@@@@", "onTokenRefresh: " + instanceId);
+    updateToken();
   }
 }

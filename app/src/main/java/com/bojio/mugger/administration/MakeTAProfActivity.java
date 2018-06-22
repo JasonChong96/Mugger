@@ -31,30 +31,23 @@ import es.dmoral.toasty.Toasty;
 
 public class MakeTAProfActivity extends AppCompatActivity {
 
+  @BindView(R.id.make_ta_prof_button_submit)
+  Button submitButton;
+  @BindView(R.id.make_ta_prof_radio_prof)
+  RadioButton checkBoxProf;
+  @BindView(R.id.make_ta_prof_radio_ta)
+  RadioButton checkBoxTA;
+  @BindView(R.id.make_ta_prof_radiogroup)
+  RadioGroup radioGroup;
+  @BindView(R.id.make_ta_prof_edit_text_module)
+  EditText editTextModule;
+  @BindView(R.id.make_ta_prof_semester)
+  TextView semesterView;
+  @BindView(R.id.make_ta_prof_title)
+  TextView titleView;
   private FirebaseFirestore db;
   private byte newRole;
   private String userUid;
-
-  @BindView(R.id.make_ta_prof_button_submit)
-  Button submitButton;
-
-  @BindView(R.id.make_ta_prof_radio_prof)
-  RadioButton checkBoxProf;
-
-  @BindView(R.id.make_ta_prof_radio_ta)
-  RadioButton checkBoxTA;
-
-  @BindView(R.id.make_ta_prof_radiogroup)
-  RadioGroup radioGroup;
-
-  @BindView(R.id.make_ta_prof_edit_text_module)
-  EditText editTextModule;
-
-  @BindView(R.id.make_ta_prof_semester)
-  TextView semesterView;
-
-  @BindView(R.id.make_ta_prof_title)
-  TextView titleView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +84,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
     radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch(checkedId) {
+        switch (checkedId) {
           case R.id.make_ta_prof_radio_prof:
             newRole = ModuleRole.PROFESSOR;
             break;

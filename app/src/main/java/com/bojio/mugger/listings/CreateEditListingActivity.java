@@ -110,48 +110,48 @@ public class CreateEditListingActivity extends AppCompatActivity {
         String currentSem = ((String) task.getResult().getData().get("currentSem"));
         db.collection("users").document(mAuth.getUid()).collection("semesters").document
             (currentSem).get().addOnCompleteListener(taskk -> {
-              if (!taskk.isSuccessful()) {
-                showShortToast("Error loading modules. Please try again later.");
-                finish();
-              } else {
-                DocumentSnapshot result = taskk.getResult();
-                if (!result.exists()) {
-                  showShortToast("Modules for this sem has not been loaded, please refresh them " +
-                      "through your settings page.");
-                  finish();
-                } else {
-                  Map<String, Object> data = result.getData();
-                  moduleCodes = new ArrayList<>();
-                  List<String> mods = (List<String>) data.get("professor");
-                  if (mods != null) {
-                    for (String mod : mods) {
-                      moduleCodes.add(mod);
-                      moduleRoles.put(mod, ModuleRole.PROFESSOR);
-                    }
-                  }
-                  mods = (List<String>) data.get("ta");
-                  if (mods != null) {
-                    for (String mod : mods) {
-                      moduleCodes.add(mod);
-                      moduleRoles.put(mod, ModuleRole.TEACHING_ASSISTANT);
-                    }
-                  }
-                  mods = (List<String>) data.get("moduleCodes");
-                  if (mods != null) {
-                    for (String mod : mods) {
-                      moduleCodes.add(mod);
-                      moduleRoles.put(mod, ModuleRole.EMPTY);
-                    }
-                  }
-                  ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
-                      moduleCodes);
-                  moduleCode.setAdapter(adapter);
-                  if (b != null) {
-                    moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
-                  }
-                  dialog.dismiss();
+          if (!taskk.isSuccessful()) {
+            showShortToast("Error loading modules. Please try again later.");
+            finish();
+          } else {
+            DocumentSnapshot result = taskk.getResult();
+            if (!result.exists()) {
+              showShortToast("Modules for this sem has not been loaded, please refresh them " +
+                  "through your settings page.");
+              finish();
+            } else {
+              Map<String, Object> data = result.getData();
+              moduleCodes = new ArrayList<>();
+              List<String> mods = (List<String>) data.get("professor");
+              if (mods != null) {
+                for (String mod : mods) {
+                  moduleCodes.add(mod);
+                  moduleRoles.put(mod, ModuleRole.PROFESSOR);
                 }
               }
+              mods = (List<String>) data.get("ta");
+              if (mods != null) {
+                for (String mod : mods) {
+                  moduleCodes.add(mod);
+                  moduleRoles.put(mod, ModuleRole.TEACHING_ASSISTANT);
+                }
+              }
+              mods = (List<String>) data.get("moduleCodes");
+              if (mods != null) {
+                for (String mod : mods) {
+                  moduleCodes.add(mod);
+                  moduleRoles.put(mod, ModuleRole.EMPTY);
+                }
+              }
+              ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
+                  moduleCodes);
+              moduleCode.setAdapter(adapter);
+              if (b != null) {
+                moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
+              }
+              dialog.dismiss();
+            }
+          }
         });
       }
     });
@@ -334,26 +334,26 @@ public class CreateEditListingActivity extends AppCompatActivity {
             (uidToListing);
 
           }*/
-         if (task.getResult() != null) {
-           FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
-         }
-         if (b == null) {
-           Map<String, Object> notificationData = new HashMap<>();
-           notificationData.put("title", "Listing Created");
-           StringBuilder body = new StringBuilder();
-           body.append(mAuth.getCurrentUser().getDisplayName()).append(" has created a Listing for ")
-               .append(moduleCode.getSelectedItem().toString())
-               .append(".");
-           notificationData.put("body", body.toString());
-           notificationData.put("type", MessagingService.CREATED_NOTIFICATION);
-           notificationData.put("fromUid", mAuth.getUid());
-           notificationData.put("topicUid", moduleCode.getSelectedItem().toString());
-           notificationData.put("listingUid", task.getResult().getId());
-           db.collection("notifications").add(notificationData);
-         }
-         Toasty.success(CreateEditListingActivity.this, b == null ? "Listing successfully " +
-             "created!" : "Listing " +
-             "successfully edited!").show();
+          if (task.getResult() != null) {
+            FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
+          }
+          if (b == null) {
+            Map<String, Object> notificationData = new HashMap<>();
+            notificationData.put("title", "Listing Created");
+            StringBuilder body = new StringBuilder();
+            body.append(mAuth.getCurrentUser().getDisplayName()).append(" has created a Listing for ")
+                .append(moduleCode.getSelectedItem().toString())
+                .append(".");
+            notificationData.put("body", body.toString());
+            notificationData.put("type", MessagingService.CREATED_NOTIFICATION);
+            notificationData.put("fromUid", mAuth.getUid());
+            notificationData.put("topicUid", moduleCode.getSelectedItem().toString());
+            notificationData.put("listingUid", task.getResult().getId());
+            db.collection("notifications").add(notificationData);
+          }
+          Toasty.success(CreateEditListingActivity.this, b == null ? "Listing successfully " +
+              "created!" : "Listing " +
+              "successfully edited!").show();
           CreateEditListingActivity.this.finish();
         }
       }

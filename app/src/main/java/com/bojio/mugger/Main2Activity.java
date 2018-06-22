@@ -66,14 +66,12 @@ public class Main2Activity extends AppCompatActivity
     ListingsFragments.OnListingsFragmentInteractionListener,
     ProfileFragment.OnProfileFragmentInteractionListener {
 
-  private FirebaseAuth mAuth;
-  private FirebaseFirestore db;
-
   @BindView(R.id.fab)
   FloatingActionButton fab;
-
   @BindView(android.R.id.content)
   View activityView;
+  private FirebaseAuth mAuth;
+  private FirebaseFirestore db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -204,6 +202,7 @@ public class Main2Activity extends AppCompatActivity
       }
     });
   }
+
   /**
    * Subscribes this client to the relevant listing notifications.
    */
@@ -211,7 +210,7 @@ public class Main2Activity extends AppCompatActivity
     if (mAuth == null) {
       return;
     }
-    Query q  = db.collection("listings")
+    Query q = db.collection("listings")
         .whereGreaterThan(mAuth.getUid(), 0);
     q.get().addOnCompleteListener(snap -> {
       List<DocumentSnapshot> results = snap.getResult().getDocuments();
@@ -247,6 +246,7 @@ public class Main2Activity extends AppCompatActivity
 
   /**
    * Creates the options menu (top right). Also sets the notification drawer display name and email.
+   *
    * @param menu the menu
    * @return
    */
@@ -345,27 +345,27 @@ public class Main2Activity extends AppCompatActivity
           new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
               "access?").items(MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole()) ? admin
               : moderator).itemsCallback((dialog, itemView, position, text) -> {
-                switch (position) {
-                  case 0:
-                    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
-                      startActivity(new Intent(this, ViewAllReportsActivity.class));
-                    }
-                    break;
-                  case 1:
-                    if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
-                      startActivity(new Intent(this, ViewAllFeedbackActivity.class));
-                    }
-                    break;
-                  case 2:
-                    if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
-                      startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
-                    }
-                    break;
-                  default:
-                    Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
-                    break;
+            switch (position) {
+              case 0:
+                if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+                  startActivity(new Intent(this, ViewAllReportsActivity.class));
                 }
-              }).build().show();
+                break;
+              case 1:
+                if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                  startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                }
+                break;
+              case 2:
+                if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                  startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
+                }
+                break;
+              default:
+                Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
+                break;
+            }
+          }).build().show();
         }
         break;
       default:

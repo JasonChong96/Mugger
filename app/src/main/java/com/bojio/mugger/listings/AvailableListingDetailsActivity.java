@@ -3,7 +3,6 @@ package com.bojio.mugger.listings;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,9 +19,7 @@ import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.MuggerRole;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,11 +28,10 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,26 +103,26 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
       }
       Task<DocumentSnapshot> listingTask = db.collection("listings").document(listingUid).get()
           .addOnCompleteListener(task -> {
-        if (!task.isSuccessful()) {
-          Toasty.error(this, "Error fetching listing data", Toast.LENGTH_SHORT).show();
-          finish();
-          return;
-        } else {
-          if (!task.getResult().exists()) {
-            Toasty.info(this, "Listing no longer exists").show();
-            finish();
-            return;
-          }
-          listing = Listing.getListingFromSnapshot(task.getResult());
-          init();
-          dialog.dismiss();
-        }
-      });
+            if (!task.isSuccessful()) {
+              Toasty.error(this, "Error fetching listing data", Toast.LENGTH_SHORT).show();
+              finish();
+              return;
+            } else {
+              if (!task.getResult().exists()) {
+                Toasty.info(this, "Listing no longer exists").show();
+                finish();
+                return;
+              }
+              listing = Listing.getListingFromSnapshot(task.getResult());
+              init();
+              dialog.dismiss();
+            }
+          });
     } else {
       init();
     }
 
-  //  db.collection("listings").document(listing.getUid()).addSnapshotListener(this, )
+    //  db.collection("listings").document(listing.getUid()).addSnapshotListener(this, )
 
   }
 

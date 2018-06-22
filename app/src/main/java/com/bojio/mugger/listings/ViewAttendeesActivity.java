@@ -1,18 +1,14 @@
 package com.bojio.mugger.listings;
 
 import android.app.AlertDialog;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.profile.ProfileActivity;
 import com.bojio.mugger.profile.ProfileListRecyclerAdapter;
-import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;

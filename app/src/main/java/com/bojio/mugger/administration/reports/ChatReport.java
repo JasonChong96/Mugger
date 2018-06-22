@@ -3,16 +3,34 @@ package com.bojio.mugger.administration.reports;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.view.View;
 import android.widget.Button;
 
-public class ChatReport extends Report{
+public class ChatReport extends Report {
+  public static final Creator<ChatReport> CREATOR = new Creator<ChatReport>() {
+    @Override
+    public ChatReport createFromParcel(Parcel in) {
+      return new ChatReport(in);
+    }
+
+    @Override
+    public ChatReport[] newArray(int size) {
+      return new ChatReport[size];
+    }
+  };
   private String message;
   private Button.OnClickListener listener;
 
-
   protected ChatReport() {
 
+  }
+
+  public ChatReport(Parcel in) {
+    super(in);
+    this.message = in.readString();
+  }
+
+  protected ChatReport(String message) {
+    this.message = message;
   }
 
   @Override
@@ -29,31 +47,10 @@ public class ChatReport extends Report{
     return listener;
   }
 
-  public ChatReport(Parcel in) {
-    super(in);
-    this.message = in.readString();
-  }
-
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     super.writeToParcel(dest, flags);
     dest.writeString(message);
-  }
-
-  public static final Creator<ChatReport> CREATOR = new Creator<ChatReport>() {
-    @Override
-    public ChatReport createFromParcel(Parcel in) {
-      return new ChatReport(in);
-    }
-
-    @Override
-    public ChatReport[] newArray(int size) {
-      return new ChatReport[size];
-    }
-  };
-
-  protected ChatReport(String message) {
-    this.message = message;
   }
 
   public String getMessage() {

@@ -12,12 +12,6 @@ public class Feedback {
   private long time;
   private DocumentReference docRef;
 
-  public static Feedback getFeedbackFromSnapshot(DocumentSnapshot snapshot) {
-    return new Feedback(snapshot.getId(), (String) snapshot.get("userUid"),
-        (String) snapshot.get("title"), (String) snapshot.get("description"), (String) snapshot
-        .get("userName"), (Long) snapshot.get("time"), snapshot.getReference());
-  }
-
   private Feedback(String uid, String userUid, String title, String description, String userName,
                    Long time, DocumentReference docRef) {
     this.uid = uid;
@@ -27,6 +21,12 @@ public class Feedback {
     this.userName = userName;
     this.time = time == null ? 0 : time;
     this.docRef = docRef;
+  }
+
+  public static Feedback getFeedbackFromSnapshot(DocumentSnapshot snapshot) {
+    return new Feedback(snapshot.getId(), (String) snapshot.get("userUid"),
+        (String) snapshot.get("title"), (String) snapshot.get("description"), (String) snapshot
+        .get("userName"), (Long) snapshot.get("time"), snapshot.getReference());
   }
 
   public String getUserName() {

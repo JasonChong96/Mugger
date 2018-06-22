@@ -1,6 +1,5 @@
 package com.bojio.mugger.authentication;
 
-import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerRole;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
@@ -14,12 +13,6 @@ public class MuggerUser {
   private static MuggerUser user;
   private MuggerRole role;
   private TreeMap<String, TreeMap<String, Byte>> modules;
-
-  public void setData(Map<String, Object> data) {
-    this.data = data;
-    role = MuggerRole.getByRoleId((Long) data.get("roleId"));
-  }
-
   private Map<String, Object> data;
 
   public MuggerUser() {
@@ -31,6 +24,10 @@ public class MuggerUser {
       user = new MuggerUser();
     }
     return user;
+  }
+
+  public static void clear() {
+    user = new MuggerUser();
   }
 
   public long isMuted() {
@@ -47,12 +44,13 @@ public class MuggerUser {
     }
   }
 
-  public static void clear() {
-    user = new MuggerUser();
-  }
-
   public Map<String, Object> getData() {
     return data;
+  }
+
+  public void setData(Map<String, Object> data) {
+    this.data = data;
+    role = MuggerRole.getByRoleId((Long) data.get("roleId"));
   }
 
   public MuggerRole getRole() {

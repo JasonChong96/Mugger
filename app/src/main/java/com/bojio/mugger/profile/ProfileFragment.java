@@ -55,65 +55,46 @@ import dmax.dialog.SpotsDialog;
  * create an instance of this fragment.
  */
 public class ProfileFragment extends Fragment {
+  @BindView(R.id.profile_text_view_name)
+  TextView nameView;
+  @BindView(R.id.profile_text_view_email)
+  TextView emailView;
+  @BindView(R.id.profile_image_view_sex)
+  ImageView sexView;
+  @BindView(R.id.profile_text_view_faculty)
+  TextView facultyView;
+  @BindView(R.id.profile_text_view_first_major)
+  TextView firstMajorView;
+  @BindView(R.id.profile_text_view_second_major)
+  TextView secondMajorView;
+  @BindView(R.id.profile_spinner_select_semester)
+  Spinner semesterSpinner;
+  @BindView(R.id.profile_text_view_modules)
+  TextView modulesView;
+  @BindView(R.id.profile_text_view_status)
+  TextView statusView;
+  @BindView(R.id.profile_plain_text_status)
+  EditText editStatusView;
+  @BindView(R.id.profile_button_mute)
+  Button muteButton;
+  @BindView(R.id.profile_button_make_ta_prof)
+  Button makeTAProfButton;
+  @BindView(R.id.profile_button_ban)
+  Button banButton;
+  @BindView(R.id.profile_button_change_mugger_role)
+  Button changeRoleButton;
+  @BindView(R.id.divider4)
+  View divider4;
+  @BindView(R.id.profile_button_update_status)
+  Button updateStatusButton;
+  @BindView(R.id.profile_text_view_actions_title)
+  TextView adminLabelView;
   private String profileUid;
   private FirebaseFirestore db;
   private FirebaseAuth mAuth;
   private List<List<String>> modulesBySem, modulesBySem_ta, modulesBySem_prof;
   private List<String> semesters;
   private Map<String, Object> moduleTitles;
-
-  @BindView(R.id.profile_text_view_name)
-  TextView nameView;
-
-  @BindView(R.id.profile_text_view_email)
-  TextView emailView;
-
-  @BindView(R.id.profile_image_view_sex)
-  ImageView sexView;
-
-  @BindView(R.id.profile_text_view_faculty)
-  TextView facultyView;
-
-  @BindView(R.id.profile_text_view_first_major)
-  TextView firstMajorView;
-
-  @BindView(R.id.profile_text_view_second_major)
-  TextView secondMajorView;
-
-  @BindView(R.id.profile_spinner_select_semester)
-  Spinner semesterSpinner;
-
-  @BindView(R.id.profile_text_view_modules)
-  TextView modulesView;
-
-  @BindView(R.id.profile_text_view_status)
-  TextView statusView;
-
-  @BindView(R.id.profile_plain_text_status)
-  EditText editStatusView;
-
-  @BindView(R.id.profile_button_mute)
-  Button muteButton;
-
-  @BindView(R.id.profile_button_make_ta_prof)
-  Button makeTAProfButton;
-
-  @BindView(R.id.profile_button_ban)
-  Button banButton;
-
-  @BindView(R.id.profile_button_change_mugger_role)
-  Button changeRoleButton;
-
-  @BindView(R.id.divider4)
-  View divider4;
-
-  @BindView(R.id.profile_button_update_status)
-  Button updateStatusButton;
-
-  @BindView(R.id.profile_text_view_actions_title)
-  TextView adminLabelView;
-
-
   private OnProfileFragmentInteractionListener mListener;
 
   public ProfileFragment() {
@@ -165,11 +146,11 @@ public class ProfileFragment extends Fragment {
     dialog.show();
     Tasks.whenAll(profileTask, modulesTask, moduleTitlesTask).addOnCompleteListener
         (task -> {
-      ProfileFragment.this.moduleTitles = moduleTitlesTask.getResult().getData();
-      ProfileFragment.this.loadProfile(profileTask.getResult(), modulesTask.getResult().getDocuments
-          ());
+          ProfileFragment.this.moduleTitles = moduleTitlesTask.getResult().getData();
+          ProfileFragment.this.loadProfile(profileTask.getResult(), modulesTask.getResult().getDocuments
+              ());
           dialog.dismiss();
-    });
+        });
     return view;
   }
 
@@ -184,7 +165,7 @@ public class ProfileFragment extends Fragment {
     }
     getActivity().setTitle(displayName + "'s Profile");
     emailView.setText((String) profileData.get("email"));
-    if (((String) profileData.get("sex")).equals("Female")) {
+    if (profileData.get("sex").equals("Female")) {
       sexView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.gender_female));
     }
     facultyView.setText((String) profileData.get("faculty"));
@@ -258,11 +239,11 @@ public class ProfileFragment extends Fragment {
       editStatusView.setVisibility(View.VISIBLE);
       statusView.setVisibility(View.GONE);
       ConstraintLayout layout;
-      layout = (ConstraintLayout) getActivity().findViewById(R.id.profile_constraint_layout);
+      layout = getActivity().findViewById(R.id.profile_constraint_layout);
       ConstraintSet constraintSet = new ConstraintSet();
       constraintSet.clone(layout);
-      constraintSet.connect(R.id.divider4,ConstraintSet.TOP,R.id.profile_plain_text_status,ConstraintSet
-          .BOTTOM,8);
+      constraintSet.connect(R.id.divider4, ConstraintSet.TOP, R.id.profile_plain_text_status, ConstraintSet
+          .BOTTOM, 8);
       constraintSet.applyTo(layout);
       editStatusView.setText((String) profileData.get("status"));
       updateStatusButton.setVisibility(View.VISIBLE);
@@ -342,7 +323,7 @@ public class ProfileFragment extends Fragment {
               }
             }).show();
       });
-    //  banButton.setVisibility(View.VISIBLE);
+      //  banButton.setVisibility(View.VISIBLE);
     }
     if (MuggerRole.ADMIN.check(ownRole)) {
       makeTAProfButton.setVisibility(View.VISIBLE);
@@ -390,7 +371,6 @@ public class ProfileFragment extends Fragment {
           }
         });
   }
-
 
 
   @OnClick(R.id.profile_button_make_ta_prof)
