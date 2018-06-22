@@ -13,6 +13,7 @@ public class ListingsViewHolder extends RecyclerView.ViewHolder {
   public TextView venue;
   public TextView numAttendees;
   public CardView cardView;
+  public TextView nameView;
   public View view;
 
   public ListingsViewHolder(View view) {
@@ -22,6 +23,7 @@ public class ListingsViewHolder extends RecyclerView.ViewHolder {
     venue = view.findViewById(R.id.venue);
     numAttendees = view.findViewById(R.id.num_attendees);
     cardView = view.findViewById(R.id.card_view_listing);
+    nameView = view.findViewById(R.id.owner_name);
     this.view = view;
   }
 }

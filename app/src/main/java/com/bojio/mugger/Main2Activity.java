@@ -102,6 +102,28 @@ public class Main2Activity extends AppCompatActivity
     });
     // Set behavior when logged in state changes
     setAuthStateChangeListener();
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main2);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryAdmin));
+    ButterKnife.bind(this);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+    drawer.addDrawerListener(toggle);
+    toggle.syncState();
+
+
+    String instanceId = FirebaseInstanceId.getInstance().getToken();
+    // Update instance id of this account in database
+    if (instanceId != null) {
+      db.collection("users")
+          .document(user.getUid())
+          .update("instanceId", instanceId);
+    }
+    // Subscribe to chat notifications
+    subscribeToTopics();
     if (MuggerUser.getInstance().getModules() == null) {
       AlertDialog dialog = new SpotsDialog
           .Builder()
@@ -144,35 +166,21 @@ public class Main2Activity extends AppCompatActivity
               }
               NavigationView navigationView = findViewById(R.id.nav_view);
               navigationView.setNavigationItemSelectedListener(this);
-              setTitle("Listings");
+              setTitle("Study Sessions");
               navigationView.setCheckedItem(R.id.nav_available_listings);
               onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
             }
             dialog.dismiss();
           });
+    } else {
+      NavigationView navigationView = findViewById(R.id.nav_view);
+      navigationView.setNavigationItemSelectedListener(this);
+      setTitle("Study Sessions");
+      navigationView.setCheckedItem(R.id.nav_available_listings);
+      onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
     }
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main2);
-    Toolbar toolbar = findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryAdmin));
-    ButterKnife.bind(this);
-    DrawerLayout drawer = findViewById(R.id.drawer_layout);
-    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-    drawer.addDrawerListener(toggle);
-    toggle.syncState();
 
 
-    String instanceId = FirebaseInstanceId.getInstance().getToken();
-    // Update instance id of this account in database
-    if (instanceId != null) {
-      db.collection("users")
-          .document(user.getUid())
-          .update("instanceId", instanceId);
-    }
-    // Subscribe to chat notifications
-    subscribeToTopics();
   }
 
   /**
@@ -290,7 +298,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.VISIBLE);
         ft.commit();
-        setTitle("Listings");
+        setTitle("Study Sessions");
         break;
       case R.id.nav_my_listings:
         fragment = new MyListingsFragments();
@@ -306,7 +314,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.GONE);
         ft.commit();
-        setTitle("Listings That I'm Joining");
+        setTitle("Sessions That I'm Joining");
         break;
       case R.id.nav_profile:
         Intent intent = new Intent(this, ProfileActivity.class);

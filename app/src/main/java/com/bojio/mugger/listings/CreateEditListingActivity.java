@@ -298,8 +298,9 @@ public class CreateEditListingActivity extends AppCompatActivity {
     data.put("endTime", endDateTime.getTimeInMillis());
     data.put("startTime", startTimeMillis);
     data.put("moduleCode", moduleCode.getSelectedItem().toString());
-    data.put("ownerId", mAuth.getCurrentUser().getUid());
-    data.put("ownerName", mAuth.getCurrentUser().getDisplayName());
+    data.put("ownerId", b == null ? mAuth.getCurrentUser().getUid() : toEdit.getOwnerId());
+    data.put("ownerName", b == null ? mAuth.getCurrentUser().getDisplayName() : toEdit
+        .getOwnerName());
     data.put("venue", venue.getText().toString());
     data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
     data.put(mAuth.getUid(), startTimeMillis);

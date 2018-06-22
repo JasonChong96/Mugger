@@ -1,11 +1,14 @@
 package com.bojio.mugger.listings.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -68,6 +71,7 @@ public abstract class ListingsFragments extends Fragment {
   public ListingsFragments() {
   }
 
+
   public static ListingsFragments newInstance(int columnCount) {
     AvailableListingsFragments fragment = new AvailableListingsFragments();
     Bundle args = new Bundle();
@@ -119,6 +123,27 @@ public abstract class ListingsFragments extends Fragment {
   public void onDetach() {
     super.onDetach();
     mListener = null;
+  }
+  /**
+   * When inside a nested fragment and Activity gets recreated due to reasons like orientation
+   * change, {@link android.support.v4.app.Fragment#getActivity()} returns old Activity but the top
+   * level parent fragment's {@link android.support.v4.app.Fragment#getActivity()} returns current,
+   * recreated Activity. Hence use this method in nested fragments instead of
+   * android.support.v4.app.Fragment#getActivity()
+   *
+   * @param fragment
+   *  The current nested Fragment
+   *
+   * @return current Activity that fragment is hosted in
+   */
+  public Activity getActivity(Fragment fragment) {
+    if (fragment == null) {
+      return null;
+    }
+    while (fragment.getParentFragment() != null) {
+      fragment = fragment.getParentFragment();
+    }
+    return fragment.getActivity();
   }
 
   protected void initListings() {
@@ -176,9 +201,9 @@ public abstract class ListingsFragments extends Fragment {
         holder.moduleCode.setText(title);
         holder.venue.setText(listing.getVenue());
         DateFormat df = android.text.format.DateFormat.getDateFormat(ListingsFragments.this
-            .getActivity());
+            .getActivity(ListingsFragments.this));
         DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(ListingsFragments
-            .this.getActivity());
+            .this.getActivity(ListingsFragments.this));
         Date startDateTime = new Date(listing.getStartTime());
         Date endDateTime = new Date(listing.getEndTime());
         holder.dateTime.setText(new StringBuilder()
@@ -192,6 +217,7 @@ public abstract class ListingsFragments extends Fragment {
             .toString());
         holder.numAttendees.setText(String.format(Locale.getDefault(), "%d",listing.getNumAttendees
             ()));
+        holder.nameView.setText(String.format("By %s", listing.getOwnerName()));
       }
 
 

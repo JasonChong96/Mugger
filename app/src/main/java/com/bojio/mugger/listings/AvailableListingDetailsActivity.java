@@ -34,6 +34,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
@@ -259,6 +260,16 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
     b.putParcelable("listing", listing);
     b.putString("reportType", Report.ReportType.LISTING.name());
     b.putString("listingUid", listing.getUid());
+    intent.putExtras(b);
+    startActivity(intent);
+  }
+
+  @OnClick(R.id.button_view_attendees)
+  public void onClick_viewAttendees() {
+    Intent intent = new Intent(this, ViewAttendeesActivity.class);
+    Bundle b = new Bundle();
+    b.putStringArrayList("profiles", (ArrayList<String>) listing.getAttendees());
+    b.putString("ownerUid", listing.getOwnerId());
     intent.putExtras(b);
     startActivity(intent);
   }
