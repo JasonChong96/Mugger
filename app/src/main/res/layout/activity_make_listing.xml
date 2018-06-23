@@ -23,135 +23,142 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="true"
-            android:visibility="invisible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
+
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/venue"
-            android:layout_width="288dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="244dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:ems="10"
-            android:hint="e.g Outside LT27"
-            android:inputType="textCapWords|textNoSuggestions"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="13dp"
 
-        <TextView
-            android:id="@+id/end_date_time"
-            android:layout_width="288dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="316dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:background="?android:attr/editTextBackground"
-            android:ems="10"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:boxStrokeColor="?attr/colorAccent"
+            app:helperText="E.g Outside LT27, Tech Hangout"
+            app:helperTextEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="@+id/end_date_time"
+            app:layout_constraintTop_toBottomOf="@+id/end_date_time">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/venue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Venue"
+
+                android:inputType="text|textCapSentences"
+                android:textColor="@color/colorTextPrimary" />
+        </android.support.design.widget.TextInputLayout>
 
         <TextView
             android:id="@+id/end_date_time_label"
             android:layout_width="174dp"
             android:layout_height="26dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
             android:text=" End Date &amp; time"
             android:textAppearance="@style/TextAppearance.AppCompat"
-            app:layout_constraintBottom_toTopOf="@+id/end_date_time"
-            app:layout_constraintStart_toStartOf="@+id/end_date_time" />
+            app:layout_constraintStart_toStartOf="@+id/start_date_time"
+            app:layout_constraintTop_toBottomOf="@+id/start_date_time" />
 
         <TextView
-            android:id="@+id/start_date_time_label"
-            android:layout_width="174dp"
-            android:layout_height="26dp"
-            android:text=" Start Date &amp; time"
-            android:textAppearance="@style/TextAppearance.AppCompat"
-            app:layout_constraintBottom_toTopOf="@+id/start_date_time"
-            app:layout_constraintStart_toStartOf="@+id/start_date_time" />
-
-        <Spinner
-            android:id="@+id/module_code"
-            android:layout_width="288dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="460dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/start_date_time"
-            android:layout_width="288dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="388dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:id="@+id/end_date_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:background="?android:attr/editTextBackground"
             android:ems="10"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/end_date_time_label"
+            app:layout_constraintTop_toBottomOf="@+id/end_date_time_label" />
+
+        <TextView
+            android:id="@+id/start_date_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text=" Start Date &amp; time"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            app:layout_constraintStart_toStartOf="@+id/module_code"
+            app:layout_constraintTop_toBottomOf="@+id/module_code" />
+
+        <Spinner
+            android:id="@+id/module_code"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="460dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/module_code_label" />
 
         <TextView
-            android:id="@+id/venue_label"
-            android:layout_width="97dp"
-            android:layout_height="26dp"
-            android:text=" Venue"
-            android:textAppearance="@style/TextAppearance.AppCompat"
-            app:layout_constraintBottom_toTopOf="@+id/venue"
-            app:layout_constraintStart_toStartOf="@+id/venue" />
-
-        <TextView
-            android:id="@+id/description_label"
-            android:layout_width="97dp"
-            android:layout_height="26dp"
-            android:text=" Description"
-            android:textAppearance="@style/TextAppearance.AppCompat"
-            app:layout_constraintBottom_toTopOf="@+id/description"
-            app:layout_constraintStart_toStartOf="@+id/description" />
+            android:id="@+id/start_date_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="?android:attr/editTextBackground"
+            android:ems="10"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/start_date_time_label"
+            app:layout_constraintTop_toBottomOf="@+id/start_date_time_label" />
 
         <TextView
             android:id="@+id/module_code_label"
             android:layout_width="97dp"
             android:layout_height="26dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:text=" Module Code"
             android:textAppearance="@style/TextAppearance.AppCompat"
             app:layout_constraintBottom_toTopOf="@+id/module_code"
-            app:layout_constraintStart_toStartOf="@+id/module_code"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/description"
-            android:layout_width="288dp"
-            android:layout_height="120dp"
-            android:layout_marginBottom="92dp"
-            android:ems="10"
-            android:hint="Type a short description about your study session. For example, which topics you're studying"
-            android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/submit_button"
-            style="@android:style/ButtonBar"
-            android:layout_width="288dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:text="Publish Listing"
+            android:textColor="@color/colorPrimaryDarkAdmin"
+            app:icon="@drawable/ic_baseline_publish_24px"
+            app:iconTint="@color/colorPrimaryDarkAdmin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/description" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Study Session Description"
+            app:helperText="E.g Topics, Study preferences"
+            app:helperTextEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="hint"
+                android:inputType="text|textCapSentences"
+                android:textColor="@color/colorTextPrimary" />
+        </android.support.design.widget.TextInputLayout>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

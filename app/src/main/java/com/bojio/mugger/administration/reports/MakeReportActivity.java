@@ -59,6 +59,7 @@ public class MakeReportActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Submitting Report...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
   }

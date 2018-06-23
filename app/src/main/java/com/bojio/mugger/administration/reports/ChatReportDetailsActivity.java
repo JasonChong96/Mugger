@@ -97,6 +97,7 @@ public class ChatReportDetailsActivity extends AppCompatActivity {
             .setContext(this)
             .setMessage("Deleting report...")
             .setCancelable(false)
+            .setTheme(R.style.SpotsDialog)
             .build();
         dialog.show();
         db.collection("reports").document(report.getUid()).delete().addOnCompleteListener(task

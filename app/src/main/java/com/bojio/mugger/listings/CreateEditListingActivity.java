@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.MenuItem;
@@ -41,6 +43,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
@@ -50,7 +53,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
   Spinner moduleCode;
 
   @BindView(R.id.venue)
-  EditText venue;
+  TextInputEditText venue;
 
   @BindView(R.id.start_date_time)
   TextView startDateTimeInput;
@@ -87,6 +90,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
         .Builder()
         .setContext(this)
         .setMessage("Loading modules...")
+        .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
     dialog.show();
@@ -277,6 +281,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
     }
     if (venue.getText().toString().isEmpty()) {
       showShortToast("Please fill in the venue which your study session is/will be held at.");
+
       submitButton.setClickable(true);
       return;
     }
@@ -290,6 +295,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage(b == null ? "Publishing listing..." : "Submitting changes...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     dialog.show();
     Map<String, Object> data = new HashMap<>();
@@ -302,8 +308,10 @@ public class CreateEditListingActivity extends AppCompatActivity {
     data.put("ownerName", b == null ? mAuth.getCurrentUser().getDisplayName() : toEdit
         .getOwnerName());
     data.put("venue", venue.getText().toString());
-    data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
-    data.put(mAuth.getUid(), startTimeMillis);
+    if (b == null) {
+      data.put(mAuth.getUid(), startTimeMillis);
+      data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
+    }
     data.put(moduleCode.getSelectedItem().toString(), startTimeMillis);
     if (toEdit != null) {
       for (String attendee : toEdit.getAttendees()) {

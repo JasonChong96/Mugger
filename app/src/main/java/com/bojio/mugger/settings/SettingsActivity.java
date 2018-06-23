@@ -68,6 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         .Builder()
         .setContext(this)
         .setMessage("Updating settings...")
+        .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
     DocumentReference userRef = db.collection("users").document(user.getUid());
@@ -128,6 +129,7 @@ public class SettingsActivity extends AppCompatActivity {
         .Builder()
         .setContext(this)
         .setMessage("Changing display name...")
+        .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
     dialog.show();

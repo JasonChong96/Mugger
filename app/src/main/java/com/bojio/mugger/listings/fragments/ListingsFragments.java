@@ -1,11 +1,14 @@
 package com.bojio.mugger.listings.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.button.MaterialButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,24 +18,44 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
+import com.bojio.mugger.administration.reports.MakeReportActivity;
+import com.bojio.mugger.administration.reports.Report;
+import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
+import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingsViewHolder;
+import com.bojio.mugger.listings.ViewAttendeesActivity;
+import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.mateware.snacky.Snacky;
+import dmax.dialog.SpotsDialog;
+import es.dmoral.toasty.Toasty;
 
 /**
  * A fragment representing a list of Items.
@@ -53,6 +76,7 @@ public abstract class ListingsFragments extends Fragment {
   @BindView(R.id.listings_fragments_empty_text)
   TextView emptyTextView;
   FirebaseFirestore db = FirebaseFirestore.getInstance();
+  FirebaseMessaging fcm = FirebaseMessaging.getInstance();
   FirebaseAuth mAuth;
   private int mColumnCount = 1;
   private OnListingsFragmentInteractionListener mListener;
@@ -149,6 +173,8 @@ public abstract class ListingsFragments extends Fragment {
         })
         .build();
     FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Listing, ListingsViewHolder>(options) {
+      private String uid = mAuth.getUid();
+
       @Override
       public void onDataChanged() {
         if (this.getItemCount() == 0) {
@@ -158,37 +184,124 @@ public abstract class ListingsFragments extends Fragment {
         }
       }
 
+      private void onClick_report(Listing listing) {
+        Intent intent = new Intent(ListingsFragments.this.getContext(), MakeReportActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("listing", listing);
+        b.putString("reportType", Report.ReportType.LISTING.name());
+        b.putString("listingUid", listing.getUid());
+        intent.putExtras(b);
+        startActivity(intent);
+      }
+
+      private void onClick_chat(Listing listing) {
+        Intent intent = new Intent(ListingsFragments.this.getContext(), ListingChatActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("listing", listing);
+        intent.putExtras(b);
+        startActivity(intent);
+      }
+
+      private void onClick_delete(Listing listing) {
+        new MaterialDialog.Builder(ListingsFragments.this.getContext()).title("Confirmation").content
+            ("Are you sure you want to delete this listing?").positiveText("Yes").negativeText("No")
+            .onPositive((dialog, which) -> {
+              AlertDialog dialogg = new SpotsDialog
+                  .Builder()
+                  .setContext(ListingsFragments.this.getContext())
+                  .setMessage("Deleting listing...")
+                  .setCancelable(false)
+                  .setTheme(R.style.SpotsDialog)
+                  .build();
+              dialogg.show();
+              db.collection("listings").document(listing.getUid()).delete().addOnCompleteListener(task -> {
+                dialogg.dismiss();
+                if (task.isSuccessful()) {
+                  Map<String, Object> notificationData = new HashMap<>();
+                  notificationData.put("title", "Listing Deleted");
+                  StringBuilder body = new StringBuilder();
+                  body.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode())
+                      .append(" Listing has been deleted.");
+                  notificationData.put("body", body.toString());
+                  notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
+                  notificationData.put("fromUid", mAuth.getUid());
+                  notificationData.put("topicUid", listing.getUid());
+                  db.collection("notifications").add(notificationData);
+                } else {
+                  Snacky.builder().setActivity(ListingsFragments.this.getActivity())
+                      .setText("Failed to delete listing, please try again later")
+                      .error()
+                      .show();
+                }
+              });
+            }).show();
+      }
+
+      private void onClick_edit(Listing listing) {
+        Intent intent = new Intent(ListingsFragments.this.getContext(), CreateEditListingActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("listing", listing);
+        intent.putExtras(b);
+        startActivity(intent);
+      }
+
+      private void onClick_join(MaterialButton button, Listing listing) {
+        DocumentReference listingRef = db.collection("listings").document(listing.getUid());
+        Map<String, Object> updates = new HashMap<>();
+        if (listing.isAttending(uid)) {
+          if (mAuth.getUid().equals(listing.getOwnerId())) {
+            Snacky.builder().setActivity(ListingsFragments.this.getActivity())
+                .setText("You must be attending listings that you own.")
+                .error()
+                .show();
+          } else {
+            updates.put(mAuth.getUid(), FieldValue.delete());
+            fcm.unsubscribeFromTopic(listing.getUid());
+            listingRef.update(updates);
+          }
+        } else {
+          if (listing.getNumAttendees() > 19) {
+            Snacky.builder().setActivity(ListingsFragments.this.getActivity())
+                .setText("There are too many people attending this listing")
+                .error()
+                .show();
+          } else {
+            updates.put(mAuth.getUid(), listing.getStartTime());
+            fcm.subscribeToTopic(listing.getUid());
+            listingRef.update(updates);
+          }
+        }
+      }
+
       @Override
       public void onBindViewHolder(ListingsViewHolder holder, int position, Listing listing) {
         if (mAuth.getCurrentUser() == null) {
           return;
         }
-        holder.itemView.setOnClickListener((view) -> {
-          Intent intent = new Intent(view.getContext(), AvailableListingDetailsActivity.class);
-          Bundle b = new Bundle();
-          b.putParcelable("listing", listing);
-          intent.putExtras(b);
-          view.getContext().startActivity(intent);
-        });
 
         int type = listing.getType();
         String title = listing.getModuleCode();
         if (listing.isAttending(mAuth.getCurrentUser().getUid())) {
-          holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
+          holder.colorCode.setColorFilter(holder.view.getContext().getResources().getColor
               (R.color.own_listing_background));
+          holder.colorCode.setVisibility(View.VISIBLE);
           if (listing.getOwnerId().equals(mAuth.getCurrentUser().getUid())) {
             title += " (Yours)";
           } else {
             title += " (Attending)";
           }
         } else if (type == ModuleRole.PROFESSOR) {
-          holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
+          holder.colorCode.setColorFilter(holder.view.getContext().getResources().getColor
               (R.color.prof_listing_background));
+          holder.colorCode.setVisibility(View.VISIBLE);
           title += " (Professor)";
         } else if (type == ModuleRole.TEACHING_ASSISTANT) {
-          holder.cardView.setCardBackgroundColor(holder.view.getContext().getResources().getColor
+          holder.colorCode.setColorFilter(holder.view.getContext().getResources().getColor
               (R.color.ta_listing_background));
+          holder.colorCode.setVisibility(View.VISIBLE);
           title += " (TA)";
+        } else {
+          holder.colorCode.setVisibility(View.INVISIBLE);
         }
         holder.moduleCode.setText(title);
         holder.venue.setText(listing.getVenue());
@@ -210,6 +323,50 @@ public abstract class ListingsFragments extends Fragment {
         holder.numAttendees.setText(String.format(Locale.getDefault(), "%d", listing.getNumAttendees
             ()));
         holder.nameView.setText(String.format("By %s", listing.getOwnerName()));
+        holder.expandClickView.setOnClickListener(v -> {
+          holder.expandLayout.callOnClick();
+        });
+        holder.numAttendeesClickView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), ViewAttendeesActivity.class);
+            Bundle b = new Bundle();
+            b.putStringArrayList("profiles", (ArrayList<String>) listing.getAttendees());
+            b.putString("ownerUid", listing.getOwnerId());
+            intent.putExtras(b);
+            startActivity(intent);
+        });
+        holder.expandLayout.setOnClickListener(view -> {
+          if (!holder.isExpanded()) {
+            holder.expandedLayout.setVisibility(View.VISIBLE);
+            holder.expandedLayout2.setVisibility(View.VISIBLE);
+            if (uid.equals(listing.getOwnerId()) || MuggerRole.MODERATOR
+                .check(MuggerUser.getInstance().getRole())) {
+              holder.creatorControlsLayout.setVisibility(View.VISIBLE);
+            }
+            holder.expandImage.setImageDrawable(getResources().getDrawable(R.drawable
+                .ic_baseline_expand_less_24px));
+          } else {
+            holder.expandedLayout.setVisibility(View.GONE);
+            holder.creatorControlsLayout.setVisibility(View.GONE);
+            holder.expandedLayout2.setVisibility(View.GONE);
+            holder.expandImage.setImageDrawable(getResources().getDrawable(R.drawable
+                .ic_baseline_expand_more_24px));
+          }
+          holder.toggleExpanded();
+        });
+        holder.chatButton.setOnClickListener(v -> onClick_chat(listing));
+        holder.reportButton.setOnClickListener(v -> onClick_report(listing));
+        holder.editButton.setOnClickListener(v -> onClick_edit(listing));
+        holder.deleteButton.setOnClickListener(v -> onClick_delete(listing));
+        holder.descriptionView.setText(listing.getDescription());
+        if (listing.isAttending(uid)) {
+          holder.joinButton.setVisibility(View.INVISIBLE);
+          holder.unjoinButton.setVisibility(View.VISIBLE);
+        } else {
+          holder.joinButton.setVisibility(View.VISIBLE);
+          holder.unjoinButton.setVisibility(View.INVISIBLE);
+        }
+        holder.joinButton.setOnClickListener(v -> onClick_join((MaterialButton) v, listing));
+        holder.unjoinButton.setOnClickListener(v -> onClick_join((MaterialButton) v, listing));
       }
 
 

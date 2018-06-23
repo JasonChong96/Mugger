@@ -44,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 app:srcCompat="@drawable/gender_male"
+                android:tint="@color/colorWhite"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_text_view_name"
                 app:layout_constraintStart_toEndOf="@+id/profile_text_view_name"
                 app:layout_constraintTop_toTopOf="@+id/profile_text_view_name" />
@@ -59,7 +60,7 @@
             android:textAppearance="@android:style/TextAppearance.Holo.Medium"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
@@ -217,49 +218,49 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_update_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="Update Status"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="12sp"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/divider4"
             app:layout_constraintStart_toEndOf="@+id/profile_plain_text_status"
             app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_make_ta_prof"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
+            android:textColor="@color/colorPrimaryDark"
             android:text="Make TA/Prof"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="visible"
             app:layout_constraintStart_toStartOf="@+id/profile_button_mute"
             app:layout_constraintTop_toBottomOf="@+id/profile_button_mute" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_change_mugger_role"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:textColor="@color/colorPrimaryDark"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="Change Mugger Role"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/profile_button_make_ta_prof"
-            app:layout_constraintTop_toTopOf="@+id/profile_button_make_ta_prof" />
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="@+id/profile_button_make_ta_prof"
+            app:layout_constraintTop_toBottomOf="@+id/profile_button_make_ta_prof" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_mute"
             android:layout_width="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
             android:text="Mute this user"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintStart_toEndOf="@+id/profile_button_ban"
             app:layout_constraintTop_toTopOf="@+id/profile_button_ban" />
 

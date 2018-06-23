@@ -5,6 +5,7 @@
             android:defaultValue="true"
             android:key="@string/settings_key_toggle_delete_notifications"
             android:summary="Receive a notification when a listing i joined is deleted"
+
             android:title="Listing Deleted" />
 
         <SwitchPreference

@@ -95,6 +95,7 @@ public class IvleLoginActivity extends AppCompatActivity {
                 .Builder()
                 .setContext(IvleLoginActivity.this)
                 .setMessage("Loading data from IVLE...")
+                .setTheme(R.style.SpotsDialog)
                 .setCancelable(false)
                 .build();
             dialog.show();

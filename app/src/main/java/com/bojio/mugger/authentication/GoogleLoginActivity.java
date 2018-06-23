@@ -89,6 +89,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
             .Builder()
             .setContext(this)
             .setMessage("Signing in...")
+            .setTheme(R.style.SpotsDialog)
             .setCancelable(false)
             .build();
         dialog.show();

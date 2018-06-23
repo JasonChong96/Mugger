@@ -75,6 +75,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Changing role...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     dialog.show();
     long roleId = MuggerRole.valueOf((String) spinner.getSelectedItem()).getRoleId();

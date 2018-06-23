@@ -93,6 +93,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
           .setContext(this)
           .setMessage("Loading listing information...")
           .setCancelable(false)
+          .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
       String listingUid = b.getString("listingUid");
@@ -166,6 +167,7 @@ public class AvailableListingDetailsActivity extends AppCompatActivity {
           .setContext(this)
           .setMessage("Deleting listing...")
           .setCancelable(false)
+          .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
       db.collection("listings").document(listing.getUid()).delete().addOnCompleteListener(task -> {

@@ -94,6 +94,7 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
                     .setContext(ViewAllFeedbackActivity.this)
                     .setMessage("Deleting Feedback...")
                     .setCancelable(false)
+                    .setTheme(R.style.SpotsDialog)
                     .build();
                 dialogg.show();
                 feedback.getDocRef().delete().addOnCompleteListener(task -> {

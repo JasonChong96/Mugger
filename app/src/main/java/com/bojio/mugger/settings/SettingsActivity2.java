@@ -224,6 +224,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
         .Builder()
         .setContext(this)
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     snackbar = Snackbar.make(findViewById(android.R.id.content), "", Snackbar.LENGTH_SHORT);
   }

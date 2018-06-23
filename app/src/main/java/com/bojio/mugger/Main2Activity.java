@@ -128,6 +128,7 @@ public class Main2Activity extends AppCompatActivity
           .setContext(this)
           .setMessage("Loading module data and notifications...")
           .setCancelable(false)
+          .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
       db.collection("users").document(user.getUid()).collection("semesters").get()

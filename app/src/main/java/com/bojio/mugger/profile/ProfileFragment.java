@@ -140,6 +140,7 @@ public class ProfileFragment extends Fragment {
     AlertDialog dialog = new SpotsDialog
         .Builder()
         .setContext(this.getActivity())
+        .setTheme(R.style.SpotsDialog)
         .setMessage("Loading profile...")
         .setCancelable(false)
         .build();
@@ -271,6 +272,7 @@ public class ProfileFragment extends Fragment {
                     .setContext(ProfileFragment.this.getContext())
                     .setMessage("Muting...")
                     .setCancelable(false)
+                    .setTheme(R.style.SpotsDialog)
                     .build();
                 dialogg.show();
                 String hoursString = input.toString();

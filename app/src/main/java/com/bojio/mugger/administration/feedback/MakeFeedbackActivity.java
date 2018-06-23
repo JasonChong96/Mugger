@@ -58,6 +58,7 @@ public class MakeFeedbackActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Submitting Feedback...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
   }
 

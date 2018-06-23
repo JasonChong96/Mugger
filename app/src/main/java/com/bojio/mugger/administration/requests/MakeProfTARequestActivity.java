@@ -25,6 +25,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
@@ -66,6 +67,7 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Submitting Request...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
   }
 
@@ -76,15 +78,21 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
     String moduleCode = moduleCodeView.getText().toString();
     String description = descriptionView.getText().toString();
     if (roleSpinner.getSelectedItemPosition() == 0) {
-      Snackbar.make(view, "Please choose your role in the module.", Snackbar.LENGTH_SHORT).show();
+      Snacky.builder().setActivity(this)
+          .setText("Please choose your role in the module.")
+          .error().show();
       return;
     }
     if (moduleCode.isEmpty()) {
-      Snackbar.make(view, "Please enter the module code.", Snackbar.LENGTH_SHORT).show();
+      Snacky.builder().setActivity(this)
+          .setText("Please enter the module code.")
+          .error().show();
       return;
     }
     if (description.isEmpty()) {
-      Snackbar.make(view, "Please fill in the description field.", Snackbar.LENGTH_SHORT).show();
+      Snacky.builder().setActivity(this)
+          .setText("Please fill in the description field.")
+          .error().show();
       return;
     }
     dialog.show();

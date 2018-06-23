@@ -75,8 +75,7 @@
             android:theme="@style/AppTheme.Admin" />
         <activity
             android:name=".administration.requests.MakeProfTARequestActivity"
-            android:label="Request Professor / TA Role"
-            android:theme="@style/AppTheme.Admin" />
+            android:label="Request Professor / TA Role" />
         <activity
             android:name=".administration.requests.ViewAllProfTARequestActivity"
             android:label="Professor / TA Role Requests"

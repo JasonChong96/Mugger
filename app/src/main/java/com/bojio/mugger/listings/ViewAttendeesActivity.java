@@ -45,6 +45,7 @@ public class ViewAttendeesActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Loading data...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     dialog.show();
     Bundle b = getIntent().getExtras();

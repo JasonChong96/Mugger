@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
       SpotsDialog.Builder dialog = new SpotsDialog
           .Builder()
           .setContext(this)
+          .setTheme(R.style.SpotsDialog)
           .setMessage("Signing in...")
           .setCancelable(false);
       dialog.build().show();

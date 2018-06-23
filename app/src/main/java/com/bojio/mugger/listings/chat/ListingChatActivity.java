@@ -90,6 +90,7 @@ public class ListingChatActivity extends AppCompatActivity {
           .setContext(this)
           .setMessage("Loading...")
           .setCancelable(false)
+          .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
       db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {

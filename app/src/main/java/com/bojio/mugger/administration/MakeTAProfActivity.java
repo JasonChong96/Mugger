@@ -60,6 +60,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
         .Builder()
         .setContext(this)
         .setMessage("Fetching current semester...")
+        .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
     dialog.show();
@@ -111,6 +112,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
           .Builder()
           .setContext(this)
           .setMessage("Changing role...")
+          .setTheme(R.style.SpotsDialog)
           .setCancelable(false)
           .build();
       dialog.show();
