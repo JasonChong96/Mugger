@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.TimeZone;
 
 import butterknife.BindView;
@@ -126,6 +127,15 @@ public class ListingChatActivity extends AppCompatActivity {
                 "hours",
             hours)).show();
         return;
+      }
+      if (message.equalsIgnoreCase("fuck you")) {
+        String[] wholesome = {"Wholly accept your flaws, and suddenly no one is strong enough to " +
+            "use them against you.",
+            "Remember, you have been criticizing yourself for years and it hasn’t worked. Try " +
+                "approving of yourself and see what happens.",
+            "Accepting yourself is about respecting yourself. It’s about honoring yourself right " +
+                "now, here today, in this moment. Not just who you could become somewhere down the line."};
+        message = wholesome[new Random().nextInt(wholesome.length)];
       }
       long timestamp = System.currentTimeMillis();
       long dayTimestamp = getDayTimestamp(timestamp);
