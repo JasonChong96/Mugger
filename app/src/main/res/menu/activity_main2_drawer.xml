@@ -3,52 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
     <item android:title="Browse Listings">
-    <group android:checkableBehavior="single">
-        <item
-            android:icon="@drawable/ic_baseline_filter_list_24px"
-            android:id="@+id/nav_available_listings"
-            android:title="Available Listings By Module" />
-        <item
-            android:icon="@drawable/ic_baseline_filter_list_24px"
-            android:id="@+id/nav_joining_listings"
-            android:title="Listings I'm Joining" />
-        <item
-            android:icon="@drawable/ic_baseline_filter_list_24px"
-            android:id="@+id/nav_my_listings"
-            android:title="My Listings" />
-    </group>
+        <group android:checkableBehavior="single">
+            <item
+                android:id="@+id/nav_available_listings"
+                android:icon="@drawable/ic_baseline_filter_list_24px"
+                android:title="Available Listings By Module" />
+            <item
+                android:id="@+id/nav_joining_listings"
+                android:icon="@drawable/ic_baseline_filter_list_24px"
+                android:title="Listings I'm Joining" />
+            <item
+                android:id="@+id/nav_my_listings"
+                android:icon="@drawable/ic_baseline_filter_list_24px"
+                android:title="My Listings" />
+        </group>
     </item>
     <item android:title="Community">
         <menu>
             <item
-                android:icon="@drawable/ic_baseline_person_24px"
                 android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_baseline_person_24px"
                 android:title="My Profile" />
             <item
-                android:icon="@drawable/ic_toolbox"
                 android:id="@+id/nav_admin_tools"
+                android:icon="@drawable/ic_toolbox"
                 android:title="Administrative Tools"
-                android:visible="false"/>
+                android:visible="false" />
         </menu>
     </item>
     <item android:title="Actions">
         <menu>
             <item
-                android:icon="@drawable/ic_baseline_feedback_24px"
                 android:id="@+id/nav_submit_feedback"
+                android:icon="@drawable/ic_baseline_feedback_24px"
                 android:title="Submit Feedback" />
             <item
-                android:icon="@drawable/ic_outline_feedback_24px"
                 android:id="@+id/nav_request_role"
+                android:icon="@drawable/ic_outline_feedback_24px"
                 android:title="Request TA / Prof Role" />
             <item
-                android:icon="@drawable/ic_baseline_exit_to_app_24px"
                 android:id="@+id/logout"
-                android:title="Logout" />
-            <item
                 android:icon="@drawable/ic_baseline_exit_to_app_24px"
-                android:id="@+id/refresh_logout"
-                android:title="Logout and Update Modules" />
+                android:title="Logout" />
         </menu>
     </item>
 

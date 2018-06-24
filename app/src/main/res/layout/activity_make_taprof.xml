@@ -6,103 +6,104 @@
     android:layout_height="match_parent"
     android:isScrollContainer="true"
     tools:context=".administration.MakeTAProfActivity">
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".administration.MakeTAProfActivity">
 
-    <TextView
-        android:id="@+id/make_ta_prof_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Rachel"
-        android:textAppearance="@android:style/TextAppearance.Holo.Medium"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/make_ta_prof_semester"
-        app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_semester" />
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".administration.MakeTAProfActivity">
 
-    <TextView
-        android:id="@+id/make_ta_prof_module_code_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Module Code:"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/make_ta_prof_radiogroup"
-        app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_radiogroup" />
-
-    <EditText
-        android:id="@+id/make_ta_prof_edit_text_module"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="e.g GER1000"
-        android:inputType="textCapCharacters"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@+id/make_ta_prof_module_code_label"
-        app:layout_constraintStart_toEndOf="@+id/make_ta_prof_module_code_label"
-        app:layout_constraintTop_toTopOf="@+id/make_ta_prof_module_code_label" />
-
-    <Button
-        android:id="@+id/make_ta_prof_button_submit"
-        style="@android:style/ButtonBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="3dp"
-        android:layout_marginTop="16dp"
-        android:text="Submit Changes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_edit_text_module" />
-
-    <TextView
-        android:id="@+id/make_ta_prof_semester"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="2017/2018 Semester 1"
-        android:textAppearance="@android:style/TextAppearance.Holo.Large"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <RadioGroup
-        android:id="@+id/make_ta_prof_radiogroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@+id/make_ta_prof_title"
-        app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_title">
-
-        <RadioButton
-            android:id="@+id/make_ta_prof_radio_ta"
+        <TextView
+            android:id="@+id/make_ta_prof_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Promote to Teaching Assistant" />
+            android:layout_marginTop="8dp"
+            android:text="Rachel"
+            android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/make_ta_prof_semester"
+            app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_semester" />
 
-        <RadioButton
-            android:id="@+id/make_ta_prof_radio_prof"
+        <TextView
+            android:id="@+id/make_ta_prof_module_code_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Promote to Professor" />
+            android:layout_marginTop="16dp"
+            android:text="Module Code:"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/make_ta_prof_radiogroup"
+            app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_radiogroup" />
 
-        <RadioButton
-            android:id="@+id/make_ta_prof_radio_remove"
+        <EditText
+            android:id="@+id/make_ta_prof_edit_text_module"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Remove Role" />
-    </RadioGroup>
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="1dp"
+            android:ems="10"
+            android:hint="e.g GER1000"
+            android:inputType="textCapCharacters"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/make_ta_prof_module_code_label"
+            app:layout_constraintStart_toEndOf="@+id/make_ta_prof_module_code_label"
+            app:layout_constraintTop_toTopOf="@+id/make_ta_prof_module_code_label" />
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/make_ta_prof_button_submit"
+            style="@android:style/ButtonBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="3dp"
+            android:text="Submit Changes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_edit_text_module" />
+
+        <TextView
+            android:id="@+id/make_ta_prof_semester"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="2017/2018 Semester 1"
+            android:textAppearance="@android:style/TextAppearance.Holo.Large"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/make_ta_prof_radiogroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/make_ta_prof_title"
+            app:layout_constraintTop_toBottomOf="@+id/make_ta_prof_title">
+
+            <RadioButton
+                android:id="@+id/make_ta_prof_radio_ta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Promote to Teaching Assistant" />
+
+            <RadioButton
+                android:id="@+id/make_ta_prof_radio_prof"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Promote to Professor" />
+
+            <RadioButton
+                android:id="@+id/make_ta_prof_radio_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Remove Role" />
+        </RadioGroup>
+
+    </android.support.constraint.ConstraintLayout>
 </ScrollView>

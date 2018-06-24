@@ -23,9 +23,9 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/make_feedback_title"
             android:layout_width="match_parent"
-            android:textColor="@color/colorTextPrimary"
             android:layout_height="wrap_content"
-            android:inputType="text|textCapWords" />
+            android:inputType="text|textCapWords"
+            android:textColor="@color/colorTextPrimary" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -37,6 +37,7 @@
         android:hint="Description"
         app:helperText="Please be detailed in your description. If possible, provide suggestions."
         app:helperTextEnabled="true"
+        app:helperTextTextAppearance="@style/AppTheme.HelperText"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
         app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
@@ -44,9 +45,9 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/make_feedback_description"
             android:layout_width="match_parent"
-            android:textColor="@color/colorTextPrimary"
             android:layout_height="wrap_content"
-            android:inputType="text|textCapSentences|textMultiLine" />
+            android:inputType="text|textCapSentences|textMultiLine"
+            android:textColor="@color/colorTextPrimary" />
 
     </android.support.design.widget.TextInputLayout>
 

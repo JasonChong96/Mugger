@@ -20,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
@@ -41,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
     initGoogleSignInButton();
     ButterKnife.bind(this);
+    Bundle b = getIntent().getExtras();
+    if (b != null) {
+      String errMsg = b.getString("errorMessage");
+      if (errMsg != null) {
+        Toasty.error(this, errMsg).show();
+      }
+    }
     if (acc != null) { // Logged in
       SpotsDialog.Builder dialog = new SpotsDialog
           .Builder()

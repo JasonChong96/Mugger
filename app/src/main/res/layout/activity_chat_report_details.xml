@@ -10,12 +10,12 @@
         android:id="@+id/chat_report_reported_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:text="TextView"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/chat_report_reported_profile_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,10 +24,10 @@
         android:id="@+id/chat_report_reporter_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/chat_report_reported_profile_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/chat_report_reported_name"
         app:layout_constraintTop_toBottomOf="@+id/chat_report_reported_name" />
@@ -46,41 +46,39 @@
         android:id="@+id/chat_report_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/chat_report_reporter_profile_button"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/chat_report_message_label"
         app:layout_constraintTop_toBottomOf="@+id/chat_report_message_label" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/chat_report_reported_profile_button"
-        android:drawableStart="@drawable/ic_baseline_person_24px"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:text="Reported's Profile"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/chat_report_reported_name" />
+        app:icon="@drawable/ic_baseline_person_24px"
+        app:layout_constraintStart_toStartOf="@+id/chat_report_description"
+        app:layout_constraintTop_toBottomOf="@+id/chat_report_description" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/chat_report_reporter_profile_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_baseline_person_24px"
-        android:layout_marginTop="8dp"
         android:text="Reporter's Profile"
+        app:icon="@drawable/ic_baseline_person_24px"
         app:layout_constraintStart_toStartOf="@+id/chat_report_reported_profile_button"
         app:layout_constraintTop_toBottomOf="@+id/chat_report_reported_profile_button" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/chat_report_chat_button"
-        android:drawableStart="@drawable/ic_baseline_chat_24px"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="View Chat"
+        app:icon="@drawable/ic_baseline_chat_24px"
         app:layout_constraintStart_toStartOf="@+id/chat_report_reporter_profile_button"
         app:layout_constraintTop_toBottomOf="@+id/chat_report_reporter_profile_button" />
 
@@ -98,10 +96,10 @@
         android:id="@+id/chat_report_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/chat_report_chat_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/chat_report_description_label"
         app:layout_constraintTop_toBottomOf="@+id/chat_report_description_label" />

@@ -70,6 +70,9 @@ public class CreateEditListingActivity extends AppCompatActivity {
   @BindView(R.id.progressBar2)
   ProgressBar progressBar;
 
+  @BindView(R.id.publish_listing_start_date_time)
+  TextInputLayout startDateTimeWrapper;
+
   private Calendar startDateTime;
   private Calendar endDateTime;
   private java.text.DateFormat df;
@@ -186,7 +189,7 @@ public class CreateEditListingActivity extends AppCompatActivity {
       setTitle("Add Listing");
       endDateTime.add(Calendar.HOUR_OF_DAY, 1);
     }
-
+    startDateTimeWrapper.setHelperText("Today's date: " + df.format(startDateTime.getTime()));
     //Define the AutoComplete Threshold
     updateStartDateTimeDisplay();
     updateEndDateTimeDisplay();

@@ -100,14 +100,14 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="profile_modules_heading">Modules:</string>
-    <string name="profile_status_heading">Status:</string>
-    <string name="profile_status_hint">e.g available, in lecture, etc.</string>
+    <string name="profile_modules_heading">Modules</string>
+    <string name="profile_status_heading">Additional Information</string>
+    <string name="profile_status_hint">Edit info</string>
     <string name="report">Report</string>
     <string name="profile_view_msg_hist">View Message History</string>
     <string name="profile_ban">Ban this user</string>
     <string name="profile_view_reports">View Reports</string>
-    <string name="profile_actions">Actions</string>
+    <string name="profile_actions">Administration Tools</string>
     <string name="title_activity_settings2">Settings</string>
 
     <!-- Strings related to Settings -->

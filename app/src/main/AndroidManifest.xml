@@ -95,8 +95,9 @@
             android:name=".administration.reports.ListingReportDetailsActivity"
             android:label="ListingReportDetails"
             android:theme="@style/AppTheme.Admin" />
-        <activity android:name=".listings.ViewAttendeesActivity"
-            android:label="Study Session Attendees"/>
+        <activity
+            android:name=".listings.ViewAttendeesActivity"
+            android:label="Study Session Attendees" />
     </application>
 
 </manifest>

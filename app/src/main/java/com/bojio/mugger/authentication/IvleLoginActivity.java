@@ -14,12 +14,14 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.Main2Activity;
+import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.Modules;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.common.hash.Hashing;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -134,10 +136,17 @@ public class IvleLoginActivity extends AppCompatActivity {
       return;
     }
     if (checkTask.isSuccessful()) {
-      if (checkTask.getResult().getDocuments().size() > 0) {
-        Toasty.error(this, "Your IVLE account is already tagged to another Mugger account. " +
-                "You are only allowed one account per person.",
-            Toast.LENGTH_LONG).show();
+      List<DocumentSnapshot> snaps = checkTask.getResult().getDocuments();
+      if (snaps.size() > 1 || (snaps.size() > 0 && !mAuth.getUid().equals(snaps.get(0).getId()))) {
+        Intent intent = new Intent(this, MainActivity.class);
+        // Clears back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        Bundle b = new Bundle();
+        b.putString("errorMessage", "Your IVLE account is already tagged to another Mugger account. " +
+            "You are only allowed one account per person.");
+        intent.putExtras(b);
+        startActivity(intent);
+        finish();
         return;
       }
     } else {
@@ -281,8 +290,14 @@ public class IvleLoginActivity extends AppCompatActivity {
   }
 
   private void onError() {
+    Intent intent = new Intent(this, MainActivity.class);
+    // Clears back stack
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+    Bundle b = new Bundle();
+    b.putString("errorMessage", "An error has occured, please try again later.");
+    intent.putExtras(b);
+    startActivity(intent);
     finish();
-    Toasty.error(this, "An error has occurred please try again later", Toast.LENGTH_LONG)
-        .show();
+    return;
   }
 }

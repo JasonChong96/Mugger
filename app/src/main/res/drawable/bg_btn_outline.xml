@@ -2,15 +2,15 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/btn_outline" android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/colorOverlayAdmin"/>
+            <solid android:color="@color/colorOverlayAdmin" />
         </shape>
     </item>
     <item android:drawable="@drawable/btn_outline" android:state_focused="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/colorOverlayAdmin"/>
+            <solid android:color="@color/colorOverlayAdmin" />
         </shape>
     </item>
 
-    <item android:drawable="@drawable/btn_outline"/>
+    <item android:drawable="@drawable/btn_outline" />
 
 </selector>

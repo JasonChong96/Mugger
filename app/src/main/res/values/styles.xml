@@ -10,24 +10,32 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="textInputStyle">@style/TextInputTextStyle</item>
         <item name="md_dark_theme">true</item>
+        <item name="md_background_color">@color/cardViewColorAdmin</item>
         <item name="android:textColorSecondary">@android:color/white</item>
-        <item name="android:popupBackground">@color/colorPrimaryAdmin</item>
+        <item name="android:popupBackground">@color/colorBackgroundAdmin</item>
+        <item name="android:windowBackground">@color/colorBackgroundAdmin</item>
+        <item name="actionBarPopupTheme">@style/AppTheme.PopupOverlay</item>
     </style>
-        <style name="SpotsDialog" parent="android:Theme.DeviceDefault.Dialog">
-            <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
-            <item name="DialogSpotColor">@color/colorAccentAdmin</item>
-        </style>
-    <style name="MyPopupMenu"
-        parent="@android:style/Widget.Holo.ListPopupWindow">
-    <item name="android:popupBackground">@color/colorPrimaryAdmin</item>
+
+    <style name="AppTheme.HelperText" parent="TextAppearance.Design.HelperText">
+        <item name="android:textColor">?android:textColorHintInverse</item>
     </style>
+
+    <style name="SpotsDialog" parent="Base.Theme.MaterialComponents.Dialog">
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogSpotColor">@color/colorAccentAdmin</item>
+        <item name="android:background">@color/cardViewColorAdmin</item>
+    </style>
+
     <style name="TextInputTextStyle" parent="@style/Theme.MaterialComponents">
         <item name="android:textColor">@color/colorWhite</item>
     </style>
+
     <style name="AppTheme.Main2" parent="AppTheme.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">?attr/colorAccent</item>
     </style>
+
     <style name="AppTheme.Admin" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -38,6 +46,7 @@
 
 
     </style>
+
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -48,12 +57,13 @@
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="android:popupBackground">@color/colorBackgroundAdmin</item>
+        <item name="android:backgroundTint">@color/cardViewColorAdmin</item>
     </style>
 
     <style name="SendFabTheme" parent="AppTheme">
         <item name="colorAccent">@color/colorBackground</item>
     </style>
+
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
@@ -69,7 +79,8 @@
         <item name="backgroundTint">@color/colorBackgroundAdmin</item>
 
     </style>
-    <style name="ButtonBorder" parent="Widget.AppCompat.Button.Colored"/>
+
+    <style name="ButtonBorder" parent="Widget.AppCompat.Button.Colored" />
 
     <style name="ButtonBorder.Accent">
         <item name="android:background">@drawable/bg_btn_outline</item>

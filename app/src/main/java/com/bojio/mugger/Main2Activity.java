@@ -25,6 +25,7 @@ import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
 import com.bojio.mugger.administration.reports.ViewAllReportsActivity;
 import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
+import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerConstants;
@@ -44,7 +45,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -198,7 +198,7 @@ public class Main2Activity extends AppCompatActivity
         Intent intent = new Intent(this, MainActivity
             .class);
         Toasty.success(Main2Activity.this, "Logged out " +
-            "successfully", Toast.LENGTH_LONG).show();
+            "successfully", Toast.LENGTH_SHORT).show();
         startActivity(intent);
       }
     });
@@ -276,6 +276,9 @@ public class Main2Activity extends AppCompatActivity
       Intent intent = new Intent(this, SettingsActivity2.class);
       startActivity(intent);
       return true;
+    } else if (id == R.id.action_refresh_modules) {
+      startActivity(new Intent(this, IvleLoginActivity.class));
+      finish();
     }
 
     return super.onOptionsItemSelected(item);
@@ -323,13 +326,6 @@ public class Main2Activity extends AppCompatActivity
         b.putString("profileUid", mAuth.getUid());
         intent.putExtras(b);
         startActivity(intent);
-        break;
-      case R.id.refresh_logout:
-        db.collection("users").document(mAuth.getUid()).update("nusNetId", FieldValue.delete())
-            .addOnCompleteListener(task -> {
-              signOut();
-              Toasty.success(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
-            });
         break;
       case R.id.nav_submit_feedback:
         intent = new Intent(this, MakeFeedbackActivity.class);
