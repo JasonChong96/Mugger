@@ -15,7 +15,7 @@ import android.util.Log;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.DebugSettings;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;

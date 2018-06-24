@@ -1,16 +1,18 @@
-package com.bojio.mugger.constants;
+package com.bojio.mugger.authentication;
 
 public enum MuggerRole {
 
-  USER(0),
-  MODERATOR(1),
-  ADMIN(2),
-  MASTER(3);
+  USER(0, true),
+  MODERATOR(1, false),
+  ADMIN(2, true),
+  MASTER(3, true);
 
   private int roleId;
+  private boolean enabled;
 
-  MuggerRole(int roleId) {
+  MuggerRole(int roleId, boolean enabled) {
     this.roleId = roleId;
+    this.enabled = enabled;
   }
 
   public static MuggerRole getByRoleId(int roleId) {
@@ -45,5 +47,9 @@ public enum MuggerRole {
 
   public boolean checkSuperiorityTo(MuggerRole toCheck) {
     return roleId > toCheck.roleId;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
   }
 }

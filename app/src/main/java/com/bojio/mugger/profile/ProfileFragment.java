@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,7 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
 import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -89,6 +90,8 @@ public class ProfileFragment extends Fragment {
   Button updateStatusButton;
   @BindView(R.id.profile_text_view_actions_title)
   TextView adminLabelView;
+  @BindView(R.id.profile_plain_text_status_wrapper)
+  TextInputLayout statusWrapper;
   private String profileUid;
   private FirebaseFirestore db;
   private FirebaseAuth mAuth;
@@ -237,7 +240,7 @@ public class ProfileFragment extends Fragment {
     semesterSpinner.setSelection(0, true); // true to trigger onItemSelected
     if (mAuth.getCurrentUser().getUid().equals(profileUid)) {
       // Viewing own profile
-      editStatusView.setVisibility(View.VISIBLE);
+      statusWrapper.setVisibility(View.VISIBLE);
       statusView.setVisibility(View.GONE);
       ConstraintLayout layout;
       layout = getActivity().findViewById(R.id.profile_constraint_layout);

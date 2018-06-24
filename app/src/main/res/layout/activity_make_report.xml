@@ -30,7 +30,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="19dp"
         android:hint="Reason for Reporting"
-        app:helperText="Please describe the issues with this listing. Moderators will receieve details of the offending listing/message."
+        app:helperText="Please describe the issues with this listing. Moderators will receive details of the offending listing/message."
         app:helperTextEnabled="true"
         app:helperTextTextAppearance="@style/AppTheme.HelperText"
         app:layout_constraintEnd_toEndOf="parent"

@@ -185,7 +185,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:hint="@string/profile_status_hint"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:boxBackgroundColor="@color/cardViewColorAdmin"
                 app:helperText="E.g Contact details, hobbies"
                 app:helperTextEnabled="true"
@@ -200,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="text|textCapSentences"
                     android:textColor="@color/colorTextPrimary"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
             </android.support.design.widget.TextInputLayout>
         </android.support.constraint.ConstraintLayout>
 

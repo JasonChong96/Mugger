@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -18,18 +17,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
-import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.fcm.MessagingService;
-import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingsViewHolder;
@@ -55,7 +51,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
-import es.dmoral.toasty.Toasty;
 
 /**
  * A fragment representing a list of Items.
@@ -358,7 +353,10 @@ public abstract class ListingsFragments extends Fragment {
         holder.editButton.setOnClickListener(v -> onClick_edit(listing));
         holder.deleteButton.setOnClickListener(v -> onClick_delete(listing));
         holder.descriptionView.setText(listing.getDescription());
-        if (listing.isAttending(uid)) {
+        if (listing.getOwnerId().equals(mAuth.getUid())) {
+          holder.joinButton.setVisibility(View.INVISIBLE);
+          holder.unjoinButton.setVisibility(View.INVISIBLE);
+        } else if (listing.isAttending(uid)) {
           holder.joinButton.setVisibility(View.INVISIBLE);
           holder.unjoinButton.setVisibility(View.VISIBLE);
         } else {

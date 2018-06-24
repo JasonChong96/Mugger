@@ -29,7 +29,7 @@ import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerConstants;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.fragments.AttendingListingsFragments;

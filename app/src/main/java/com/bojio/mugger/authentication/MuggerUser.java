@@ -1,6 +1,5 @@
 package com.bojio.mugger.authentication;
 
-import com.bojio.mugger.constants.MuggerRole;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;

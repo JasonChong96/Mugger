@@ -50,6 +50,9 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:hint="Module Code"
+        app:helperTextTextAppearance="@style/AppTheme.HelperText"
+        app:helperText="E.g GER1000, GEQ1000"
+        app:helperTextEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -70,6 +73,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="Additional Information"
+        app:helperTextTextAppearance="@style/AppTheme.HelperText"
         app:helperText="Please provide any link to proof or email us directly at mugger@muggerapp.com"
         app:helperTextEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +84,7 @@
             android:id="@+id/request_profta_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text|textCapSentences"
+            android:inputType="text|textCapSentences|textMultiLine"
             android:textColor="@color/colorTextPrimary" />
     </android.support.design.widget.TextInputLayout>
 </android.support.constraint.ConstraintLayout>

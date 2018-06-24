@@ -149,6 +149,7 @@
             android:hint="Study Session Description"
             app:helperText="E.g Topics, Study preferences"
             app:helperTextEnabled="true"
+            app:helperTextTextAppearance="@style/AppTheme.HelperText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/publish_listing_venue_wrapper"
             app:layout_constraintTop_toBottomOf="@+id/publish_listing_venue_wrapper">

@@ -16,7 +16,7 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.android.gms.tasks.Task;
