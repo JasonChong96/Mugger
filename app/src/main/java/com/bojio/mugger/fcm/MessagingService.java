@@ -163,7 +163,7 @@ public class MessagingService extends FirebaseMessagingService {
     Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     NotificationCompat.Builder notificationBuilder =
         new NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_baseline_local_cafe_24px)
             .setContentTitle(messageTitle)
             .setContentText(messageBody)
             .setAutoCancel(true)
@@ -181,7 +181,7 @@ public class MessagingService extends FirebaseMessagingService {
     // Since android Oreo notification channel is needed.
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       NotificationChannel channel = new NotificationChannel(channelId,
-          "Channel human readable title",
+          "Mugger",
           NotificationManager.IMPORTANCE_DEFAULT);
       notificationManager.createNotificationChannel(channel);
     }
