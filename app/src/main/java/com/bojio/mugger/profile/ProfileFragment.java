@@ -10,6 +10,7 @@ import android.support.constraint.ConstraintSet;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,6 +123,7 @@ public class ProfileFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     if (getArguments() != null) {
       profileUid = getArguments().getString("profileUid");
     }
@@ -159,7 +161,9 @@ public class ProfileFragment extends Fragment {
   }
 
   private void loadProfile(DocumentSnapshot profile, List<DocumentSnapshot> moduless) {
-
+    if (getActivity() == null) {
+      return;
+    }
     Map<String, Object> profileData = profile.getData();
     String displayName = (String) profileData.get("displayName");
     nameView.setText(displayName);
