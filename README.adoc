@@ -29,15 +29,17 @@ Primary login method will be using your Google account, although first-time user
 
 There will be an in-app explanation to inform the user the reason for logging in to IVLE and the data that we collect and the hashing (SHA-256) we use to keep their actual NUSNET ID unretrievable from our data. Google login was implemented as the main method due to the fact that it allows for the login information to be remembered, thus users do not need to re-enter it every time they log out of the app, unlike IVLE login which does not have that user-friendly feature.
 
-image::https://i.imgur.com/gUC7owE.png[Main Navigation Drawer]
+image::https://i.imgur.com/WoxpKIN.png[Main Navigation Drawer]
 === 3.1 Listings
 
 Listings are used to facilitate the organising of face-to-face study sessions and/or consultations among all users, including Teaching Assistants (TAs) and professors.
 
 ==== 3.1.1 Available Listings By Module
 
+image:https://i.imgur.com/o6zEFvI.png[Default Page] image:https://i.imgur.com/9cuKEqk.png[Filter by Module]
 Shows all the available study session listings created by users, including yourself. Listings created by yourself will be labelled "Yours", and listings you are att ending (including your own) will be  labelled  in orange (F2845C) at the top right hand corner. T As and professors will also have their listings labelled in cya n (97D3CA) and violet (9EB3ED) respe ctively to further differentiate the types of listings available. You can also filter out specific modules, and create your own listing directly by tapping on the orange floating action button . You can view a list of people attending a session by clicking on the icon on the top right of listings.
 
+image::https://i.imgur.com/WcdIxaC.png[Expanded Listing]
 Tapping on the 'down' arrow on a listing will expand it and give you more information about it, where you can also indicate your attendance. All listings will also have a chatroom specific to that listing, where users can interact with others attending that same listing, including the listing creator. Do note that chats serve to help users decide if they want to attend that particular listing, and are not meant to replace the end goal of a face-to-face study session.
 
 In the chat and attendees list, you can tap on a user's display name to  be redirected to their profile (refer to 3.2  below).
@@ -46,24 +48,28 @@ In the chat and attendees list, you can tap on a user's display name to  be red
 
 Only the listings that you have joined will show up here, for you to easily keep track of all your appointments.
 
-==== My Listings
+==== 3.1.3 My Listings
 
 Shows the listings that you have created.
 
-==== 3.1.3 Create/Edit Listings
+==== 3.1.4 Create/Edit Listings
 
+image::https://i.imgur.com/Wgh4nP8.png[Create/Edit Listing]
 You can also edit and delete your listings from these pages as shown on the right. Note that when a creator deletes his/her listing, all of its information (including chat messages) will be erased, and it will also disappear from all the listings pages. There will also be a button on the bottom right of the screen to create listings. Admins are able to edit and delete any listing, including those that are not their own.
 
 === 3.2 My Profile
 
+image::https://i.imgur.com/jaLXEPw.png[Own Profile Page]
 Here you will find your personal information, like modules and current display names. You can also type in additional information to personalise your bio. All these will be displayed to any user that views your profile for added user experience.
 
 === 3.3 Administrative Tools
 
+image::https://i.imgur.com/K1qMo1h.png[Administrative Tools]
 Only admins will have this extra option in the navigation drawer to access all the reports, feedback and prof/TA requests sent by users. They can then decide to take further action, such as muting malicious users for a specific number of hours . Other profile options that are only displayed for admins include 'Make TA/Prof ' and 'Change Mugger Role ', which allows for a user to be elevated to become an admin or vice versa . This promotion or demotion of roles can only be done by a master , who oversees all admins, and the admins in turn manage the users.
 
 === 3.4 Settings
 
+image:https://i.imgur.com/zoWsvAq.png[Settings] image:https://i.imgur.com/wJmgynP.png[Change Display Name]
 Settings can be accessed by tapping on the three dots at the top right hand corner of any page. There, you can enable or disable different categories of notifications . Your display name can also be changed here, otherwise the default will be the one associated with your Google account. Previously, we wanted to include a geolocation option, but after taking feedback into consideration, that feature will not be implemented as most students would usually join and create listings within the same faculty or nearby.
 
 === 3.5 Refresh Modules
@@ -72,10 +78,12 @@ This feature can also be accessed from the three dots action bar. It is used for
 
 === 3.6 Submit Feedback
 
+image::https://i.imgur.com/GkWSGaH.png[Screenshot of Feedback Form]
 This page allows users to send feedback that is viewable only by the admins. This is a channel for users to suggest application improvements and report bugs. This is valuable for us to improve the app in terms of user experience.
 
 === 3.7 Request Prof/TA Role
 
+image::https://i.imgur.com/DPTzhdx.png[Screenshot of Prof/TA request form]
 This page allows users to request to be registered as a Professor or TA for the module that they are teaching. They'll be required to type in the module code along with proof of their position. These requests can only be viewed by admins who can approve such requests and give them their respective roles(section 3.3) so that they can make specially tagged listings as mentioned in section 3.1.
 
 === 3.8 Logout
