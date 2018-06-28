@@ -2,6 +2,8 @@
 
 ![Mugger](https://i.imgur.com/aecirYh.png)
 
+[directory structure](../DeveloperGuide.md)
+
 ## Introduction
 
 Mugger is an Android app-based platform that allows its users to quickly scan through the study listings available, indicate their attendance for those that they are interested in, as well as create their own listings for others to join and delete them once they are done.
