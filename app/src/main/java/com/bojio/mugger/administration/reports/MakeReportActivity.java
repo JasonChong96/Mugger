@@ -2,8 +2,8 @@ package com.bojio.mugger.administration.reports;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,17 +27,15 @@ import es.dmoral.toasty.Toasty;
 
 public class MakeReportActivity extends AppCompatActivity {
 
+  @BindView(R.id.make_report_description)
+  EditText descriptionView;
+  @BindView(android.R.id.content)
+  View view;
   private Map<String, Object> reportData;
   private Report.ReportType type;
   private FirebaseFirestore db;
   private FirebaseUser user;
   private AlertDialog dialog;
-
-  @BindView(R.id.make_report_description)
-  EditText descriptionView;
-
-  @BindView(android.R.id.content)
-  View view;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +59,14 @@ public class MakeReportActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Submitting Report...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
   }
 
   @OnClick(R.id.make_report_submit_button)
   public void onClick_submit() {
-    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     String reportDescription = descriptionView.getText().toString();
     if (reportDescription.isEmpty()) {
@@ -88,7 +87,7 @@ public class MakeReportActivity extends AppCompatActivity {
             .show();
       } else {
         Toasty.success(this, "Report submitted successfully! Our moderators will be on it as " +
-                "soon as possible.", Toast.LENGTH_SHORT, true).show();
+            "soon as possible.", Toast.LENGTH_SHORT, true).show();
         finish();
       }
     });

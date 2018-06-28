@@ -6,4 +6,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_refresh_modules"
+        android:orderInCategory="100"
+        android:title="Refresh Modules"
+        app:showAsAction="never" />
 </menu>

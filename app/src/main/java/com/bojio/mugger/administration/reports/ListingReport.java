@@ -6,6 +6,17 @@ import android.os.Parcel;
 import android.widget.Button;
 
 public class ListingReport extends Report {
+  public static final Creator<ListingReport> CREATOR = new Creator<ListingReport>() {
+    @Override
+    public ListingReport createFromParcel(Parcel in) {
+      return new ListingReport(in);
+    }
+
+    @Override
+    public ListingReport[] newArray(int size) {
+      return new ListingReport[size];
+    }
+  };
   private String listingDescription;
   private String venue;
   private Button.OnClickListener listener;
@@ -29,24 +40,17 @@ public class ListingReport extends Report {
     this.venue = in.readString();
   }
 
+  public ListingReport(String listingDescription, String venue) {
+    this.listingDescription = listingDescription;
+    this.venue = venue;
+  }
+
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     super.writeToParcel(dest, flags);
     dest.writeString(listingDescription);
     dest.writeString(venue);
   }
-
-  public static final Creator<ListingReport> CREATOR = new Creator<ListingReport>() {
-    @Override
-    public ListingReport createFromParcel(Parcel in) {
-      return new ListingReport(in);
-    }
-
-    @Override
-    public ListingReport[] newArray(int size) {
-      return new ListingReport[size];
-    }
-  };
 
   @Override
   public Button.OnClickListener getOnClickListener() {
@@ -60,11 +64,6 @@ public class ListingReport extends Report {
       };
     }
     return listener;
-  }
-
-  public ListingReport(String listingDescription, String venue) {
-    this.listingDescription = listingDescription;
-    this.venue = venue;
   }
 
   public String getListingDescription() {

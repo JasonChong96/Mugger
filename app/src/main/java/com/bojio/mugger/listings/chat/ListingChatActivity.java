@@ -1,7 +1,6 @@
 package com.bojio.mugger.listings.chat;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.TimeZone;
 
 import butterknife.BindView;
@@ -48,20 +48,17 @@ import es.dmoral.toasty.Toasty;
 
 public class ListingChatActivity extends AppCompatActivity {
 
+  @BindView(R.id.messages)
+  RecyclerView messages;
+  @BindView(R.id.activity_thread_input_edit_text)
+  EditText toSendView;
+  @BindView(R.id.progressBar6)
+  ProgressBar progressBar;
   private Listing listing;
   private String listingUid;
   private FirebaseFirestore db;
   private FirebaseUser user;
   private MuggerUser cache;
-
-  @BindView(R.id.messages)
-  RecyclerView messages;
-
-  @BindView(R.id.activity_thread_input_edit_text)
-  EditText toSendView;
-
-  @BindView(R.id.progressBar6)
-  ProgressBar progressBar;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +91,7 @@ public class ListingChatActivity extends AppCompatActivity {
           .setContext(this)
           .setMessage("Loading...")
           .setCancelable(false)
+          .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
       db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {
@@ -129,6 +127,15 @@ public class ListingChatActivity extends AppCompatActivity {
                 "hours",
             hours)).show();
         return;
+      }
+      if (message.equalsIgnoreCase("fuck you")) {
+        String[] wholesome = {"Wholly accept your flaws, and suddenly no one is strong enough to " +
+            "use them against you.",
+            "Remember, you have been criticizing yourself for years and it hasn’t worked. Try " +
+                "approving of yourself and see what happens.",
+            "Accepting yourself is about respecting yourself. It’s about honoring yourself right " +
+                "now, here today, in this moment. Not just who you could become somewhere down the line."};
+        message = wholesome[new Random().nextInt(wholesome.length)];
       }
       long timestamp = System.currentTimeMillis();
       long dayTimestamp = getDayTimestamp(timestamp);
@@ -227,7 +234,7 @@ public class ListingChatActivity extends AppCompatActivity {
             .this);
         holder.dateView.setText(dfDate.format(new Date(message.getTime())));
         holder.senderView.setOnClickListener(view -> {
-          CharSequence options[] = new CharSequence[] {"View " + message.getFromName() + "'s " +
+          CharSequence options[] = new CharSequence[]{"View " + message.getFromName() + "'s " +
               "profile", "Report this message"};
           new MaterialDialog.Builder(ListingChatActivity.this).items(options)
               .itemsCallback((dialog, itemView, which, text) -> {
@@ -304,16 +311,16 @@ public class ListingChatActivity extends AppCompatActivity {
   }
 
   class MessageViewHolder extends RecyclerView.ViewHolder {
-    @BindView (R.id.item_message_content)
+    @BindView(R.id.item_message_content)
     TextView contentView;
 
-    @BindView (R.id.item_message_sender)
+    @BindView(R.id.item_message_sender)
     TextView senderView;
 
-    @BindView (R.id.item_message_time)
+    @BindView(R.id.item_message_time)
     TextView timeView;
 
-    @BindView (R.id.item_message_date_text_view)
+    @BindView(R.id.item_message_date_text_view)
     TextView dateView;
 
     View view;

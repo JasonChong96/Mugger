@@ -6,43 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".administration.reports.MakeReportActivity">
 
-    <EditText
-        android:id="@+id/make_report_description"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Please describe the issues with this listing. Moderators will receieve details of the offending listing/message."
-        android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/make_report_submit_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/make_report_submit_button"
-        style="@android:style/ButtonBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Submit Report"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/colorPrimaryDarkAdmin"
+        app:icon="@drawable/ic_baseline_publish_24px"
+        app:iconTint="@color/colorPrimaryDarkAdmin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout7" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout7"
+        android:layout_width="0dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Please fill in the reason for this report below:"
+        android:layout_marginEnd="19dp"
+        android:hint="Reason for Reporting"
+        app:helperText="Please describe the issues with this listing. Moderators will receive details of the offending listing/message."
+        app:helperTextEnabled="true"
+        app:helperTextTextAppearance="@style/AppTheme.HelperText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/make_report_description"
+            android:layout_width="match_parent"
+            android:textColor="@color/colorTextPrimary"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine" />
+    </android.support.design.widget.TextInputLayout>
+
 </android.support.constraint.ConstraintLayout>

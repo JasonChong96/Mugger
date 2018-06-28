@@ -17,7 +17,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="PlaceHolder"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/colorWhite"
         android:textSize="@dimen/text_size_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -28,79 +28,90 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/message_received_chip"
-        android:orientation="horizontal"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_message_date_text_view"
         tools:layout_conversion_absoluteHeight="96dp"
         tools:layout_conversion_absoluteWidth="74dp">
 
-        <TextView
-            android:id="@+id/item_message_content"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:clickable="true"
-            android:longClickable="true"
-            android:padding="@dimen/simple_padding_medium"
-            android:paddingEnd="@dimen/simple_padding_large"
-            android:paddingStart="@dimen/simple_padding_large"
-            android:text="Body"
-            android:textColor="@color/colorBlack"
-            android:textSize="@dimen/text_size_secondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_message_sender"
-            tools:layout_conversion_absoluteHeight="35dp"
-            tools:layout_conversion_absoluteWidth="63dp"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="71dp" />
-
-        <TextView
-            android:id="@+id/item_message_sender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:clickable="true"
-            android:longClickable="true"
-            android:padding="@dimen/simple_padding_medium"
-            android:paddingEnd="@dimen/simple_padding_large"
-            android:paddingStart="@dimen/simple_padding_large"
-            android:text="Name"
-            android:textColor="@color/colorBlack"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_conversion_absoluteHeight="35dp"
-            tools:layout_conversion_absoluteWidth="70dp"
-            tools:layout_editor_absoluteX="4dp"
-            tools:layout_editor_absoluteY="36dp" />
-
-        <TextView
-            android:id="@+id/item_message_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="TextView"
-            app:layout_constraintStart_toStartOf="@+id/item_message_content"
-            app:layout_constraintTop_toBottomOf="@+id/item_message_content"
-            tools:layout_conversion_absoluteHeight="19dp"
-            tools:layout_conversion_absoluteWidth="58dp" />
-
-        <View
-            android:id="@+id/divider5"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toBottomOf="@+id/item_message_sender"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:background="@drawable/message_received_chip"
+            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_message_sender" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toBottomOf="@+id/item_message_sender"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item_message_sender" />
+
+            <TextView
+                android:id="@+id/item_message_sender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:clickable="true"
+                android:longClickable="true"
+                android:padding="@dimen/simple_padding_medium"
+                android:paddingStart="@dimen/simple_padding_large"
+                android:paddingEnd="@dimen/simple_padding_large"
+                android:text="Name"
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_conversion_absoluteHeight="35dp"
+                tools:layout_conversion_absoluteWidth="70dp" />
+
+            <TextView
+                android:id="@+id/item_message_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="TextView"
+                android:textColor="@color/colorBlack"
+                app:layout_constraintStart_toStartOf="@+id/item_message_content"
+                app:layout_constraintTop_toBottomOf="@+id/item_message_content"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="58dp" />
+
+            <TextView
+                android:id="@+id/item_message_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:clickable="true"
+                android:longClickable="true"
+                android:padding="@dimen/simple_padding_medium"
+                android:paddingStart="@dimen/simple_padding_large"
+                android:paddingEnd="@dimen/simple_padding_large"
+                android:text="Body"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/text_size_secondary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item_message_sender"
+                tools:layout_conversion_absoluteHeight="35dp"
+                tools:layout_conversion_absoluteWidth="63dp" />
+        </android.support.constraint.ConstraintLayout>
+
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

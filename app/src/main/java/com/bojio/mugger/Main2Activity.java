@@ -13,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,10 +26,11 @@ import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
 import com.bojio.mugger.administration.reports.ViewAllReportsActivity;
 import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
+import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerConstants;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.fragments.AttendingListingsFragments;
@@ -44,7 +46,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -66,20 +67,19 @@ public class Main2Activity extends AppCompatActivity
     ListingsFragments.OnListingsFragmentInteractionListener,
     ProfileFragment.OnProfileFragmentInteractionListener {
 
-  private FirebaseAuth mAuth;
-  private FirebaseFirestore db;
-
   @BindView(R.id.fab)
   FloatingActionButton fab;
-
   @BindView(android.R.id.content)
   View activityView;
+  private FirebaseAuth mAuth;
+  private FirebaseFirestore db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
+    AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     if (user == null) { // Not logged in, go back to login
       backToHome();
       return;
@@ -102,12 +102,35 @@ public class Main2Activity extends AppCompatActivity
     });
     // Set behavior when logged in state changes
     setAuthStateChangeListener();
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main2);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryAdmin));
+    ButterKnife.bind(this);
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+    drawer.addDrawerListener(toggle);
+    toggle.syncState();
+
+
+    String instanceId = FirebaseInstanceId.getInstance().getToken();
+    // Update instance id of this account in database
+    if (instanceId != null) {
+      db.collection("users")
+          .document(user.getUid())
+          .update("instanceId", instanceId);
+    }
+    // Subscribe to chat notifications
+    subscribeToTopics();
     if (MuggerUser.getInstance().getModules() == null) {
       AlertDialog dialog = new SpotsDialog
           .Builder()
           .setContext(this)
           .setMessage("Loading module data and notifications...")
           .setCancelable(false)
+          .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
       db.collection("users").document(user.getUid()).collection("semesters").get()
@@ -144,35 +167,21 @@ public class Main2Activity extends AppCompatActivity
               }
               NavigationView navigationView = findViewById(R.id.nav_view);
               navigationView.setNavigationItemSelectedListener(this);
-              setTitle("Listings");
+              setTitle("Study Sessions");
               navigationView.setCheckedItem(R.id.nav_available_listings);
               onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
             }
             dialog.dismiss();
           });
+    } else {
+      NavigationView navigationView = findViewById(R.id.nav_view);
+      navigationView.setNavigationItemSelectedListener(this);
+      setTitle("Study Sessions");
+      navigationView.setCheckedItem(R.id.nav_available_listings);
+      onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
     }
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main2);
-    Toolbar toolbar = findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryAdmin));
-    ButterKnife.bind(this);
-    DrawerLayout drawer = findViewById(R.id.drawer_layout);
-    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-    drawer.addDrawerListener(toggle);
-    toggle.syncState();
 
 
-    String instanceId = FirebaseInstanceId.getInstance().getToken();
-    // Update instance id of this account in database
-    if (instanceId != null) {
-      db.collection("users")
-          .document(user.getUid())
-          .update("instanceId", instanceId);
-    }
-    // Subscribe to chat notifications
-    subscribeToTopics();
   }
 
   /**
@@ -191,11 +200,12 @@ public class Main2Activity extends AppCompatActivity
         Intent intent = new Intent(this, MainActivity
             .class);
         Toasty.success(Main2Activity.this, "Logged out " +
-            "successfully", Toast.LENGTH_LONG).show();
+            "successfully", Toast.LENGTH_SHORT).show();
         startActivity(intent);
       }
     });
   }
+
   /**
    * Subscribes this client to the relevant listing notifications.
    */
@@ -203,7 +213,7 @@ public class Main2Activity extends AppCompatActivity
     if (mAuth == null) {
       return;
     }
-    Query q  = db.collection("listings")
+    Query q = db.collection("listings")
         .whereGreaterThan(mAuth.getUid(), 0);
     q.get().addOnCompleteListener(snap -> {
       List<DocumentSnapshot> results = snap.getResult().getDocuments();
@@ -239,6 +249,7 @@ public class Main2Activity extends AppCompatActivity
 
   /**
    * Creates the options menu (top right). Also sets the notification drawer display name and email.
+   *
    * @param menu the menu
    * @return
    */
@@ -267,6 +278,9 @@ public class Main2Activity extends AppCompatActivity
       Intent intent = new Intent(this, SettingsActivity2.class);
       startActivity(intent);
       return true;
+    } else if (id == R.id.action_refresh_modules) {
+      startActivity(new Intent(this, IvleLoginActivity.class));
+      finish();
     }
 
     return super.onOptionsItemSelected(item);
@@ -290,7 +304,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.VISIBLE);
         ft.commit();
-        setTitle("Listings");
+        setTitle("Study Sessions");
         break;
       case R.id.nav_my_listings:
         fragment = new MyListingsFragments();
@@ -306,7 +320,7 @@ public class Main2Activity extends AppCompatActivity
         ft.replace(R.id.container, fragment);
         fab.setVisibility(View.GONE);
         ft.commit();
-        setTitle("Listings That I'm Joining");
+        setTitle("Sessions That I'm Joining");
         break;
       case R.id.nav_profile:
         Intent intent = new Intent(this, ProfileActivity.class);
@@ -314,13 +328,6 @@ public class Main2Activity extends AppCompatActivity
         b.putString("profileUid", mAuth.getUid());
         intent.putExtras(b);
         startActivity(intent);
-        break;
-      case R.id.refresh_logout:
-        db.collection("users").document(mAuth.getUid()).update("nusNetId", FieldValue.delete())
-            .addOnCompleteListener(task -> {
-              signOut();
-              Toasty.success(this, "Refreshed successfully", Toast.LENGTH_SHORT).show();
-            });
         break;
       case R.id.nav_submit_feedback:
         intent = new Intent(this, MakeFeedbackActivity.class);
@@ -337,27 +344,27 @@ public class Main2Activity extends AppCompatActivity
           new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
               "access?").items(MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole()) ? admin
               : moderator).itemsCallback((dialog, itemView, position, text) -> {
-                switch (position) {
-                  case 0:
-                    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
-                      startActivity(new Intent(this, ViewAllReportsActivity.class));
-                    }
-                    break;
-                  case 1:
-                    if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
-                      startActivity(new Intent(this, ViewAllFeedbackActivity.class));
-                    }
-                    break;
-                  case 2:
-                    if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
-                      startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
-                    }
-                    break;
-                  default:
-                    Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
-                    break;
+            switch (position) {
+              case 0:
+                if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+                  startActivity(new Intent(this, ViewAllReportsActivity.class));
                 }
-              }).build().show();
+                break;
+              case 1:
+                if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                  startActivity(new Intent(this, ViewAllFeedbackActivity.class));
+                }
+                break;
+              case 2:
+                if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                  startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
+                }
+                break;
+              default:
+                Snackbar.make(activityView, "Not implemented yet.", Snackbar.LENGTH_SHORT).show();
+                break;
+            }
+          }).build().show();
         }
         break;
       default:

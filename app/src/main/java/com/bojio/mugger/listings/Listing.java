@@ -32,16 +32,13 @@ public class Listing implements Parcelable {
   private String ownerName;
 
 
-
   private int type;
-
 
 
   private List<String> attendees;
 
   private Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
-                  long endTime, String description, String venue, List<String> attendees, int type)
-  {
+                  long endTime, String description, String venue, List<String> attendees, int type) {
     this.uid = uid;
     this.ownerName = ownerName;
     this.ownerId = ownerId;
@@ -52,6 +49,20 @@ public class Listing implements Parcelable {
     this.venue = venue;
     this.attendees = attendees;
     this.type = type;
+  }
+
+  private Listing(Parcel source) {
+    this.uid = source.readString();
+    this.ownerName = source.readString();
+    this.ownerId = source.readString();
+    this.moduleCode = source.readString();
+    this.description = source.readString();
+    this.startTime = source.readLong();
+    this.endTime = source.readLong();
+    this.venue = source.readString();
+    this.attendees = new ArrayList<String>();
+    source.readStringList(this.attendees);
+    this.type = source.readInt();
   }
 
   public static Listing getListingFromSnapshot(DocumentSnapshot snapshot) {
@@ -71,7 +82,7 @@ public class Listing implements Parcelable {
     data.remove("venue");
     data.remove("type");
     data.remove("ownerName");
-    data.remove((String) snapshot.get("moduleCode"));
+    data.remove(snapshot.get("moduleCode"));
     List<String> attendeesList = new ArrayList<>(data.keySet());
 
     return new Listing(snapshot.getId(),
@@ -85,20 +96,6 @@ public class Listing implements Parcelable {
         attendeesList,
         type
     );
-  }
-
-  private Listing(Parcel source) {
-    this.uid = source.readString();
-    this.ownerName = source.readString();
-    this.ownerId = source.readString();
-    this.moduleCode = source.readString();
-    this.description = source.readString();
-    this.startTime = source.readLong();
-    this.endTime = source.readLong();
-    this.venue = source.readString();
-    this.attendees = new ArrayList<String>();
-    source.readStringList(this.attendees);
-    this.type = source.readInt();
   }
 
   @Override

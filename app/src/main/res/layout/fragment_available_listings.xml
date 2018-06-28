@@ -15,8 +15,6 @@
         android:layout_height="match_parent">
 
 
-
-
         <android.support.constraint.ConstraintLayout
             android:id="@+id/listings_fragments_constraint_layout_2"
             android:layout_width="wrap_content"
@@ -51,12 +49,10 @@
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/list"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -73,8 +69,8 @@
             android:id="@+id/listings_fragments_empty_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
             android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             android:text="There are currently no listings matching the search criteria. Make your own using the button on the bottom right corner of the screen."
             android:textAlignment="center"
             android:visibility="gone"

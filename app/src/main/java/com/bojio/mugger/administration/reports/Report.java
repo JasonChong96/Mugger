@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.view.View;
 import android.widget.Button;
 
 import com.bojio.mugger.listings.Listing;
@@ -12,9 +11,18 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.Map;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
-
 public class Report implements Parcelable {
+  public static final Creator<Report> CREATOR = new Creator<Report>() {
+    @Override
+    public Report createFromParcel(Parcel in) {
+      return new Report(in);
+    }
+
+    @Override
+    public Report[] newArray(int size) {
+      return new Report[size];
+    }
+  };
   protected ReportType type;
   protected String uid;
   protected String reporterUid;
@@ -52,23 +60,6 @@ public class Report implements Parcelable {
     listingUid = in.readString();
   }
 
-  public static final Creator<Report> CREATOR = new Creator<Report>() {
-    @Override
-    public Report createFromParcel(Parcel in) {
-      return new Report(in);
-    }
-
-    @Override
-    public Report[] newArray(int size) {
-      return new Report[size];
-    }
-  };
-
-  public Button.OnClickListener getOnClickListener() {
-    return v -> {
-    };
-  }
-
   @NonNull
   public static Report getReportFromSnapshot(DocumentSnapshot snapshot) {
     ReportType type = ReportType.valueOf((String) snapshot.get("type"));
@@ -83,6 +74,11 @@ public class Report implements Parcelable {
     report.setListingUid((String) snapshot.get("listingUid"));
     report.setUid(snapshot.getId());
     return report;
+  }
+
+  public Button.OnClickListener getOnClickListener() {
+    return v -> {
+    };
   }
 
   public String getListingUid() {
@@ -211,7 +207,9 @@ public class Report implements Parcelable {
         reportData.put("listingUid", b.getString("listingUid"));
       }
     };
+
     abstract Report init(DocumentSnapshot snapshot);
+
     public abstract void transferData(Bundle b, Map<String, Object> reportData);
   }
 }

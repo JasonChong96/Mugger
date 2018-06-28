@@ -2,10 +2,10 @@ package com.bojio.mugger.administration.requests;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
-import com.bojio.mugger.administration.feedback.ViewAllFeedbackActivity;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -64,6 +63,7 @@ public class ViewAllProfTARequestActivity extends AppCompatActivity {
           emptyTextView.setVisibility(View.GONE);
         }
       }
+
       @NonNull
       @Override
       public ProfTARequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -7,66 +7,63 @@
     tools:context=".administration.feedback.MakeFeedbackActivity">
 
 
-    <EditText
-        android:id="@+id/make_feedback_title"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout3"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="7dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
         android:hint="Title"
-        android:inputType="text|textCapWords|textAutoCorrect|textAutoComplete"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/make_feedback_title_label"
-        app:layout_constraintTop_toBottomOf="@+id/make_feedback_title_label" />
-
-    <EditText
-        android:id="@+id/make_feedback_description"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Description. Please include details so that we may solve the problem effectively"
-        android:inputType="text|textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/make_feedback_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/make_feedback_description_label"
-        app:layout_constraintTop_toBottomOf="@+id/make_feedback_description_label" />
-
-    <Button
-        android:id="@+id/make_feedback_button"
-        style="@android:style/ButtonBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Submit Feedback"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/make_feedback_title_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Title"
-        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/make_feedback_description_label"
-        android:layout_width="wrap_content"
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/make_feedback_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text|textCapWords"
+            android:textColor="@color/colorTextPrimary" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout4"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Description"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/make_feedback_title"
-        app:layout_constraintTop_toBottomOf="@+id/make_feedback_title" />
+        android:hint="Description"
+        app:helperText="Please be detailed in your description. If possible, provide suggestions."
+        app:helperTextEnabled="true"
+        app:helperTextTextAppearance="@style/AppTheme.HelperText"
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/make_feedback_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text|textCapSentences|textMultiLine"
+            android:textColor="@color/colorTextPrimary" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.button.MaterialButton
+        android:id="@+id/make_feedback_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:text="Submit Feedback"
+        android:textColor="@color/colorPrimaryDarkAdmin"
+        app:icon="@drawable/ic_baseline_publish_24px"
+        app:iconTint="@color/colorPrimaryDarkAdmin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
+
 </android.support.constraint.ConstraintLayout>

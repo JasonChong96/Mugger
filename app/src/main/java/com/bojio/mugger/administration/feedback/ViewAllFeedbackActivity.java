@@ -1,7 +1,6 @@
 package com.bojio.mugger.administration.feedback;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.profile.ProfileActivity;
@@ -30,16 +28,13 @@ import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
 
 public class ViewAllFeedbackActivity extends AppCompatActivity {
-  private FirebaseFirestore db;
-
   @BindView(android.R.id.content)
   View activityView;
-
   @BindView(R.id.feedback_view_recycler)
   RecyclerView recyclerView;
-
   @BindView(R.id.feedback_view_empty_text)
   TextView emptyTextView;
+  private FirebaseFirestore db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +94,7 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
                     .setContext(ViewAllFeedbackActivity.this)
                     .setMessage("Deleting Feedback...")
                     .setCancelable(false)
+                    .setTheme(R.style.SpotsDialog)
                     .build();
                 dialogg.show();
                 feedback.getDocRef().delete().addOnCompleteListener(task -> {
@@ -117,6 +113,18 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
     };
     adapter.startListening();
     recyclerView.setAdapter(adapter);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      // When back button on the top left is clicked
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+    }
+
+    return super.onOptionsItemSelected(item);
   }
 
   class FeedbackViewHolder extends RecyclerView.ViewHolder {
@@ -142,17 +150,5 @@ public class ViewAllFeedbackActivity extends AppCompatActivity {
       ButterKnife.bind(this, itemView);
       this.view = itemView;
     }
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      // When back button on the top left is clicked
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-    }
-
-    return super.onOptionsItemSelected(item);
   }
 }

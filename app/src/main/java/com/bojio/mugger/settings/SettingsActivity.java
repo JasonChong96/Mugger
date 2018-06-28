@@ -3,20 +3,17 @@ package com.bojio.mugger.settings;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -71,6 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         .Builder()
         .setContext(this)
         .setMessage("Updating settings...")
+        .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
     DocumentReference userRef = db.collection("users").document(user.getUid());
@@ -131,28 +129,29 @@ public class SettingsActivity extends AppCompatActivity {
         .Builder()
         .setContext(this)
         .setMessage("Changing display name...")
+        .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
     dialog.show();
 
     user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(newName).build()).addOnCompleteListener((task) -> {
-          if (!task.isSuccessful()) {
-            dialog.dismiss();
-            Snackbar.make(view, "Failed to change display name, please try again later",
-                Snackbar.LENGTH_SHORT).show();
-          } else {
-            db.collection("users").document(user.getUid()).update("displayName", newName)
-                .addOnCompleteListener(task2 -> {
-                  dialog.dismiss();
-                  if (!task2.isSuccessful()) {
-                    Snackbar.make(view, "Failed to change display name, please try again later",
-                        Snackbar.LENGTH_SHORT).show();
-                  } else {
-                    Snackbar.make(view, "Your display name has been changed successfully",
-                        Snackbar.LENGTH_SHORT).show();
-                  }
-                });
-          }
+      if (!task.isSuccessful()) {
+        dialog.dismiss();
+        Snackbar.make(view, "Failed to change display name, please try again later",
+            Snackbar.LENGTH_SHORT).show();
+      } else {
+        db.collection("users").document(user.getUid()).update("displayName", newName)
+            .addOnCompleteListener(task2 -> {
+              dialog.dismiss();
+              if (!task2.isSuccessful()) {
+                Snackbar.make(view, "Failed to change display name, please try again later",
+                    Snackbar.LENGTH_SHORT).show();
+              } else {
+                Snackbar.make(view, "Your display name has been changed successfully",
+                    Snackbar.LENGTH_SHORT).show();
+              }
+            });
+      }
     });
   }
 
@@ -167,7 +166,7 @@ public class SettingsActivity extends AppCompatActivity {
   }
 
   private void hideKeyboard() {
-    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
   }
 

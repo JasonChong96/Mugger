@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="Notifications">
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/settings_key_toggle_delete_notifications"
             android:summary="Receive a notification when a listing i joined is deleted"
+
             android:title="Listing Deleted" />
 
         <SwitchPreference
@@ -21,10 +23,12 @@
 
     <PreferenceCategory android:title="Profile">
 
-        <EditTextPreference
+        <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference
             android:inputType="text|textCapWords|textNoSuggestions"
             android:key="@string/settings_key_change_display_name"
-            android:title="Change Display Name" />
+            android:textColor="@color/colorTextPrimary"
+            android:title="Change Display Name"
+            app:useStockLayout="true" />
 
     </PreferenceCategory>
 </PreferenceScreen>

@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.MuggerRole;
+import com.bojio.mugger.authentication.MuggerRole;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -57,7 +57,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
     List<String> availableRoles = new ArrayList<>();
     MuggerRole ownRole = MuggerUser.getInstance().getRole();
     for (MuggerRole role : MuggerRole.values()) {
-      if (ownRole.checkSuperiorityTo(role)) {
+      if (role.isEnabled() && ownRole.checkSuperiorityTo(role)) {
         availableRoles.add(role.name());
       }
     }
@@ -75,6 +75,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
         .setContext(this)
         .setMessage("Changing role...")
         .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
         .build();
     dialog.show();
     long roleId = MuggerRole.valueOf((String) spinner.getSelectedItem()).getRoleId();
@@ -96,7 +97,7 @@ public class ChangeMuggerRoleActivity extends AppCompatActivity {
               notificationData.put("fromUid", "");
               notificationData.put("topicUid", "");
               notificationData.put("type", "role");
-              notificationData.put("newRoleName", ((String) spinner.getSelectedItem()));
+              notificationData.put("newRoleName", spinner.getSelectedItem());
               FirebaseFirestore.getInstance().collection("notifications").add(notificationData);
             });
 

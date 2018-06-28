@@ -2,8 +2,8 @@ package com.bojio.mugger.administration.reports;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -97,6 +97,7 @@ public class ChatReportDetailsActivity extends AppCompatActivity {
             .setContext(this)
             .setMessage("Deleting report...")
             .setCancelable(false)
+            .setTheme(R.style.SpotsDialog)
             .build();
         dialog.show();
         db.collection("reports").document(report.getUid()).delete().addOnCompleteListener(task
@@ -123,8 +124,8 @@ public class ChatReportDetailsActivity extends AppCompatActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
 
-      getMenuInflater().inflate(R.menu.listing_menu, menu);
-      menu.findItem(R.id.edit_listing).setVisible(false);
+    getMenuInflater().inflate(R.menu.listing_menu, menu);
+    menu.findItem(R.id.edit_listing).setVisible(false);
 
     return true;
   }

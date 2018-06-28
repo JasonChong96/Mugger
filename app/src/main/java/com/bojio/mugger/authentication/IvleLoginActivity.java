@@ -12,13 +12,16 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.Main2Activity;
+import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.Modules;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.common.hash.Hashing;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -55,6 +58,7 @@ public class IvleLoginActivity extends AppCompatActivity {
   FirebaseFirestore db;
   String token;
   FirebaseAuth mAuth;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     mAuth = FirebaseAuth.getInstance();
@@ -64,6 +68,25 @@ public class IvleLoginActivity extends AppCompatActivity {
     ButterKnife.bind(this);
     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
     StrictMode.setThreadPolicy(policy);
+    new MaterialDialog.Builder(this)
+        .title("IVLE Login")
+        .cancelable(false)
+        .content("This IVLE login will only be done once per account (Unless your current modules" +
+            " change). Information fetched will be your modules, faculty, major, gender and a " +
+            "hashed " +
+            "version of your NUSNET ID. Your NUSNET ID in our database is hashed using SHA-256 " +
+            "for your privacy in case of data leaks. It is only stored to ensure each person " +
+            "only has one Mugger account. Rest assured that no data collected can " +
+            "be too easily traced back to a specific person. We also not store your real name. " +
+            "Your default display name will be fetched from your google account and can be " +
+            "changed in the settings page.")
+        .positiveText("Proceed")
+        .negativeText("Cancel and Quit")
+        .onNegative((dialog, which) -> {
+          finish();
+          System.exit(0);
+        })
+        .show();
     webView.setWebViewClient(new WebViewClient() {
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -74,12 +97,13 @@ public class IvleLoginActivity extends AppCompatActivity {
                 .Builder()
                 .setContext(IvleLoginActivity.this)
                 .setMessage("Loading data from IVLE...")
+                .setTheme(R.style.SpotsDialog)
                 .setCancelable(false)
                 .build();
             dialog.show();
-           // Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
-          //      .LENGTH_SHORT).show();
-              });
+            // Snackbar.make(view, "Please wait while Mugger fetches relevant data.", Snackbar
+            //      .LENGTH_SHORT).show();
+          });
           token = url.substring(54);
           // Run in parallel so the loading screen still shows for the user while data is loading.
           Needle.onBackgroundThread().execute(() -> {
@@ -112,10 +136,17 @@ public class IvleLoginActivity extends AppCompatActivity {
       return;
     }
     if (checkTask.isSuccessful()) {
-      if (checkTask.getResult().getDocuments().size() > 0) {
-        Toasty.error(this, "Your IVLE account is already tagged to another Mugger account. " +
-                "You are only allowed one account per person.",
-            Toast.LENGTH_LONG).show();
+      List<DocumentSnapshot> snaps = checkTask.getResult().getDocuments();
+      if (snaps.size() > 1 || (snaps.size() > 0 && !mAuth.getUid().equals(snaps.get(0).getId()))) {
+        Intent intent = new Intent(this, MainActivity.class);
+        // Clears back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        Bundle b = new Bundle();
+        b.putString("errorMessage", "Your IVLE account is already tagged to another Mugger account. " +
+            "You are only allowed one account per person.");
+        intent.putExtras(b);
+        startActivity(intent);
+        finish();
         return;
       }
     } else {
@@ -129,26 +160,26 @@ public class IvleLoginActivity extends AppCompatActivity {
     }
     db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(userData,
         SetOptions.merge()).addOnCompleteListener(task -> {
-          if (!task.isSuccessful()) {
-            onError();
-            return;
-          } else {
-            db.collection("users").document(FirebaseAuth.getInstance().getUid()).get()
-                .addOnCompleteListener(taskk -> {
-                  if (!task.isSuccessful()) {
-                    onError();
-                    return;
-                  } else {
-                    MuggerUser.getInstance().setData(taskk.getResult().getData());
-                    Intent intent = new Intent(this, Main2Activity.class);
-                    // Clears back stack
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                  }
-                });
+      if (!task.isSuccessful()) {
+        onError();
+        return;
+      } else {
+        db.collection("users").document(FirebaseAuth.getInstance().getUid()).get()
+            .addOnCompleteListener(taskk -> {
+              if (!task.isSuccessful()) {
+                onError();
+                return;
+              } else {
+                MuggerUser.getInstance().setData(taskk.getResult().getData());
+                Intent intent = new Intent(this, Main2Activity.class);
+                // Clears back stack
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+              }
+            });
 
-          }
+      }
     });
   }
 
@@ -159,7 +190,7 @@ public class IvleLoginActivity extends AppCompatActivity {
     try {
 
       url = new URL(https_url + token);
-      HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+      HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
       Scanner sc = new Scanner(con.getInputStream());
       String[] data = sc.nextLine().split("\"");
@@ -209,7 +240,7 @@ public class IvleLoginActivity extends AppCompatActivity {
     try {
 
       url = new URL(https_url_modules + token);
-      HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+      HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
       Scanner sc = new Scanner(con.getInputStream());
       String s = sc.nextLine();
@@ -259,8 +290,14 @@ public class IvleLoginActivity extends AppCompatActivity {
   }
 
   private void onError() {
+    Intent intent = new Intent(this, MainActivity.class);
+    // Clears back stack
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+    Bundle b = new Bundle();
+    b.putString("errorMessage", "An error has occured, please try again later.");
+    intent.putExtras(b);
+    startActivity(intent);
     finish();
-    Toasty.error(this, "An error has occurred please try again later", Toast.LENGTH_LONG)
-        .show();
+    return;
   }
 }

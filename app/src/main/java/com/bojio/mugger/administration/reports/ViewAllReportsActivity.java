@@ -1,8 +1,8 @@
 package com.bojio.mugger.administration.reports;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -85,6 +84,18 @@ public class ViewAllReportsActivity extends AppCompatActivity {
     adapter.startListening();
   }
 
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      // When back button on the top left is clicked
+      case android.R.id.home:
+        onBackPressed();
+        return true;
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
   class ReportViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.report_view_type)
     TextView typeView;
@@ -105,17 +116,5 @@ public class ViewAllReportsActivity extends AppCompatActivity {
       ButterKnife.bind(this, itemView);
       this.view = itemView;
     }
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      // When back button on the top left is clicked
-      case android.R.id.home:
-        onBackPressed();
-        return true;
-    }
-
-    return super.onOptionsItemSelected(item);
   }
 }

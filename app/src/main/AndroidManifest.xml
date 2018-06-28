@@ -22,17 +22,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".authentication.GoogleLoginActivity"
-            android:label="Mugger Login"/>
+        <activity
+            android:name=".authentication.GoogleLoginActivity"
+            android:label="Mugger Login" />
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.Main2" />
         <activity android:name=".listings.CreateEditListingActivity" />
-        <activity android:name=".listings.AvailableListingDetailsActivity"
-            android:label="Listing Details"/>
-        <activity android:name=".authentication.IvleLoginActivity"
-            android:label="IVLE Login (First-timer only)"/>
+        <activity
+            android:name=".listings.AvailableListingDetailsActivity"
+            android:label="Session Details" />
+        <activity
+            android:name=".authentication.IvleLoginActivity"
+            android:label="IVLE Login (First-timer only)" />
         <activity android:name=".listings.chat.ListingChatActivity" />
 
         <service
@@ -72,14 +75,14 @@
             android:theme="@style/AppTheme.Admin" />
         <activity
             android:name=".administration.requests.MakeProfTARequestActivity"
-            android:label="Request Professor / TA Role"
-            android:theme="@style/AppTheme.Admin" />
+            android:label="Request Professor / TA Role" />
         <activity
             android:name=".administration.requests.ViewAllProfTARequestActivity"
             android:label="Professor / TA Role Requests"
             android:theme="@style/AppTheme.Admin" />
-        <activity android:name=".administration.reports.MakeReportActivity"
-            android:label="Submit Report"/>
+        <activity
+            android:name=".administration.reports.MakeReportActivity"
+            android:label="Submit Report" />
         <activity
             android:name=".administration.reports.ViewAllReportsActivity"
             android:label="All Reports"
@@ -88,9 +91,13 @@
             android:name=".administration.reports.ChatReportDetailsActivity"
             android:label="Chat Report Details"
             android:theme="@style/AppTheme.Admin" />
-        <activity android:name=".administration.reports.ListingReportDetailsActivity"
+        <activity
+            android:name=".administration.reports.ListingReportDetailsActivity"
             android:label="ListingReportDetails"
-            android:theme="@style/AppTheme.Admin"/>
+            android:theme="@style/AppTheme.Admin" />
+        <activity
+            android:name=".listings.ViewAttendeesActivity"
+            android:label="Study Session Attendees" />
     </application>
 
 </manifest>

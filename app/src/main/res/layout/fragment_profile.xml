@@ -43,10 +43,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                app:srcCompat="@drawable/gender_male"
+                android:tint="@color/colorWhite"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_text_view_name"
                 app:layout_constraintStart_toEndOf="@+id/profile_text_view_name"
-                app:layout_constraintTop_toTopOf="@+id/profile_text_view_name" />
+                app:layout_constraintTop_toTopOf="@+id/profile_text_view_name"
+                app:srcCompat="@drawable/gender_male" />
         </android.support.constraint.ConstraintLayout>
 
         <TextView
@@ -61,7 +62,7 @@
             android:textStyle="bold"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider4" />
+            app:layout_constraintTop_toBottomOf="@+id/status_layout" />
 
         <TextView
             android:id="@+id/profile_text_view_first_major"
@@ -100,9 +101,9 @@
             android:id="@+id/divider2"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginEnd="25dp"
             android:layout_marginStart="25dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="25dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -113,9 +114,9 @@
             android:id="@+id/divider3"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginEnd="25dp"
             android:layout_marginStart="25dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="25dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -126,14 +127,13 @@
             android:id="@+id/divider4"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginEnd="25dp"
             android:layout_marginStart="25dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginEnd="25dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_status" />
+            app:layout_constraintTop_toBottomOf="parent" />
 
         <TextView
             android:id="@+id/profile_text_view_modules_title"
@@ -147,6 +147,62 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/status_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/profile_text_view_status_title"
+            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_status_title">
+
+            <android.support.design.button.MaterialButton
+                android:id="@+id/profile_button_update_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apply Changes"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/profile_text_view_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/profile_plain_text_status_wrapper"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:hint="@string/profile_status_hint"
+                android:visibility="gone"
+                app:boxBackgroundColor="@color/cardViewColorAdmin"
+                app:helperText="E.g Contact details, hobbies"
+                app:helperTextEnabled="true"
+                app:helperTextTextAppearance="@style/AppTheme.HelperText"
+                app:layout_constraintEnd_toStartOf="@+id/profile_button_update_status"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/profile_plain_text_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text|textCapSentences"
+                    android:textColor="@color/colorTextPrimary"
+                    android:visibility="visible" />
+            </android.support.design.widget.TextInputLayout>
+        </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/profile_text_view_status_title"
@@ -178,24 +234,6 @@
             app:layout_constraintStart_toStartOf="@+id/profile_text_view_modules_title"
             app:layout_constraintTop_toBottomOf="@+id/profile_text_view_modules_title" />
 
-        <TextView
-            android:id="@+id/profile_text_view_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@+id/profile_text_view_status_title"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_status_title" />
-
-        <EditText
-            android:id="@+id/profile_plain_text_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/profile_status_hint"
-            android:textAppearance="@android:style/TextAppearance.Holo.Small"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/profile_text_view_status_title"
-            app:layout_constraintTop_toBottomOf="@+id/profile_text_view_status_title" />
 
         <Button
             android:id="@+id/profile_button_ban"
@@ -217,48 +255,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
-        <Button
-            android:id="@+id/profile_button_update_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Update Status"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/divider4"
-            app:layout_constraintStart_toEndOf="@+id/profile_plain_text_status"
-            app:layout_constraintTop_toBottomOf="@+id/divider3" />
-
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_make_ta_prof"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:text="Make TA/Prof"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/profile_button_mute"
-            app:layout_constraintTop_toBottomOf="@+id/profile_button_mute" />
+            app:layout_constraintTop_toBottomOf="@+id/profile_button_mute"
+            app:strokeColor="?attr/colorAccent" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_change_mugger_role"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="Change Mugger Role"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/profile_button_make_ta_prof"
-            app:layout_constraintTop_toTopOf="@+id/profile_button_make_ta_prof" />
+            app:layout_constraintStart_toStartOf="@+id/profile_button_make_ta_prof"
+            app:layout_constraintTop_toBottomOf="@+id/profile_button_make_ta_prof"
+            app:strokeColor="?attr/colorAccent" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/profile_button_mute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
             android:text="Mute this user"
+            android:textColor="@color/colorPrimaryDark"
             android:visibility="gone"
             app:layout_constraintStart_toEndOf="@+id/profile_button_ban"
             app:layout_constraintTop_toTopOf="@+id/profile_button_ban" />

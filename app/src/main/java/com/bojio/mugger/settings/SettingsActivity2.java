@@ -1,11 +1,9 @@
 package com.bojio.mugger.settings;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -15,13 +13,11 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUser;
@@ -30,7 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
@@ -39,107 +34,12 @@ import dmax.dialog.SpotsDialog;
 
 public class SettingsActivity2 extends AppCompatPreferenceActivity {
   private static final String TAG = SettingsActivity2.class.getSimpleName();
-  private FirebaseAuth mAuth;
-  private FirebaseUser user;
   private static AlertDialog dialog;
   private static Snackbar snackbar;
-
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    mAuth = FirebaseAuth.getInstance();
-    // load settings fragment
-    PreferenceFragment fragment = new MainPreferenceFragment();
-    getFragmentManager().beginTransaction().replace(android.R.id.content, fragment).commit();
-      dialog = new SpotsDialog
-          .Builder()
-          .setContext(this)
-          .setCancelable(false)
-          .build();
-      snackbar = Snackbar.make(findViewById(android.R.id.content), "", Snackbar.LENGTH_SHORT);
-  }
-
-  public static class MainPreferenceFragment extends PreferenceFragment {
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
-
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      addPreferencesFromResource(R.xml.pref_main);
-
-
-      // gallery EditText change listener
-     // bindPreferenceSummaryToValue(findPreference(getString(R.string.key_gallery_name)));
-
-      // notification preference change listener
-    //  bindPreferenceSummaryToValue(findPreference(getString(R.string
-       //   .key_notifications_new_message_ringtone)));
-
-      // feedback preference click listener
-   /*   Preference myPref = findPreference(getString(R.string.key_send_feedback));
-      myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-        public boolean onPreferenceClick(Preference preference) {
-          sendFeedback(getActivity());
-          return true;
-        }
-      });*/
-      mAuth = FirebaseAuth.getInstance();
-      EditTextPreference changeName = (EditTextPreference) findPreference
-          (getString(R.string.settings_key_change_display_name));
-      user = mAuth.getCurrentUser();
-      MuggerUser muggerUser = MuggerUser.getInstance();
-      bindPreferenceSummaryToValue(changeName);
-      changeName.setText(user.getDisplayName());
-      changeName.setSummary(user.getDisplayName());
-
-      SwitchPreference deleteNotifSwitch = (SwitchPreference) findPreference(getString(R.string
-          .settings_key_toggle_delete_notifications));
-      deleteNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
-      Long deleteSettings = (Long) muggerUser.getData().get(MessagingService.DELETED_NOTIFICATION);
-      if (deleteSettings == null) {
-        deleteSettings = 1L;
-      }
-      deleteNotifSwitch.setChecked(!deleteSettings.equals(Long.valueOf(0)));
-
-      SwitchPreference chatNotifSwitch = (SwitchPreference) findPreference(getString(R.string
-          .settings_key_toggle_chat_notifications));
-      chatNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
-      Long chatSettings = (Long) muggerUser.getData().get(MessagingService.CHAT_NOTIFICATION);
-      if (chatSettings == null) {
-        chatSettings = 1L;
-      }
-      chatNotifSwitch.setChecked(!chatSettings.equals(Long.valueOf(0)));
-
-      SwitchPreference createNotifSwitch = (SwitchPreference) findPreference(getString(R.string
-          .settings_key_toggle_create_notifications));
-      createNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
-      Long createSettings = (Long) muggerUser.getData().get(MessagingService.CREATED_NOTIFICATION);
-      if (createSettings == null) {
-        createSettings = 1L;
-      }
-      chatNotifSwitch.setChecked(!createSettings.equals(Long.valueOf(0)));
-    }
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    if (item.getItemId() == android.R.id.home) {
-      onBackPressed();
-    }
-    return super.onOptionsItemSelected(item);
-  }
-
-  private static void bindPreferenceSummaryToValue(Preference preference) {
-    preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-  }
-
   private static Preference.OnPreferenceChangeListener sBindSwitchPreferenceListener = new Preference.OnPreferenceChangeListener() {
     private FirebaseUser user;
     private FirebaseFirestore db;
+
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
       dialog.setMessage("Updating Settings...");
@@ -169,7 +69,6 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       return true;
     }
   };
-
   /**
    * A preference value change listener that updates the preference's summary
    * to reflect its new value.
@@ -213,7 +112,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
 
           if (ringtone == null) {
             // Clear the summary if there was a lookup error.
-          //  preference.setSummary(R.string.summary_choose_ringtone);
+            //  preference.setSummary(R.string.summary_choose_ringtone);
           } else {
             // Set the summary to reflect the new ringtone display
             // name.
@@ -282,6 +181,13 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       return true;
     }
   };
+  private FirebaseAuth mAuth;
+  private FirebaseUser user;
+
+  private static void bindPreferenceSummaryToValue(Preference preference) {
+    preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+  }
 
   /**
    * Email client intent to send support mail
@@ -304,5 +210,93 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
     intent.putExtra(Intent.EXTRA_TEXT, body);
     //context.startActivity(Intent.createChooser(intent, context.getString(R.string
     //    .choose_email_client)));
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    mAuth = FirebaseAuth.getInstance();
+    // load settings fragment
+    PreferenceFragment fragment = new MainPreferenceFragment();
+    getFragmentManager().beginTransaction().replace(android.R.id.content, fragment).commit();
+    dialog = new SpotsDialog
+        .Builder()
+        .setContext(this)
+        .setCancelable(false)
+        .setTheme(R.style.SpotsDialog)
+        .build();
+    snackbar = Snackbar.make(findViewById(android.R.id.content), "", Snackbar.LENGTH_SHORT);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == android.R.id.home) {
+      onBackPressed();
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  public static class MainPreferenceFragment extends PreferenceFragment {
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      addPreferencesFromResource(R.xml.pref_main);
+
+
+      // gallery EditText change listener
+      // bindPreferenceSummaryToValue(findPreference(getString(R.string.key_gallery_name)));
+
+      // notification preference change listener
+      //  bindPreferenceSummaryToValue(findPreference(getString(R.string
+      //   .key_notifications_new_message_ringtone)));
+
+      // feedback preference click listener
+   /*   Preference myPref = findPreference(getString(R.string.key_send_feedback));
+      myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        public boolean onPreferenceClick(Preference preference) {
+          sendFeedback(getActivity());
+          return true;
+        }
+      });*/
+      mAuth = FirebaseAuth.getInstance();
+      EditTextPreference changeName = (EditTextPreference) findPreference
+          (getString(R.string.settings_key_change_display_name));
+      user = mAuth.getCurrentUser();
+      MuggerUser muggerUser = MuggerUser.getInstance();
+      bindPreferenceSummaryToValue(changeName);
+      changeName.setText(user.getDisplayName());
+      changeName.setSummary(user.getDisplayName());
+
+      SwitchPreference deleteNotifSwitch = (SwitchPreference) findPreference(getString(R.string
+          .settings_key_toggle_delete_notifications));
+      deleteNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
+      Long deleteSettings = (Long) muggerUser.getData().get(MessagingService.DELETED_NOTIFICATION);
+      if (deleteSettings == null) {
+        deleteSettings = 1L;
+      }
+      deleteNotifSwitch.setChecked(!deleteSettings.equals(Long.valueOf(0)));
+
+      SwitchPreference chatNotifSwitch = (SwitchPreference) findPreference(getString(R.string
+          .settings_key_toggle_chat_notifications));
+      chatNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
+      Long chatSettings = (Long) muggerUser.getData().get(MessagingService.CHAT_NOTIFICATION);
+      if (chatSettings == null) {
+        chatSettings = 1L;
+      }
+      chatNotifSwitch.setChecked(!chatSettings.equals(Long.valueOf(0)));
+
+      SwitchPreference createNotifSwitch = (SwitchPreference) findPreference(getString(R.string
+          .settings_key_toggle_create_notifications));
+      createNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
+      Long createSettings = (Long) muggerUser.getData().get(MessagingService.CREATED_NOTIFICATION);
+      if (createSettings == null) {
+        createSettings = 1L;
+      }
+      chatNotifSwitch.setChecked(!createSettings.equals(Long.valueOf(0)));
+    }
   }
 }

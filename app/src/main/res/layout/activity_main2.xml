@@ -32,9 +32,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@color/cardViewColorAdmin"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main2"
-        android:background="@color/colorBackground"
+        app:itemTextColor="@color/actionbar_text"
         app:menu="@menu/activity_main2_drawer">
 
     </android.support.design.widget.NavigationView>

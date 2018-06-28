@@ -4,6 +4,16 @@ public class Message {
   private String fromUid;
   private String fromName;
   private String content;
+  private Long time;
+  private Long day;
+
+  Message(String fromUid, String fromName, String content, Long time, Long day) {
+    this.fromUid = fromUid;
+    this.fromName = fromName;
+    this.content = content;
+    this.time = time;
+    this.day = day;
+  }
 
   public Long getTime() {
     return time;
@@ -13,23 +23,11 @@ public class Message {
     this.time = time;
   }
 
-  private Long time;
-
   public Long getDay() {
     return day;
   }
 
   public void setDay(Long day) {
-    this.day = day;
-  }
-
-  private Long day;
-
-  Message(String fromUid, String fromName, String content, Long time, Long day) {
-    this.fromUid = fromUid;
-    this.fromName = fromName;
-    this.content = content;
-    this.time = time;
     this.day = day;
   }
 

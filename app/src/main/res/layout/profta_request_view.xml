@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,9 +8,9 @@
         android:id="@+id/prof_ta_request_view_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="TextView"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/prof_ta_request_view_button_profile"
@@ -23,8 +22,8 @@
         android:id="@+id/prof_ta_request_view_module_code"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="TextView"
         app:layout_constraintEnd_toStartOf="@+id/prof_ta_request_view_button_profile"
         app:layout_constraintHorizontal_bias="0.0"
@@ -35,39 +34,33 @@
         android:id="@+id/prof_ta_request_view_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="TextView"
         app:layout_constraintEnd_toStartOf="@+id/prof_ta_request_view_button_delete"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/prof_ta_request_view_module_code"
         app:layout_constraintTop_toBottomOf="@+id/prof_ta_request_view_module_code" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/prof_ta_request_view_button_profile"
-        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
-        
-        android:drawableStart="@drawable/ic_baseline_person_24px"
+        android:layout_marginEnd="16dp"
         android:text="Profile"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:icon="@drawable/ic_baseline_person_24px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/prof_ta_request_view_button_delete"
-        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        
-        android:drawableStart="@drawable/ic_baseline_delete_24px"
+        android:layout_marginBottom="8dp"
+        app:icon="@drawable/ic_baseline_delete_24px"
         android:text="Delete"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/prof_ta_request_view_button_profile"
         app:layout_constraintTop_toBottomOf="@+id/prof_ta_request_view_button_profile"
@@ -77,8 +70,8 @@
         android:id="@+id/divider8"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

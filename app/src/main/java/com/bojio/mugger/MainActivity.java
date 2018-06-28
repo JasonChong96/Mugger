@@ -25,11 +25,10 @@ import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity {
 
-  private FirebaseAuth mAuth;
-  private FirebaseFirestore db;
-
   @BindView(R.id.progressBar5)
   ProgressBar progressBar;
+  private FirebaseAuth mAuth;
+  private FirebaseFirestore db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +40,18 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
     initGoogleSignInButton();
     ButterKnife.bind(this);
+    Bundle b = getIntent().getExtras();
+    if (b != null) {
+      String errMsg = b.getString("errorMessage");
+      if (errMsg != null) {
+        Toasty.error(this, errMsg).show();
+      }
+    }
     if (acc != null) { // Logged in
       SpotsDialog.Builder dialog = new SpotsDialog
           .Builder()
           .setContext(this)
+          .setTheme(R.style.SpotsDialog)
           .setMessage("Signing in...")
           .setCancelable(false);
       dialog.build().show();
@@ -66,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
    * Checks the account and starts the appropriate activity for the account. i.e If the account
    * has not logged in to IVLE for verification before, redirect to IVLE login. If not, redirect
    * to the listings main page.
+   *
    * @param acc the account to check
    */
   private void checkAccount(FirebaseUser acc) {
