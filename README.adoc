@@ -1,10 +1,13 @@
+ifdef::env-github,env-browser[:relfileprefix:]
 :toc:
-:toc-title:
+:toc-title: User Guide
 :toc-placement: preamble
 
 = Mugger
 
 image::https://i.imgur.com/aecirYh.png[float="right"]
+
+<<DeveloperGuide#, Developer Guide>>
 
 == 1. Introduction
 
