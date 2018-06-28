@@ -1,0 +1,55 @@
+= Developer Guide
+:toc:
+:toc-title:
+:toc-placement: preamble
+
+== 1. Developer Set-up
+1. Ensure you have Android Studio installed along with Android SDK 28.
+2. Go to https://github.com/JasonChong96/Mugger and click ‘Clone or Download’ to download and later extract the ZIP file.
+3. Open Android Studio and go to File > Open.
+4. Navigate to where the ZIP file was extracted to and open the Mugger project which will have a different icon from regular folders.
+5. Android Studio will automatically download all dependencies needed for the Application [more in section 7]. 
+6. All java files should be under the package name com.bojio.mugger and resource files under the res folder.
+7. After Android Studio has finished loading the project, press Ctrl + F9 to build an Android Package Kit (APK) for the project.
+
+== 2. Implementation
+This section describes some short noteworthy details of how certain features are implemented. Only a few features have been chosen due to space constraints.
+
+=== 2.1 Storage and Display of Study Session Listings
+Listings are stored as individual documents under the listings collection in the Firestore database. Listings are displayed using a RecyclerView that is updated in real time whenever any listings are modified/added/deleted.
+
+==== 2.1.1 Sorting and Filtering of Listings
+Chosen implementation: 
+Sorting is handled by the Firestore database
+
+|===
+|Advantages |Disadvantages
+|Fetching of sorted data is fast as Firestore automatically indexes the data when it is written to the database.
+|Firestore cannot filter by a field that is different from the field used for sorting.
+|Firestore can only sort by one field or 2 predefined fields.
+|
+|===
+
+Alternative Implementation:
+Sorting handled by the client after downloading all Listing data from database
+
+|===
+|Advantages |Disadvantages
+|Can sort and filter by multiple fields in any way.
+|Speed depends on the device
+|
+|Requires the application to download unnecessary data that will be filtered out
+|
+|Detrimental to app performance
+|===
+
+Rejected as the needed sorting and filtering can currently be done using Firestore queries and manipulation of different fields, e.g to filter by module code and sort by time, add a field that is named after the module code and store the listing time inside this field. Sorting by the module code then achieves the desired filtering and ordering.
+
+=== 2.2 Profile Data and Module Caching
+image::https://i.imgur.com/917O7Y8.png[Module Cache data structure]
+Profile data is cached in a MuggerUser instance. This instance can be fetched using MuggerUser.getInstance(). The data is stored as a Map of String keys and Object values. It is stored this way as these are the types that Firestore returns when fetching user data, and conversion of each individual value into the appropriate type will be done as they are fetched. Trying to typecast values when caching will require one Map object for each data type which has almost no significant advantages.
+Data Structure of Module Cache
+Modules are cached in the same MuggerUser instance as a TreeMap of String keys and nested TreeMaps of values. This data structure is shown in the figure above. TreeMaps were chosen as the semesters and module codes should be sorted alphabetically in the UI so that the user can easily choose his/her desired module. This structure allows us to easily fetch modules in a given semester as well as the user’s role in the module efficiently in O(lg(n)) time.
+
+== 3. Dev Ops
+By default, Android Studio uses Gradle for build automation. Gradle automatically downloads and imports relevant dependencies listed under build.gradle, along with the required Android SDK version and build tools.
