@@ -1,8 +1,10 @@
+:toc:
+:toc-title:
+:toc-placement: preamble
+
 = Mugger
 
 image::https://i.imgur.com/aecirYh.png[float="right"]
-
-toc::[]
 
 == Introduction
 
