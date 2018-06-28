@@ -1,7 +1,10 @@
-= Developer Guide
 :toc:
+:toc-placement!:
 :toc-title:
-:toc-placement: preamble
+
+= Developer Guide
+
+toc::[]
 
 == 1. Developer Set-up
 1. Ensure you have Android Studio installed along with Android SDK 28.
