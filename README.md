@@ -19,7 +19,9 @@ It was designed with the intention to increase the number of face-to-face opport
 
 The UI for these features is shown in our video, along with a brief reiteration of our project aims and scope. Most of the UI has been adjusted to conform to material design guidelines to provide a better user experience.
 
-## Login
+## Features
+
+### 3.0 Login
 
 Primary login method will be using your Google account, although first-time users will be prompted to login a second time with their NUSNET (IVLE) account, to prove that they are a current NUS student/staff and to fetch necessary information like current modules.
 
