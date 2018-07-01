@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,7 +23,7 @@ import java.text.DateFormat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ViewAllReportsActivity extends AppCompatActivity {
+public class ViewAllReportsActivity extends LoggedInActivity {
   FirebaseFirestore db;
 
   @BindView(R.id.view_all_reports_recycler)

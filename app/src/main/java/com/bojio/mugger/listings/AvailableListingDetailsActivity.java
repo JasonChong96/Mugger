@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.fcm.MessagingService;
@@ -39,7 +40,7 @@ import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class AvailableListingDetailsActivity extends AppCompatActivity {
+public class AvailableListingDetailsActivity extends LoggedInActivity {
 
   @BindView(R.id.module_code)
   TextView moduleCode;

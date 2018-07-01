@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -27,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
 
-public class ViewAllProfTARequestActivity extends AppCompatActivity {
+public class ViewAllProfTARequestActivity extends LoggedInActivity {
   FirebaseFirestore db;
 
   @BindView(R.id.profta_request_view_empty_text)

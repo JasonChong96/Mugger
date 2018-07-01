@@ -47,7 +47,7 @@ import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 import needle.Needle;
 
-public class IvleLoginActivity extends AppCompatActivity {
+public class IvleLoginActivity extends LoggedInActivity {
 
   @BindView(R.id.ivle_login)
   WebView webView;

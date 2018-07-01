@@ -9,10 +9,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 
 import es.dmoral.toasty.Toasty;
 
-public class ProfileActivity extends AppCompatActivity
+public class ProfileActivity extends LoggedInActivity
     implements ProfileFragment.OnProfileFragmentInteractionListener {
 
   @Override

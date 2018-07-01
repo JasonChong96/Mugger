@@ -185,5 +185,15 @@
     <string name="settings_key_toggle_delete_notifications">toggle_delete_notifications</string>
     <string name="settings_key_toggle_create_notifications">toggle_create_notifications</string>
     <string name="settings_key_toggle_chat_notifications">toggle_chat_notifications</string>
+    <string name="intro_desc_1">Study together for common modules and forge new friendships here in NUS</string>
+    <string name="intro_title_1">Welcome to Mugger!</string>
+    <string name="intro_desc_2">Choose from a wide variety of study sessions for any module
+        created by fellow students and staff</string>
+    <string name="intro_title_2">Anytime, Anywhere</string>
+    <string name="intro_desc_3">Make your own listings for others to join, as well as interact
+        with them in the chat room prior to meeting face-to-face</string>
+    <string name="intro_title_3"><![CDATA[Create & Engage]]></string>
+    <string name="intro_title_4">Your welfare matters to us</string>
+    <string name="intro_desc_4">Our dedicated admins will be happy to respond to any reports and feedback you have</string>
 
 </resources>

@@ -14,6 +14,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,7 +33,7 @@ import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends LoggedInActivity {
 
   @BindView(R.id.settings_change_display_name_button)
   Button buttonChangeName;

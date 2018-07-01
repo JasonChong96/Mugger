@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.firebase.auth.FirebaseAuth;
@@ -217,6 +218,9 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
     super.onCreate(savedInstanceState);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     mAuth = FirebaseAuth.getInstance();
+    if (mAuth.getCurrentUser() == null) {
+      LoggedInActivity.signOut(this);
+    }
     // load settings fragment
     PreferenceFragment fragment = new MainPreferenceFragment();
     getFragmentManager().beginTransaction().replace(android.R.id.content, fragment).commit();

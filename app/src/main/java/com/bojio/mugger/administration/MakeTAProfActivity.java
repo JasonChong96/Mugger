@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.constants.ModuleRole;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,7 +30,7 @@ import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class MakeTAProfActivity extends AppCompatActivity {
+public class MakeTAProfActivity extends LoggedInActivity {
 
   @BindView(R.id.make_ta_prof_button_submit)
   Button submitButton;

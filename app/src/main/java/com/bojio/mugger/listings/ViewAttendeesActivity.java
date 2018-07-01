@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.profile.ProfileListRecyclerAdapter;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -23,7 +24,7 @@ import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class ViewAttendeesActivity extends AppCompatActivity {
+public class ViewAttendeesActivity extends LoggedInActivity {
 
   @BindView(R.id.attendees_list_recycler)
   RecyclerView recyclerView;

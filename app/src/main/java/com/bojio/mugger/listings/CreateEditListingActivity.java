@@ -22,6 +22,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,7 +47,7 @@ import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class CreateEditListingActivity extends AppCompatActivity {
+public class CreateEditListingActivity extends LoggedInActivity {
 
   @BindView(R.id.module_code)
   Spinner moduleCode;

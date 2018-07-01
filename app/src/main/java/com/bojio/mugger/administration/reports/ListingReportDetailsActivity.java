@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -19,7 +20,7 @@ import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class ListingReportDetailsActivity extends AppCompatActivity {
+public class ListingReportDetailsActivity extends LoggedInActivity {
 
   @BindView(R.id.listing_report_details_listing_description)
   TextView listingDescriptionView;

@@ -27,10 +27,12 @@ import com.bojio.mugger.administration.reports.ViewAllReportsActivity;
 import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.constants.MuggerConstants;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.introduction.MuggerIntroActivity;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.fragments.AttendingListingsFragments;
@@ -62,10 +64,12 @@ import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class Main2Activity extends AppCompatActivity
+public class Main2Activity extends LoggedInActivity
     implements NavigationView.OnNavigationItemSelectedListener,
     ListingsFragments.OnListingsFragmentInteractionListener,
     ProfileFragment.OnProfileFragmentInteractionListener {
+
+  private static int REQUEST_CODE_INTRO = 0;
 
   @BindView(R.id.fab)
   FloatingActionButton fab;
@@ -101,7 +105,7 @@ public class Main2Activity extends AppCompatActivity
       }
     });
     // Set behavior when logged in state changes
-    setAuthStateChangeListener();
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
@@ -170,6 +174,9 @@ public class Main2Activity extends AppCompatActivity
               setTitle("Study Sessions");
               navigationView.setCheckedItem(R.id.nav_available_listings);
               onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+              if (MuggerUser.getInstance().getData().get("introDone") == null) {
+                startIntroActivity(true);
+              }
             }
             dialog.dismiss();
           });
@@ -184,27 +191,7 @@ public class Main2Activity extends AppCompatActivity
 
   }
 
-  /**
-   * Sets the function to be invoked when log in stage is changed. i.e when user has signed out,
-   * bring him back to the login page and unsubscribe him from notifications
-   */
-  private void setAuthStateChangeListener() {
-    mAuth.addAuthStateListener(firebaseAuth -> {
-      if (firebaseAuth.getCurrentUser() == null) {
-        finish();
-        try {
-          FirebaseInstanceId.getInstance().deleteInstanceId();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        Intent intent = new Intent(this, MainActivity
-            .class);
-        Toasty.success(Main2Activity.this, "Logged out " +
-            "successfully", Toast.LENGTH_SHORT).show();
-        startActivity(intent);
-      }
-    });
-  }
+
 
   /**
    * Subscribes this client to the relevant listing notifications.
@@ -281,6 +268,8 @@ public class Main2Activity extends AppCompatActivity
     } else if (id == R.id.action_refresh_modules) {
       startActivity(new Intent(this, IvleLoginActivity.class));
       finish();
+    } else if (id == R.id.action_view_introduction) {
+      startIntroActivity(false);
     }
 
     return super.onOptionsItemSelected(item);
@@ -411,5 +400,28 @@ public class Main2Activity extends AppCompatActivity
   @Override
   public void onProfileFragmentInteraction(Uri uri) {
 
+  }
+
+  /**
+   * Starts the Introduction Slides Activity
+   */
+  private void startIntroActivity(boolean callback) {
+    Intent intent = new Intent(this, MuggerIntroActivity.class);
+    if (callback) {
+      startActivityForResult(intent, REQUEST_CODE_INTRO);
+    } else {
+      startActivity(intent);
+    }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == REQUEST_CODE_INTRO) {
+      if (resultCode == RESULT_OK) {
+        MuggerUser.getInstance().getData().put("introDone", 1L);
+        db.collection("users").document(mAuth.getUid()).update("introDone", 1L);
+      }
+    }
   }
 }

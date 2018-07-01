@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.google.firebase.firestore.DocumentReference;
@@ -28,7 +29,7 @@ import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class ChangeMuggerRoleActivity extends AppCompatActivity {
+public class ChangeMuggerRoleActivity extends LoggedInActivity {
 
   @BindView(R.id.change_role_title)
   TextView titleView;
