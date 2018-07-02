@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,7 +20,7 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileActivity;
@@ -59,12 +58,15 @@ public class ListingChatActivity extends LoggedInActivity {
   private String listingUid;
   private FirebaseFirestore db;
   private FirebaseUser user;
-  private MuggerUser cache;
+  private MuggerUserCache cache;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    cache = MuggerUser.getInstance();
+    if (stopActivity) {  finish();
+      return;
+    }
+    cache = MuggerUserCache.getInstance();
     db = FirebaseFirestore.getInstance();
     setContentView(R.layout.activity_listing_chat);
     ButterKnife.bind(this);

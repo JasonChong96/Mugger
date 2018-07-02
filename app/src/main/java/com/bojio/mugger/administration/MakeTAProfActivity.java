@@ -2,7 +2,6 @@ package com.bojio.mugger.administration;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,6 +53,9 @@ public class MakeTAProfActivity extends LoggedInActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_make_taprof);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -27,8 +27,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
-import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -258,9 +258,9 @@ public class ProfileFragment extends Fragment {
     } else {
       statusView.setText((String) profileData.get("status"));
     }
-    MuggerRole ownRole = MuggerUser.getInstance().getRole();
+    MuggerRole ownRole = MuggerUserCache.getInstance().getRole();
     MuggerRole profileRole = MuggerRole.getByRoleId((Long) profileData.get("roleId"));
-    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+    if (MuggerRole.MODERATOR.check(MuggerUserCache.getInstance().getRole())) {
       adminLabelView.setVisibility(View.VISIBLE);
       muteButton.setVisibility(View.VISIBLE);
       muteButton.setOnClickListener((View v) -> {
@@ -270,7 +270,7 @@ public class ProfileFragment extends Fragment {
                 () {
               @Override
               public void onInput(MaterialDialog dialog, CharSequence input) {
-                if (!MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+                if (!MuggerRole.MODERATOR.check(MuggerUserCache.getInstance().getRole())) {
                   muteButton.setVisibility(View.GONE);
                   return;
                 }
@@ -339,7 +339,7 @@ public class ProfileFragment extends Fragment {
       if (true/*!profileUid.equals(mAuth.getUid()) && ownRole.checkSuperiorityTo(profileRole)*/) {
         changeRoleButton.setVisibility(View.VISIBLE);
         changeRoleButton.setOnClickListener(view -> {
-          if (!MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+          if (!MuggerRole.ADMIN.check(MuggerUserCache.getInstance().getRole())) {
             view.setVisibility(View.GONE);
             return;
           }
@@ -384,7 +384,7 @@ public class ProfileFragment extends Fragment {
 
   @OnClick(R.id.profile_button_make_ta_prof)
   void onClick_makeTAProf() {
-    if (!MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+    if (!MuggerRole.ADMIN.check(MuggerUserCache.getInstance().getRole())) {
       makeTAProfButton.setVisibility(View.GONE);
       return;
     }

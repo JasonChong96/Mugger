@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -44,6 +43,9 @@ public class ViewAllProfTARequestActivity extends LoggedInActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_view_all_prof_tarequest);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     ButterKnife.bind(this);

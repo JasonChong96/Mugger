@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -15,7 +14,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -58,13 +57,13 @@ public class SettingsActivity extends LoggedInActivity {
 
   FirebaseUser user;
   FirebaseFirestore db;
-  MuggerUser muggerUser;
+  MuggerUserCache muggerUserCache;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     user = FirebaseAuth.getInstance().getCurrentUser();
     db = FirebaseFirestore.getInstance();
-    muggerUser = MuggerUser.getInstance();
+    muggerUserCache = MuggerUserCache.getInstance();
     AlertDialog dialog = new SpotsDialog
         .Builder()
         .setContext(this)
@@ -74,10 +73,13 @@ public class SettingsActivity extends LoggedInActivity {
         .build();
     DocumentReference userRef = db.collection("users").document(user.getUid());
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_settings);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     ButterKnife.bind(this);
-    Long createdSettings = (Long) muggerUser.getData().get(MessagingService.CREATED_NOTIFICATION);
+    Long createdSettings = (Long) muggerUserCache.getData().get(MessagingService.CREATED_NOTIFICATION);
     if (createdSettings == null) {
       createdSettings = 1L;
     }
@@ -86,11 +88,11 @@ public class SettingsActivity extends LoggedInActivity {
       dialog.show();
       userRef.update(MessagingService.CREATED_NOTIFICATION, isChecked ? 1L : 0L)
           .addOnCompleteListener(task -> {
-            muggerUser.getData().put(MessagingService.CREATED_NOTIFICATION, isChecked ? 1L : 0L);
+            muggerUserCache.getData().put(MessagingService.CREATED_NOTIFICATION, isChecked ? 1L : 0L);
             dialog.dismiss();
           });
     });
-    Long deletedSettings = (Long) muggerUser.getData().get(MessagingService.DELETED_NOTIFICATION);
+    Long deletedSettings = (Long) muggerUserCache.getData().get(MessagingService.DELETED_NOTIFICATION);
     if (deletedSettings == null) {
       deletedSettings = 1L;
     }
@@ -99,11 +101,11 @@ public class SettingsActivity extends LoggedInActivity {
       dialog.show();
       userRef.update(MessagingService.DELETED_NOTIFICATION, isChecked ? 1L : 0L)
           .addOnCompleteListener(task -> {
-            muggerUser.getData().put(MessagingService.DELETED_NOTIFICATION, isChecked ? 1L : 0L);
+            muggerUserCache.getData().put(MessagingService.DELETED_NOTIFICATION, isChecked ? 1L : 0L);
             dialog.dismiss();
           });
     });
-    Long chatSettings = (Long) muggerUser.getData().get(MessagingService.CHAT_NOTIFICATION);
+    Long chatSettings = (Long) muggerUserCache.getData().get(MessagingService.CHAT_NOTIFICATION);
     if (chatSettings == null) {
       chatSettings = 1L;
     }
@@ -112,7 +114,7 @@ public class SettingsActivity extends LoggedInActivity {
       dialog.show();
       userRef.update(MessagingService.CHAT_NOTIFICATION, isChecked ? 1L : 0L)
           .addOnCompleteListener(task -> {
-            muggerUser.getData().put(MessagingService.CHAT_NOTIFICATION, isChecked ? 1L : 0L);
+            muggerUserCache.getData().put(MessagingService.CHAT_NOTIFICATION, isChecked ? 1L : 0L);
             dialog.dismiss();
           });
     });
@@ -195,6 +197,6 @@ public class SettingsActivity extends LoggedInActivity {
     GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     mGoogleSignInClient.signOut();
 
-    MuggerUser.clear();
+    MuggerUserCache.clear();
   }
 }

@@ -22,9 +22,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
-import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
@@ -322,19 +322,19 @@ public abstract class ListingsFragments extends Fragment {
           holder.expandLayout.callOnClick();
         });
         holder.numAttendeesClickView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), ViewAttendeesActivity.class);
-            Bundle b = new Bundle();
-            b.putStringArrayList("profiles", (ArrayList<String>) listing.getAttendees());
-            b.putString("ownerUid", listing.getOwnerId());
-            intent.putExtras(b);
-            startActivity(intent);
+          Intent intent = new Intent(v.getContext(), ViewAttendeesActivity.class);
+          Bundle b = new Bundle();
+          b.putStringArrayList("profiles", (ArrayList<String>) listing.getAttendees());
+          b.putString("ownerUid", listing.getOwnerId());
+          intent.putExtras(b);
+          startActivity(intent);
         });
         holder.expandLayout.setOnClickListener(view -> {
           if (!holder.isExpanded()) {
             holder.expandedLayout.setVisibility(View.VISIBLE);
             holder.expandedLayout2.setVisibility(View.VISIBLE);
             if (uid.equals(listing.getOwnerId()) || MuggerRole.MODERATOR
-                .check(MuggerUser.getInstance().getRole())) {
+                .check(MuggerUserCache.getInstance().getRole())) {
               holder.creatorControlsLayout.setVisibility(View.VISIBLE);
             }
             holder.expandImage.setImageDrawable(getResources().getDrawable(R.drawable

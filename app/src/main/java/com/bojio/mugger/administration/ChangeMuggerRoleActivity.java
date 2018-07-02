@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -13,8 +12,8 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -45,6 +44,9 @@ public class ChangeMuggerRoleActivity extends LoggedInActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_change_mugger_role);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -56,7 +58,7 @@ public class ChangeMuggerRoleActivity extends LoggedInActivity {
     }
     uid = b.getString("uid");
     List<String> availableRoles = new ArrayList<>();
-    MuggerRole ownRole = MuggerUser.getInstance().getRole();
+    MuggerRole ownRole = MuggerUserCache.getInstance().getRole();
     for (MuggerRole role : MuggerRole.values()) {
       if (role.isEnabled() && ownRole.checkSuperiorityTo(role)) {
         availableRoles.add(role.name());

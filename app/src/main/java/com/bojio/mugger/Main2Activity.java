@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -28,10 +27,9 @@ import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.ModuleRole;
-import com.bojio.mugger.constants.MuggerConstants;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.constants.MuggerConstants;
 import com.bojio.mugger.introduction.MuggerIntroActivity;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
@@ -53,10 +51,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,6 +75,10 @@ public class Main2Activity extends LoggedInActivity
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
@@ -105,8 +104,6 @@ public class Main2Activity extends LoggedInActivity
       }
     });
     // Set behavior when logged in state changes
-
-    super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -128,7 +125,7 @@ public class Main2Activity extends LoggedInActivity
     }
     // Subscribe to chat notifications
     subscribeToTopics();
-    if (MuggerUser.getInstance().getModules() == null) {
+    if (MuggerUserCache.getInstance().getModules() == null) {
       AlertDialog dialog = new SpotsDialog
           .Builder()
           .setContext(this)
@@ -144,29 +141,8 @@ public class Main2Activity extends LoggedInActivity
                   .show();
               signOut();
             } else {
-              List<DocumentSnapshot> docs = task.getResult().getDocuments();
-              TreeMap<String, TreeMap<String, Byte>> modules = new TreeMap<>(Collections.reverseOrder());
-              for (DocumentSnapshot doc : docs) {
-                TreeMap<String, Byte> mods = new TreeMap<>();
-                modules.put(doc.getId().replace(".", "/"), mods);
-                for (String mod : (List<String>) doc.get("moduleCodes")) {
-                  mods.put(mod, ModuleRole.EMPTY);
-                }
-                List<String> ta = (List<String>) doc.get("ta");
-                if (ta != null) {
-                  for (String mod : ta) {
-                    mods.put(mod, ModuleRole.TEACHING_ASSISTANT);
-                  }
-                }
-                List<String> prof = (List<String>) doc.get("professor");
-                if (prof != null) {
-                  for (String mod : (List<String>) doc.get("professor")) {
-                    mods.put(mod, ModuleRole.PROFESSOR);
-                  }
-                }
-              }
-              MuggerUser.getInstance().setModules(modules);
-              for (String mod : modules.firstEntry().getValue().keySet()) {
+              cache.loadModules(task.getResult().getDocuments());
+              for (String mod : cache.getModules().firstEntry().getValue().keySet()) {
                 FirebaseMessaging.getInstance().subscribeToTopic(mod);
               }
               NavigationView navigationView = findViewById(R.id.nav_view);
@@ -174,7 +150,7 @@ public class Main2Activity extends LoggedInActivity
               setTitle("Study Sessions");
               navigationView.setCheckedItem(R.id.nav_available_listings);
               onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
-              if (MuggerUser.getInstance().getData().get("introDone") == null) {
+              if (MuggerUserCache.getInstance().getData().get("introDone") == null) {
                 startIntroActivity(true);
               }
             }
@@ -190,7 +166,6 @@ public class Main2Activity extends LoggedInActivity
 
 
   }
-
 
 
   /**
@@ -245,7 +220,7 @@ public class Main2Activity extends LoggedInActivity
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main2, menu);
     FirebaseUser user = mAuth.getCurrentUser();
-    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+    if (MuggerRole.MODERATOR.check(MuggerUserCache.getInstance().getRole())) {
       MenuItem menuItem = ((NavigationView) findViewById(R.id.nav_view)).getMenu()
           .findItem(R.id.nav_admin_tools);
       menuItem.setVisible(true);
@@ -327,25 +302,25 @@ public class Main2Activity extends LoggedInActivity
         startActivity(intent);
         break;
       case R.id.nav_admin_tools:
-        if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+        if (MuggerRole.MODERATOR.check(MuggerUserCache.getInstance().getRole())) {
           String[] moderator = {"View Reports"};
           String[] admin = {"View Reports", "View Feedback", "View Prof/TA Requests"};
           new MaterialDialog.Builder(this).title("Which Administrative Tool would you like to " +
-              "access?").items(MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole()) ? admin
+              "access?").items(MuggerRole.ADMIN.check(MuggerUserCache.getInstance().getRole()) ? admin
               : moderator).itemsCallback((dialog, itemView, position, text) -> {
             switch (position) {
               case 0:
-                if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+                if (MuggerRole.MODERATOR.check(MuggerUserCache.getInstance().getRole())) {
                   startActivity(new Intent(this, ViewAllReportsActivity.class));
                 }
                 break;
               case 1:
-                if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                if (MuggerRole.ADMIN.check(MuggerUserCache.getInstance().getRole())) {
                   startActivity(new Intent(this, ViewAllFeedbackActivity.class));
                 }
                 break;
               case 2:
-                if (MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
+                if (MuggerRole.ADMIN.check(MuggerUserCache.getInstance().getRole())) {
                   startActivity(new Intent(this, ViewAllProfTARequestActivity.class));
                 }
                 break;
@@ -385,7 +360,7 @@ public class Main2Activity extends LoggedInActivity
     GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     mGoogleSignInClient.signOut();
 
-    MuggerUser.clear();
+    MuggerUserCache.clear();
   }
 
   /**
@@ -419,7 +394,7 @@ public class Main2Activity extends LoggedInActivity
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == REQUEST_CODE_INTRO) {
       if (resultCode == RESULT_OK) {
-        MuggerUser.getInstance().getData().put("introDone", 1L);
+        MuggerUserCache.getInstance().getData().put("introDone", 1L);
         db.collection("users").document(mAuth.getUid()).update("introDone", 1L);
       }
     }

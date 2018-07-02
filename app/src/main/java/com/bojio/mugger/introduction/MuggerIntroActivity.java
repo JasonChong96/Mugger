@@ -10,7 +10,7 @@ import de.mateware.snacky.Snacky;
 
 public class MuggerIntroActivity extends IntroActivity {
   @Override
-  protected void onCreate(Bundle savedInstanceState){
+  protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     addSlide(new SimpleSlide.Builder()
         .title(R.string.intro_title_1)

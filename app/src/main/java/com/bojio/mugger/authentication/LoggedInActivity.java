@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
@@ -16,29 +16,10 @@ import java.io.IOException;
 import es.dmoral.toasty.Toasty;
 
 public abstract class LoggedInActivity extends AppCompatActivity {
-  private FirebaseAuth mAuth;
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    mAuth = FirebaseAuth.getInstance();
-    if (mAuth.getCurrentUser() == null) {
-      signOut(this);
-    }
-    setAuthStateChangeListener();
-  }
-
-  /**
-   * Sets the function to be invoked when log in stage is changed. i.e when user has signed out,
-   * bring him back to the login page and unsubscribe him from notifications
-   */
-  private void setAuthStateChangeListener() {
-    mAuth.addAuthStateListener(firebaseAuth -> {
-      if (firebaseAuth.getCurrentUser() == null) {
-        signOut(this);
-      }
-    });
-  }
+  protected FirebaseAuth mAuth;
+  protected FirebaseFirestore db;
+  protected MuggerUserCache cache;
+  protected boolean stopActivity;
 
   /**
    * Does all necessary steps when signing out. i.e Resetting instance ID and going back to the main
@@ -57,5 +38,62 @@ public abstract class LoggedInActivity extends AppCompatActivity {
     Toasty.success(activity, "Logged out " +
         "successfully", Toast.LENGTH_SHORT).show();
     activity.startActivity(intent);
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    mAuth = FirebaseAuth.getInstance();
+    cache = MuggerUserCache.getInstance();
+    db = FirebaseFirestore.getInstance();
+    if (mAuth.getCurrentUser() == null) {
+      signOut(this);
+    }
+    setAuthStateChangeListener();
+    if (MuggerUserCache.getInstance().getData().size() == 0) {
+      //    if (mAuth.getCurrentUser() == null) {
+      Intent intent = new Intent(this, MainActivity.class);
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+          | Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(intent);
+      stopActivity = true;
+      return;
+    }
+/*      } else {
+        SpotsDialog.Builder dialog = new SpotsDialog
+            .Builder()
+            .setContext(this)
+            .setTheme(R.style.SpotsDialog)
+            .setMessage("Reloading data cache...")
+            .setCancelable(false);
+        db.collection("users").document(mAuth.getUid()).get().addOnCompleteListener(task_ -> {
+          if (!task_.isSuccessful()) {
+            signOut(this);
+          } else {
+            cache.setData(task_.getResult().getData());
+            db.collection("users").document(mAuth.getUid()).collection("semesters").get()
+                .addOnCompleteListener(task -> {
+                  if (!task.isSuccessful()) {
+                    signOut(this);
+                  } else {
+                    cache.loadModules(task.getResult().getDocuments());
+                    recreate();
+                  }
+                });
+          }
+        });*/
+    }
+
+
+  /**
+   * Sets the function to be invoked when log in stage is changed. i.e when user has signed out,
+   * bring him back to the login page and unsubscribe him from notifications
+   */
+  private void setAuthStateChangeListener() {
+    mAuth.addAuthStateListener(firebaseAuth -> {
+      if (firebaseAuth.getCurrentUser() == null) {
+        signOut(this);
+      }
+    });
   }
 }

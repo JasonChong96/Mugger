@@ -21,7 +21,7 @@ import android.view.MenuItem;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -64,7 +64,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       }
       db.collection("users").document(user.getUid()).update(type, isChecked ? 1L : 0L)
           .addOnCompleteListener(task -> {
-            MuggerUser.getInstance().getData().put(type, isChecked ? 1L : 0L);
+            MuggerUserCache.getInstance().getData().put(type, isChecked ? 1L : 0L);
             dialog.dismiss();
           });
       return true;
@@ -270,7 +270,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       EditTextPreference changeName = (EditTextPreference) findPreference
           (getString(R.string.settings_key_change_display_name));
       user = mAuth.getCurrentUser();
-      MuggerUser muggerUser = MuggerUser.getInstance();
+      MuggerUserCache muggerUserCache = MuggerUserCache.getInstance();
       bindPreferenceSummaryToValue(changeName);
       changeName.setText(user.getDisplayName());
       changeName.setSummary(user.getDisplayName());
@@ -278,7 +278,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       SwitchPreference deleteNotifSwitch = (SwitchPreference) findPreference(getString(R.string
           .settings_key_toggle_delete_notifications));
       deleteNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
-      Long deleteSettings = (Long) muggerUser.getData().get(MessagingService.DELETED_NOTIFICATION);
+      Long deleteSettings = (Long) muggerUserCache.getData().get(MessagingService.DELETED_NOTIFICATION);
       if (deleteSettings == null) {
         deleteSettings = 1L;
       }
@@ -287,7 +287,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       SwitchPreference chatNotifSwitch = (SwitchPreference) findPreference(getString(R.string
           .settings_key_toggle_chat_notifications));
       chatNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
-      Long chatSettings = (Long) muggerUser.getData().get(MessagingService.CHAT_NOTIFICATION);
+      Long chatSettings = (Long) muggerUserCache.getData().get(MessagingService.CHAT_NOTIFICATION);
       if (chatSettings == null) {
         chatSettings = 1L;
       }
@@ -296,7 +296,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       SwitchPreference createNotifSwitch = (SwitchPreference) findPreference(getString(R.string
           .settings_key_toggle_create_notifications));
       createNotifSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
-      Long createSettings = (Long) muggerUser.getData().get(MessagingService.CREATED_NOTIFICATION);
+      Long createSettings = (Long) muggerUserCache.getData().get(MessagingService.CREATED_NOTIFICATION);
       if (createSettings == null) {
         createSettings = 1L;
       }

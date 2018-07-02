@@ -3,7 +3,6 @@ package com.bojio.mugger.administration.reports;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -42,6 +41,9 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_chat_report_details);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);

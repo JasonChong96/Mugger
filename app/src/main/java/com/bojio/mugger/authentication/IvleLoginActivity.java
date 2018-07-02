@@ -10,7 +10,6 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.Main2Activity;
@@ -44,10 +43,9 @@ import javax.net.ssl.HttpsURLConnection;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
-import es.dmoral.toasty.Toasty;
 import needle.Needle;
 
-public class IvleLoginActivity extends LoggedInActivity {
+public class IvleLoginActivity extends AppCompatActivity {
 
   @BindView(R.id.ivle_login)
   WebView webView;
@@ -170,7 +168,7 @@ public class IvleLoginActivity extends LoggedInActivity {
                 onError();
                 return;
               } else {
-                MuggerUser.getInstance().setData(taskk.getResult().getData());
+                MuggerUserCache.getInstance().setData(taskk.getResult().getData());
                 Intent intent = new Intent(this, Main2Activity.class);
                 // Clears back stack
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

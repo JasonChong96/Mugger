@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +22,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,7 +42,6 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
@@ -87,9 +85,12 @@ public class CreateEditListingActivity extends LoggedInActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
-    MuggerUser cache = MuggerUser.getInstance();
+    MuggerUserCache cache = MuggerUserCache.getInstance();
     if (cache.isMuted() > 0) {
       double hours = (double) cache.isMuted() / 3600000D;
       Toasty.error(this, "You cannot do this while muted. Time left: " + String.format
@@ -102,7 +103,7 @@ public class CreateEditListingActivity extends LoggedInActivity {
     b = this.getIntent().getExtras();
     setContentView(R.layout.activity_make_listing);
     ButterKnife.bind(this);
-    moduleRoles = MuggerUser.getInstance().getModules().firstEntry().getValue();
+    moduleRoles = MuggerUserCache.getInstance().getModules().firstEntry().getValue();
     moduleCodes = new ArrayList<>(moduleRoles.keySet());
     df = DateFormat.getDateFormat(this);
     dfTime = DateFormat.getTimeFormat(this);

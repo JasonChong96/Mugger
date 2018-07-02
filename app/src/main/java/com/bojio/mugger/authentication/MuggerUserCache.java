@@ -1,32 +1,36 @@
 package com.bojio.mugger.authentication;
 
+import com.bojio.mugger.constants.ModuleRole;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class MuggerUser {
-  private static MuggerUser user;
+public class MuggerUserCache {
+  private static MuggerUserCache user;
   private MuggerRole role;
   private TreeMap<String, TreeMap<String, Byte>> modules;
   private Map<String, Object> data;
 
-  public MuggerUser() {
+  public MuggerUserCache() {
     this.data = new HashMap<>();
   }
 
-  public static MuggerUser getInstance() {
+  public static MuggerUserCache getInstance() {
     if (user == null) {
-      user = new MuggerUser();
+      user = new MuggerUserCache();
     }
     return user;
   }
 
   public static void clear() {
-    user = new MuggerUser();
+    user = new MuggerUserCache();
   }
 
   public long isMuted() {
@@ -66,5 +70,29 @@ public class MuggerUser {
 
   public void setModules(TreeMap<String, TreeMap<String, Byte>> modules) {
     this.modules = modules;
+  }
+
+  public void loadModules(List<DocumentSnapshot> docs) {
+    TreeMap<String, TreeMap<String, Byte>> modules = new TreeMap<>(Collections.reverseOrder());
+    for (DocumentSnapshot doc : docs) {
+      TreeMap<String, Byte> mods = new TreeMap<>();
+      modules.put(doc.getId().replace(".", "/"), mods);
+      for (String mod : (List<String>) doc.get("moduleCodes")) {
+        mods.put(mod, ModuleRole.EMPTY);
+      }
+      List<String> ta = (List<String>) doc.get("ta");
+      if (ta != null) {
+        for (String mod : ta) {
+          mods.put(mod, ModuleRole.TEACHING_ASSISTANT);
+        }
+      }
+      List<String> prof = (List<String>) doc.get("professor");
+      if (prof != null) {
+        for (String mod : (List<String>) doc.get("professor")) {
+          mods.put(mod, ModuleRole.PROFESSOR);
+        }
+      }
+    }
+    setModules(modules);
   }
 }

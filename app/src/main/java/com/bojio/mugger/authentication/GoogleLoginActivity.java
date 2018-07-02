@@ -96,8 +96,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
 
       } catch (ApiException e) {
         // Google Sign In failed,
-        Log.w(TAG, "Google sign in failed", e);
-        Toasty.error(this, "Sign in failed", Toast.LENGTH_SHORT).show();
+        Log.w(TAG, "Google sign in failed.", e);
+        Toasty.error(this, "Sign in failed, Please try again", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -140,7 +140,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 .ALWAYS_REDIRECT_TO_IVLE) {
               // If already verified, then go straight to main listings page
               Intent intent = new Intent(this, Main2Activity.class);
-              MuggerUser.getInstance().setData(result.getData());
+              MuggerUserCache.getInstance().setData(result.getData());
               // Clears back stack
               intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
               startActivity(intent);

@@ -3,7 +3,6 @@ package com.bojio.mugger.listings;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
@@ -16,8 +15,8 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.android.gms.tasks.Task;
@@ -77,6 +76,9 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
     db = FirebaseFirestore.getInstance();
     fcm = FirebaseMessaging.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_available_listing_details);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -143,7 +145,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
 
     FirebaseUser user = mAuth.getCurrentUser();
     if (listing != null && (user.getUid().equals(listing.getOwnerId()) || MuggerRole.MODERATOR
-        .check(MuggerUser.getInstance().getRole()))) {
+        .check(MuggerUserCache.getInstance().getRole()))) {
       getMenuInflater().inflate(R.menu.listing_menu, menu);
     }
     return true;

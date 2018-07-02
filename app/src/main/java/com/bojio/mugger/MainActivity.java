@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.authentication.GoogleLoginActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.DebugSettings;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
           // Already have record of nus net id
           // Clears back stack
           Toasty.normal(this, "Welcome back, " + acc.getDisplayName(), Toast.LENGTH_SHORT).show();
-          MuggerUser.getInstance().setData(result.getData());
+          MuggerUserCache.getInstance().setData(result.getData());
           Intent intent = new Intent(this, Main2Activity.class);
           startActivity(intent);
           finish();

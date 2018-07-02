@@ -3,7 +3,6 @@ package com.bojio.mugger.administration.reports;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -43,6 +42,9 @@ public class MakeReportActivity extends LoggedInActivity {
     db = FirebaseFirestore.getInstance();
     user = FirebaseAuth.getInstance().getCurrentUser();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {  finish();
+      return;
+    }
     setContentView(R.layout.activity_make_report);
     ButterKnife.bind(this);
     Bundle b = getIntent().getExtras();

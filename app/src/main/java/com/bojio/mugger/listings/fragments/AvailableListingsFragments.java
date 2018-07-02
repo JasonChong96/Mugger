@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
-import com.bojio.mugger.authentication.MuggerUser;
+import com.bojio.mugger.authentication.MuggerUserCache;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class AvailableListingsFragments extends ListingsFragments {
                            Bundle savedInstanceState) {
     View view = super.onCreateView(inflater, container, savedInstanceState);
     constraintLayout2.setVisibility(View.VISIBLE);
-    List<String> modules = new ArrayList<>(MuggerUser.getInstance().getModules().firstEntry()
+    List<String> modules = new ArrayList<>(MuggerUserCache.getInstance().getModules().firstEntry()
         .getValue().keySet());
     modules.add(0, "Show all modules");
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
