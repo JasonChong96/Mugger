@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -71,7 +72,7 @@ public class SettingsActivity extends LoggedInActivity {
         .setTheme(R.style.SpotsDialog)
         .setCancelable(false)
         .build();
-    DocumentReference userRef = db.collection("users").document(user.getUid());
+    DocumentReference userRef = MuggerDatabase.getUserReference(db, user.getUid());
     super.onCreate(savedInstanceState);
     if (stopActivity) {  finish();
       return;
@@ -143,7 +144,7 @@ public class SettingsActivity extends LoggedInActivity {
         Snackbar.make(view, "Failed to change display name, please try again later",
             Snackbar.LENGTH_SHORT).show();
       } else {
-        db.collection("users").document(user.getUid()).update("displayName", newName)
+        MuggerDatabase.getUserReference(db, user.getUid()).update("displayName", newName)
             .addOnCompleteListener(task2 -> {
               dialog.dismiss();
               if (!task2.isSuccessful()) {
@@ -160,7 +161,7 @@ public class SettingsActivity extends LoggedInActivity {
 
   @OnClick(R.id.settings_refresh_button)
   public void onClick_refresh() {
-    db.collection("users").document(user.getUid()).update("nusNetId", FieldValue.delete())
+    MuggerDatabase.getUserReference(db, user.getUid()).update("nusNetId", FieldValue.delete())
         .addOnCompleteListener(task -> {
           finish();
           signOut();

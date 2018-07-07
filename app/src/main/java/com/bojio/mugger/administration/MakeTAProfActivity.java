@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -121,7 +122,7 @@ public class MakeTAProfActivity extends LoggedInActivity {
       dialog.show();
       Boolean remove = newRole == ModuleRole.REMOVE;
       String role = newRole == ModuleRole.PROFESSOR ? "professor" : "ta";
-      DocumentReference docRef = db.collection("users").document(userUid).collection("semesters")
+      DocumentReference docRef = MuggerDatabase.getUserReference(db, userUid).collection(MuggerDatabase.SEMESTER_COLLECTION)
           .document(semesterView.getText().toString().replace("/", "."));
       docRef.get().addOnCompleteListener(task -> {
         if (!task.isSuccessful()) {

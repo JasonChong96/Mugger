@@ -66,12 +66,12 @@ public abstract class LoggedInActivity extends AppCompatActivity {
             .setTheme(R.style.SpotsDialog)
             .setMessage("Reloading data cache...")
             .setCancelable(false);
-        db.collection("users").document(mAuth.getUid()).get().addOnCompleteListener(task_ -> {
+        MuggerDatabase.getUserReference(db, mAuth.getUid()).get().addOnCompleteListener(task_ -> {
           if (!task_.isSuccessful()) {
             signOut(this);
           } else {
             cache.setData(task_.getResult().getData());
-            db.collection("users").document(mAuth.getUid()).collection("semesters").get()
+            MuggerDatabase.getUserReference(db, mAuth.getUid()).collection(MuggerDatabase.SEMESTER_COLLECTION).get()
                 .addOnCompleteListener(task -> {
                   if (!task.isSuccessful()) {
                     signOut(this);

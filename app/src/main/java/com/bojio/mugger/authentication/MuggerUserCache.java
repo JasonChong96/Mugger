@@ -6,16 +6,19 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class MuggerUserCache {
   private static MuggerUserCache user;
   private MuggerRole role;
   private TreeMap<String, TreeMap<String, Byte>> modules;
+  private TreeSet<String> allModules;
   private Map<String, Object> data;
 
   public MuggerUserCache() {
@@ -25,6 +28,7 @@ public class MuggerUserCache {
   public static MuggerUserCache getInstance() {
     if (user == null) {
       user = new MuggerUserCache();
+      user.allModules = new TreeSet<>();
     }
     return user;
   }
@@ -94,5 +98,13 @@ public class MuggerUserCache {
       }
     }
     setModules(modules);
+  }
+
+  public TreeSet<String> getAllModules() {
+    return allModules;
+  }
+
+  public void setAllModules(TreeSet<String> allModules) {
+    this.allModules = allModules;
   }
 }

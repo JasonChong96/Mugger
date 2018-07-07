@@ -195,5 +195,6 @@
     <string name="intro_title_3"><![CDATA[Create & Engage]]></string>
     <string name="intro_title_4">Your welfare matters to us</string>
     <string name="intro_desc_4">Our dedicated admins will be happy to respond to any reports and feedback you have</string>
+    <string name="settings_key_toggle_unrelated_modules">toggle_unrelated_modules</string>
 
 </resources>

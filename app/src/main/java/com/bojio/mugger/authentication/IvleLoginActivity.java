@@ -16,6 +16,7 @@ import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.Modules;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.common.hash.Hashing;
@@ -156,13 +157,13 @@ public class IvleLoginActivity extends AppCompatActivity {
       onError();
       return;
     }
-    db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(userData,
+    MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid()).set(userData,
         SetOptions.merge()).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         onError();
         return;
       } else {
-        db.collection("users").document(FirebaseAuth.getInstance().getUid()).get()
+        MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid()).get()
             .addOnCompleteListener(taskk -> {
               if (!task.isSuccessful()) {
                 onError();
@@ -269,8 +270,8 @@ public class IvleLoginActivity extends AppCompatActivity {
         Map<String, Object> data = new HashMap<>();
         data.put("moduleCodes", entry.getValue());
         data.put("semester", entry.getKey());
-        Task<?> task = db.collection("users").document(FirebaseAuth.getInstance().getUid())
-            .collection("semesters").document(entry.getKey()).set(data);
+        Task<?> task = MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid())
+            .collection(MuggerDatabase.SEMESTER_COLLECTION).document(entry.getKey()).set(data);
       }
       String latestSem = Collections.max(modulesBySem.keySet());
       userData.put("latestSem", latestSem);

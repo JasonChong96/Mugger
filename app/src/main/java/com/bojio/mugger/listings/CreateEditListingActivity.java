@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -149,7 +150,7 @@ public class CreateEditListingActivity extends LoggedInActivity {
           finish();
         } else {
           String currentSem = ((String) task.getResult().getData().get("currentSem"));
-          db.collection("users").document(mAuth.getUid()).collection("semesters").document
+          MuggerDatabase.getUserReference(db, mAuth.getUid()).collection(MuggerDatabase.SEMESTER_COLLECTION).document
               (currentSem).get().addOnCompleteListener(taskk -> {
             if (!taskk.isSuccessful()) {
               showShortToast("Error loading modules. Please try again later.");
@@ -372,7 +373,7 @@ public class CreateEditListingActivity extends LoggedInActivity {
             notificationData.put("fromUid", mAuth.getUid());
             notificationData.put("topicUid", moduleCode.getSelectedItem().toString());
             notificationData.put("listingUid", task.getResult().getId());
-            db.collection("notifications").add(notificationData);
+            MuggerDatabase.addNotification(db, notificationData);
           }
           Toasty.success(CreateEditListingActivity.this, b == null ? "Listing successfully " +
               "created!" : "Listing " +

@@ -21,6 +21,7 @@ import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileActivity;
@@ -163,13 +164,12 @@ public class ListingChatActivity extends LoggedInActivity {
       notificationData.put("type", MessagingService.CHAT_NOTIFICATION);
       notificationData.put("fromUid", user.getUid());
       // Add to user's chat history
-      //db.collection("users").document(userUid).collection("chatHistory").add(messageData);
+      //MuggerDatabase.getUserReference(db, userUid).collection("chatHistory").add(messageData);
       // Add to notification db
       messageData.remove("time");
       messageData.remove("day");
       messageData.put("listingOwnerUid", listing.getOwnerId());
-      db.collection("notifications").add
-          (notificationData);
+      MuggerDatabase.addNotification(db, notificationData);
       toSendView.setText("");
     }
   }

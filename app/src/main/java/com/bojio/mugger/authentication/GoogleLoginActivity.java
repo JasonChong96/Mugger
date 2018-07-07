@@ -13,6 +13,7 @@ import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.DebugSettings;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -126,7 +127,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
       if (user != null) {
         // If signed in, check if user has been verified as an NUS student by checking if
         // hashed nusnetid has been cached
-        db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
+        MuggerDatabase.getUserReference(db, user.getUid()).get().addOnCompleteListener(task_ -> {
           if (!task_.isSuccessful()) {
             Toasty.error(this, "Error fetching user data. Please try again later.", Toast
                 .LENGTH_SHORT).show();

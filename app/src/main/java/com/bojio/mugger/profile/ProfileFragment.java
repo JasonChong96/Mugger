@@ -29,6 +29,7 @@ import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -138,10 +139,10 @@ public class ProfileFragment extends Fragment {
     super.onCreate(savedInstanceState);
     View view = inflater.inflate(R.layout.fragment_profile, container, false);
     ButterKnife.bind(this, view);
-    Task<DocumentSnapshot> profileTask = db.collection("users").document(profileUid).get();
+    Task<DocumentSnapshot> profileTask = MuggerDatabase.getUserReference(db, profileUid).get();
     Task<DocumentSnapshot> moduleTitlesTask = db.collection("data").document("moduleTitles").get();
-    Task<QuerySnapshot> modulesTask = db.collection("users").document(profileUid)
-        .collection("semesters").orderBy("semester", Query.Direction.DESCENDING).get();
+    Task<QuerySnapshot> modulesTask = MuggerDatabase.getUserReference(db, profileUid)
+        .collection(MuggerDatabase.SEMESTER_COLLECTION).orderBy("semester", Query.Direction.DESCENDING).get();
     AlertDialog dialog = new SpotsDialog
         .Builder()
         .setContext(this.getActivity())
@@ -305,7 +306,7 @@ public class ProfileFragment extends Fragment {
                     notificationData.put("topicUid", "");
                     notificationData.put("type", hours == 0 ? "unmute" : "mute");
                     notificationData.put("until", Long.toString(until));
-                    tasks.add(db.collection("notifications").add(notificationData));
+                    tasks.add(MuggerDatabase.addNotification(db, notificationData));
                   }
                   Tasks.whenAll(tasks).addOnCompleteListener(task -> {
                     dialogg.dismiss();
@@ -369,7 +370,7 @@ public class ProfileFragment extends Fragment {
     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context
         .INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(this.getView().getWindowToken(), 0);
-    db.collection("users").document(profileUid).update("status", editStatusView.getText()
+    MuggerDatabase.getUserReference(db, profileUid).update("status", editStatusView.getText()
         .toString())
         .addOnCompleteListener(task -> {
           if (!task.isSuccessful()) {

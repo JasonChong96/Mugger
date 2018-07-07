@@ -9,10 +9,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * A fragment representing a list of Items.
@@ -21,6 +27,7 @@ import java.util.List;
  * interface.
  */
 public class AvailableListingsFragments extends ListingsFragments {
+  ArrayList<String> modules;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -32,10 +39,19 @@ public class AvailableListingsFragments extends ListingsFragments {
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
+    MuggerUserCache cache = MuggerUserCache.getInstance();
     View view = super.onCreateView(inflater, container, savedInstanceState);
     constraintLayout2.setVisibility(View.VISIBLE);
-    List<String> modules = new ArrayList<>(MuggerUserCache.getInstance().getModules().firstEntry()
-        .getValue().keySet());
+    long unrelatedModules = 0L;
+    if (cache.getData().containsKey("showUnrelatedModules")) {
+      unrelatedModules = (long) cache.getData().get("showUnrelatedModules");
+    }
+    if (unrelatedModules != 0) {
+      modules = new ArrayList<>(cache.getAllModules());;
+    } else {
+      modules = new ArrayList<>(cache.getModules().firstEntry()
+          .getValue().keySet());
+    }
     modules.add(0, "Show all modules");
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
         .simple_dropdown_item_1line, modules);
@@ -57,11 +73,15 @@ public class AvailableListingsFragments extends ListingsFragments {
               .orderBy("startTime", Query.Direction.ASCENDING);
         } else {
           AvailableListingsFragments.this.mQuery = db.collection("listings")
-              .orderBy(modules.get(index), Query.Direction.ASCENDING);
+              .orderBy(getMods().get(index), Query.Direction.ASCENDING);
         }
         initListings();
       }
     });
     return view;
+  }
+
+  private List<String> getMods() {
+    return modules;
   }
 }

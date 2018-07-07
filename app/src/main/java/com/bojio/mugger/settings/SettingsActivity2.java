@@ -19,9 +19,11 @@ import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,16 +55,24 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
       }
       boolean isChecked = (Boolean) newValue;
       String type;
-      if (preference.getKey().equals("toggle_delete_notifications")) {
-        type = MessagingService.DELETED_NOTIFICATION;
-      } else if (preference.getKey().equals("toggle_create_notifications")) {
-        type = MessagingService.CREATED_NOTIFICATION;
-      } else if (preference.getKey().equals("toggle_chat_notifications")) {
-        type = MessagingService.CHAT_NOTIFICATION;
-      } else {
-        return false;
+      switch (preference.getKey()) {
+        case "toggle_delete_notifications":
+          type = MessagingService.DELETED_NOTIFICATION;
+          break;
+        case "toggle_create_notifications":
+          type = MessagingService.CREATED_NOTIFICATION;
+          break;
+        case "toggle_chat_notifications":
+          type = MessagingService.CHAT_NOTIFICATION;
+          break;
+        case "toggle_unrelated_modules":
+          type = "showUnrelatedModules";
+          break;
+        default:
+          dialog.dismiss();
+          return false;
       }
-      db.collection("users").document(user.getUid()).update(type, isChecked ? 1L : 0L)
+      MuggerDatabase.getUserReference(db, user.getUid()).update(type, isChecked ? 1L : 0L)
           .addOnCompleteListener(task -> {
             MuggerUserCache.getInstance().getData().put(type, isChecked ? 1L : 0L);
             dialog.dismiss();
@@ -138,7 +148,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
               snackbar.show();
               preference.setSummary(user.getDisplayName());
             } else {
-              db.collection("users").document(user.getUid()).update("displayName", stringValue)
+              MuggerDatabase.getUserReference(db, user.getUid()).update("displayName", stringValue)
                   .addOnCompleteListener(task2 -> {
                     if (!task2.isSuccessful()) {
                       snackbar.setText("Failed to change display name, please try again later")
@@ -241,6 +251,14 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
     return super.onOptionsItemSelected(item);
   }
 
+  @Override
+  public void onBackPressed() {
+    Intent intent = new Intent(this, Main2Activity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
+    finish();
+  }
+
   public static class MainPreferenceFragment extends PreferenceFragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -301,6 +319,14 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
         createSettings = 1L;
       }
       chatNotifSwitch.setChecked(!createSettings.equals(Long.valueOf(0)));
+      SwitchPreference unrelatedModulesSwitch = (SwitchPreference) findPreference(getString(R.string
+          .settings_key_toggle_unrelated_modules));
+      unrelatedModulesSwitch.setOnPreferenceChangeListener(sBindSwitchPreferenceListener);
+      Long unrelatedModules = (Long) muggerUserCache.getData().get("showUnrelatedModules");
+      if (unrelatedModules == null) {
+        unrelatedModules = 0L;
+      }
+      chatNotifSwitch.setChecked(!unrelatedModules.equals(Long.valueOf(0)));
     }
   }
 }

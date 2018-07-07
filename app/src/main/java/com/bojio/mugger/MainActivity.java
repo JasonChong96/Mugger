@@ -11,6 +11,7 @@ import com.bojio.mugger.authentication.GoogleLoginActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.DebugSettings;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
   private void checkAccount(FirebaseUser acc) {
     // Checks if user has been verified as an NUS student by checking if NUSNETID has been
     // logged before
-    db.collection("users").document(acc.getUid()).get().addOnCompleteListener(task_ -> {
+    MuggerDatabase.getUserReference(db, acc.getUid()).get().addOnCompleteListener(task_ -> {
       if (!task_.isSuccessful()) {
         Toasty.error(this, "Error fetching user data. Please try again later.").show();
         mAuth.signOut();

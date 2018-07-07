@@ -21,6 +21,13 @@
             android:title="Listing Chat" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Study Session Filters">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/settings_key_toggle_unrelated_modules"
+            android:summary="Turning this on will allow you to filter study sessions by any module, even those that you were never enrolled in. This is disabled by default to reduce clutter."
+            android:title="Include Unrelated Modules" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Profile">
 
         <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference

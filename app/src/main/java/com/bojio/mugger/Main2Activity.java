@@ -30,6 +30,7 @@ import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.MuggerConstants;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.introduction.MuggerIntroActivity;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
@@ -43,6 +44,8 @@ import com.bojio.mugger.settings.SettingsActivity2;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -51,7 +54,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -72,6 +78,7 @@ public class Main2Activity extends LoggedInActivity
   View activityView;
   private FirebaseAuth mAuth;
   private FirebaseFirestore db;
+  private ArrayList<String> allModules;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +95,8 @@ public class Main2Activity extends LoggedInActivity
       return;
     }
     // Updates cached display name/email
-    db.collection("users").document(user.getUid()).update("displayName", user.getDisplayName());
-    db.collection("users").document(user.getUid()).update("email", user.getEmail());
+    MuggerDatabase.getUserReference(db, user.getUid()).update("displayName", user.getDisplayName());
+    MuggerDatabase.getUserReference(db, user.getUid()).update("email", user.getEmail());
     db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
       if (task.isSuccessful()) {
         long min = (Long) task.getResult().getData().get("minVersion");
@@ -134,7 +141,9 @@ public class Main2Activity extends LoggedInActivity
           .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
-      db.collection("users").document(user.getUid()).collection("semesters").get()
+      List<Task<?>> tasks = new ArrayList<>();
+      tasks.add(MuggerDatabase.getUserReference(db, user.getUid()).collection(MuggerDatabase
+          .SEMESTER_COLLECTION).get()
           .addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
               Toasty.error(this, "Unable to load module data, please log in again.")
@@ -154,8 +163,29 @@ public class Main2Activity extends LoggedInActivity
                 startIntroActivity(true);
               }
             }
-            dialog.dismiss();
-          });
+
+          }));
+      tasks.add(MuggerDatabase.getAllModuleTitlesRef(db).get().addOnCompleteListener(task -> {
+        if (!task.isSuccessful()) {
+          Toasty.error(this, "Unable to load module data, please log in again.")
+              .show();
+          signOut();
+        } else {
+          if (task.getResult().exists()) {
+            TreeSet<String> allMods = new TreeSet<>(task.getResult().getData().keySet());
+            cache.setAllModules(allMods);
+          }
+        }
+      }));
+      Tasks.whenAll(tasks).addOnCompleteListener(task -> {
+        if (!task.isSuccessful()) {
+          Toasty.error(this, "Unable to load module data, please log in again.")
+              .show();
+          signOut();
+        } else {
+          dialog.dismiss();
+        }
+      });
     } else {
       NavigationView navigationView = findViewById(R.id.nav_view);
       navigationView.setNavigationItemSelectedListener(this);
@@ -395,7 +425,7 @@ public class Main2Activity extends LoggedInActivity
     if (requestCode == REQUEST_CODE_INTRO) {
       if (resultCode == RESULT_OK) {
         MuggerUserCache.getInstance().getData().put("introDone", 1L);
-        db.collection("users").document(mAuth.getUid()).update("introDone", 1L);
+        MuggerDatabase.getUserReference(db, mAuth.getUid()).update("introDone", 1L);
       }
     }
   }

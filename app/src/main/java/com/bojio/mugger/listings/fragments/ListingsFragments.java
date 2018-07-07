@@ -25,6 +25,7 @@ import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
@@ -221,7 +222,7 @@ public abstract class ListingsFragments extends Fragment {
                   notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
                   notificationData.put("fromUid", mAuth.getUid());
                   notificationData.put("topicUid", listing.getUid());
-                  db.collection("notifications").add(notificationData);
+                  MuggerDatabase.addNotification(db, notificationData);
                 } else {
                   Snacky.builder().setActivity(ListingsFragments.this.getActivity())
                       .setText("Failed to delete listing, please try again later")
@@ -395,5 +396,9 @@ public abstract class ListingsFragments extends Fragment {
    */
   public interface OnListingsFragmentInteractionListener {
     void onListingFragmentInteraction(Listing item);
+  }
+
+  private static void getStartEndTimeDisplay(long startTime, long endTime) {
+
   }
 }
