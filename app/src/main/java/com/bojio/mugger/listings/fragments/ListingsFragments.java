@@ -29,6 +29,7 @@ import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.listings.ListingUtils;
 import com.bojio.mugger.listings.ListingsViewHolder;
 import com.bojio.mugger.listings.ViewAttendeesActivity;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
@@ -47,6 +48,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -301,7 +304,7 @@ public abstract class ListingsFragments extends Fragment {
         }
         holder.moduleCode.setText(title);
         holder.venue.setText(listing.getVenue());
-        DateFormat df = android.text.format.DateFormat.getDateFormat(ListingsFragments.this
+        /*DateFormat df = android.text.format.DateFormat.getDateFormat(ListingsFragments.this
             .getActivity(ListingsFragments.this));
         DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(ListingsFragments
             .this.getActivity(ListingsFragments.this));
@@ -316,6 +319,9 @@ public abstract class ListingsFragments extends Fragment {
             .append(" ")
             .append(dfTime.format(endDateTime))
             .toString());
+            */
+        holder.dateTime.setText(getStartEndTimeDisplay(listing.getStartTime(), listing.getEndTime
+            ()));
         holder.numAttendees.setText(String.format(Locale.getDefault(), "%d", listing.getNumAttendees
             ()));
         holder.nameView.setText(String.format("By %s", listing.getOwnerName()));
@@ -398,7 +404,53 @@ public abstract class ListingsFragments extends Fragment {
     void onListingFragmentInteraction(Listing item);
   }
 
-  private static void getStartEndTimeDisplay(long startTime, long endTime) {
-
+  private String getStartEndTimeDisplay(long startTime, long endTime) {
+    Calendar startTimeDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+    Calendar endTimeDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+    startTimeDate.setTimeInMillis(startTime);
+    endTimeDate.setTimeInMillis(startTime);
+    boolean sameDate = ListingUtils.isSameDate(startTime, endTime);
+    boolean isToday = ListingUtils.isSameDate(System.currentTimeMillis(), startTime);
+    boolean withinWeekCurToStart = Math.abs(ListingUtils.getDayTimestamp(startTime) - ListingUtils
+        .getDayTimestamp(System.currentTimeMillis())) < 1000 * 60 * 60 * 24 * 7; // 1 week
+    boolean withinWeekStartToEnd = ListingUtils.getDayTimestamp(endTime) - ListingUtils
+        .getDayTimestamp(startTime) < 1000 * 60 * 60 * 24 * 7; // 1 week
+    boolean endsToday = ListingUtils.isSameDate(System.currentTimeMillis(), endTime);
+    String startDateDisplay;
+    DateFormat df = android.text.format.DateFormat.getDateFormat(ListingsFragments.this
+        .getActivity(ListingsFragments.this));
+    df.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+    DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(ListingsFragments
+        .this.getActivity(ListingsFragments.this));
+    dfTime.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+    String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    if (isToday) {
+      startDateDisplay = "Today";
+    } else if (withinWeekCurToStart) {
+      startDateDisplay = (startTime < System.currentTimeMillis() ? "Last " : "This ") +
+          days[startTimeDate.get(Calendar.DAY_OF_WEEK) - 1];
+    } else {
+      startDateDisplay = df.format(new Date(startTime));
+    }
+    String endDateDisplay;
+    if (sameDate) {
+      endDateDisplay = "";
+    } else if (endsToday) {
+      endDateDisplay = "Today";
+    } else if (withinWeekStartToEnd){
+      endDateDisplay = days[endTimeDate.get(Calendar.DAY_OF_WEEK)];
+    } else {
+      endDateDisplay = df.format(new Date(endTime));
+    }
+    String startTimeDisplay = dfTime.format(new Date(startTime));
+    String endTimeDisplay = dfTime.format(new Date(endTime));
+    StringBuilder sb = new StringBuilder(startDateDisplay);
+    return sb.append(" ")
+        .append(startTimeDisplay)
+        .append(" - ")
+        .append(endDateDisplay)
+        .append(endDateDisplay.isEmpty() ? "" : " ")
+        .append(endTimeDisplay)
+        .toString();
   }
 }

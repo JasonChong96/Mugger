@@ -24,6 +24,7 @@ import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.listings.ListingUtils;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -33,13 +34,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -142,7 +141,7 @@ public class ListingChatActivity extends LoggedInActivity {
         message = wholesome[new Random().nextInt(wholesome.length)];
       }
       long timestamp = System.currentTimeMillis();
-      long dayTimestamp = getDayTimestamp(timestamp);
+      long dayTimestamp = ListingUtils.getDayTimestamp(timestamp);
       String userUid = user.getUid();
       Map<String, Object> messageData = new HashMap<>();
       messageData.put("fromUid", userUid);
@@ -172,17 +171,6 @@ public class ListingChatActivity extends LoggedInActivity {
       MuggerDatabase.addNotification(db, notificationData);
       toSendView.setText("");
     }
-  }
-
-  private long getDayTimestamp(long timestamp) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
-    calendar.setTimeInMillis(timestamp);
-    calendar.set(Calendar.MILLISECOND, 0);
-    calendar.set(Calendar.HOUR_OF_DAY, 0);
-    calendar.set(Calendar.SECOND, 0);
-    calendar.set(Calendar.MINUTE, 0);
-    return calendar.getTimeInMillis();
   }
 
   private void initMessages() {
