@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.button.MaterialButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +76,10 @@ public abstract class ListingsFragments extends Fragment {
   ConstraintLayout constraintLayout2;
   @BindView(R.id.listings_fragments_empty_text)
   TextView emptyTextView;
+  @BindView(R.id.listings_fragments_filter_to_date)
+  TextInputEditText filterToDateView;
+  @BindView(R.id.listings_fragments_filter_from_date)
+  TextInputEditText filterFromDateView;
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseMessaging fcm = FirebaseMessaging.getInstance();
   FirebaseAuth mAuth;
@@ -119,7 +125,10 @@ public abstract class ListingsFragments extends Fragment {
     } else {
       mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
     }
-
+    DateFormat df = android.text.format.DateFormat.getDateFormat(ListingsFragments.this
+        .getActivity(ListingsFragments.this));
+    filterFromDateView.setText(df.format(new Date()));
+    filterToDateView.setText(df.format(new Date(ListingUtils.DEFAULT_TIME_FILTER_END)));
     initListings();
     return view;
   }
@@ -338,6 +347,7 @@ public abstract class ListingsFragments extends Fragment {
         });
         holder.expandLayout.setOnClickListener(view -> {
           if (!holder.isExpanded()) {
+            TransitionManager.beginDelayedTransition(holder.cardView);
             holder.expandedLayout.setVisibility(View.VISIBLE);
             holder.expandedLayout2.setVisibility(View.VISIBLE);
             if (uid.equals(listing.getOwnerId()) || MuggerRole.MODERATOR
@@ -413,6 +423,8 @@ public abstract class ListingsFragments extends Fragment {
     boolean isToday = ListingUtils.isSameDate(System.currentTimeMillis(), startTime);
     boolean withinWeekCurToStart = Math.abs(ListingUtils.getDayTimestamp(startTime) - ListingUtils
         .getDayTimestamp(System.currentTimeMillis())) < 1000 * 60 * 60 * 24 * 7; // 1 week
+    boolean withinWeekCurToEnd = Math.abs(ListingUtils.getDayTimestamp(endTime) - ListingUtils
+        .getDayTimestamp(System.currentTimeMillis())) < 1000 * 60 * 60 * 24 * 7; // 1 week
     boolean withinWeekStartToEnd = ListingUtils.getDayTimestamp(endTime) - ListingUtils
         .getDayTimestamp(startTime) < 1000 * 60 * 60 * 24 * 7; // 1 week
     boolean endsToday = ListingUtils.isSameDate(System.currentTimeMillis(), endTime);
@@ -423,31 +435,48 @@ public abstract class ListingsFragments extends Fragment {
     DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(ListingsFragments
         .this.getActivity(ListingsFragments.this));
     dfTime.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+    int daysTillStart = ListingUtils.daysApart(startTime, System.currentTimeMillis());
+    int daysTillEnd = ListingUtils.daysApart(endTime, System.currentTimeMillis());
+    int daysDuration = ListingUtils.daysApart(endTime, startTime);
     String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     if (isToday) {
       startDateDisplay = "Today";
+    } else if (daysTillStart == 1) {
+      startDateDisplay = "Tomorrow";
+    } else if (daysTillStart == -1) {
+      startDateDisplay = "Yesterday";
     } else if (withinWeekCurToStart) {
       startDateDisplay = (startTime < System.currentTimeMillis() ? "Last " : "This ") +
           days[startTimeDate.get(Calendar.DAY_OF_WEEK) - 1];
     } else {
-      startDateDisplay = df.format(new Date(startTime));
+      startDateDisplay = df.format(new Date(startTime)) + ", " +
+          days[startTimeDate.get(Calendar.DAY_OF_WEEK) - 1];
     }
     String endDateDisplay;
+
     if (sameDate) {
       endDateDisplay = "";
     } else if (endsToday) {
       endDateDisplay = "Today";
-    } else if (withinWeekStartToEnd){
+    } else if (daysTillEnd == 1) {
+      endDateDisplay = "Tomorrow";
+    } else if (daysDuration == 1) {
+      endDateDisplay = "The day after,";
+    } else if (withinWeekStartToEnd && withinWeekCurToStart) {
       endDateDisplay = days[endTimeDate.get(Calendar.DAY_OF_WEEK)];
+    } else if (withinWeekCurToEnd) {
+      endDateDisplay = (endTime < System.currentTimeMillis() ? "Last " : "This ") +
+          days[endTimeDate.get(Calendar.DAY_OF_WEEK) - 1];
     } else {
-      endDateDisplay = df.format(new Date(endTime));
+      endDateDisplay = df.format(new Date(endTime)) + ", " + days[endTimeDate.get(Calendar
+          .DAY_OF_WEEK) - 1];
     }
     String startTimeDisplay = dfTime.format(new Date(startTime));
     String endTimeDisplay = dfTime.format(new Date(endTime));
     StringBuilder sb = new StringBuilder(startDateDisplay);
     return sb.append(" ")
         .append(startTimeDisplay)
-        .append(" - ")
+        .append(" to \n")
         .append(endDateDisplay)
         .append(endDateDisplay.isEmpty() ? "" : " ")
         .append(endTimeDisplay)
