@@ -6,6 +6,7 @@ android:
     - platform-tools
     - build-tools-28.0.0
     - android-28
+    - android-21
     - extra-google-google_play_services
     # Support library
     - extra-android-support
