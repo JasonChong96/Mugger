@@ -1,5 +1,6 @@
 package com.bojio.mugger;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -283,6 +284,7 @@ public class Main2Activity extends LoggedInActivity
   /**
    * {@inheritDoc}
    */
+  @SuppressLint("RestrictedApi")
   @SuppressWarnings("StatementWithEmptyBody")
   @Override
   public boolean onNavigationItemSelected(MenuItem item) {
