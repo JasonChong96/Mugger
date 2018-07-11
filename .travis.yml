@@ -8,8 +8,8 @@ android:
     - android-28
 before_install:
   - yes | sdkmanager "platforms;android-28"
+  - chmod +x gradlew
 script:
    - ./gradlew build connectedCheck
 jdk:
   - oraclejdk8
-after_failure: "cat $TRAVIS_BUILD_DIR/app/build/outputs/lint-results-debug.xml"
