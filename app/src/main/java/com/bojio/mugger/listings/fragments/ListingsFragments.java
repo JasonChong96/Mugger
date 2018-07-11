@@ -443,9 +443,9 @@ public abstract class ListingsFragments extends Fragment {
     DateFormat dfTime = android.text.format.DateFormat.getTimeFormat(ListingsFragments
         .this.getActivity(ListingsFragments.this));
     dfTime.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
-    int daysTillStart = ListingUtils.daysApart(startTime, System.currentTimeMillis());
-    int daysTillEnd = ListingUtils.daysApart(endTime, System.currentTimeMillis());
-    int daysDuration = ListingUtils.daysApart(endTime, startTime);
+    long daysTillStart = ListingUtils.daysApart(startTime, System.currentTimeMillis());
+    long daysTillEnd = ListingUtils.daysApart(endTime, System.currentTimeMillis());
+    long daysDuration = ListingUtils.daysApart(endTime, startTime);
     String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     if (isToday) {
       startDateDisplay = "Today";

@@ -9,8 +9,8 @@ android {
         applicationId "com.bojio.mugger"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 15
-        versionName "1.7.0"
+        versionCode 16
+        versionName "1.8.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -60,6 +60,7 @@ dependencies {
     implementation 'com.mikepenz:fastadapter:3.2.7'
     implementation 'com.heinrichreimersoftware:material-intro:-SNAPSHOT'
     implementation 'com.annimon:stream:1.2.0'
+    implementation 'com.github.prolificinteractive:material-calendarview:1.6.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
