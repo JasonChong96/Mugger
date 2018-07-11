@@ -15,6 +15,9 @@ android {
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
     }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
     buildTypes {
         release {
             minifyEnabled false

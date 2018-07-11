@@ -55,7 +55,7 @@
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="android:backgroundTint">@color/cardViewColorAdmin</item>
+
     </style>
 
     <style name="SendFabTheme" parent="AppTheme">
