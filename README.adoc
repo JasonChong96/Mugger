@@ -2,6 +2,7 @@ ifdef::env-github,env-browser[:relfileprefix:]
 :toc:
 :toc-title: User Guide
 :toc-placement: preamble
+image:https://travis-ci.com/JasonChong96/Mugger.svg?branch=milestone3["Build Status", link="https://travis-ci.com/JasonChong96/Mugger"]
 
 = Mugger
 
