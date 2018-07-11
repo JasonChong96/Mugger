@@ -6,11 +6,19 @@ android:
     - platform-tools
     - build-tools-28.0.0
     - android-28
+    - extra-google-google_play_services
+    # Support library
+    - extra-android-support
+    # Latest artifacts in local repository
+    - extra-google-m2repository
+    - extra-android-m2repository
+    # Specify at least one system image,
+    - sys-img-armeabi-v7a-android-28
 before_install:
   - yes | sdkmanager "platforms;android-28"
   - chmod +x gradlew
 before_script:
-  - echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a
+  - echo no | android create avd --force --name test --target android-28 --abi armeabi-v7a
   - emulator -avd test -no-skin -no-audio -no-window -gpu off &
   - android-wait-for-emulator
   - adb devices
