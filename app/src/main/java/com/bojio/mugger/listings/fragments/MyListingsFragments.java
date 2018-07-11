@@ -2,6 +2,7 @@ package com.bojio.mugger.listings.fragments;
 
 import android.os.Bundle;
 
+import com.bojio.mugger.listings.ListingUtils;
 import com.google.firebase.firestore.Query;
 
 /**
@@ -15,9 +16,7 @@ public class MyListingsFragments extends ListingsFragments {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    this.mQuery = db.collection("listings")
-        .orderBy("startTime", Query.Direction.ASCENDING)
-        .whereEqualTo("ownerId", mAuth.getCurrentUser().getUid());
+    this.mQuery = ListingUtils.getMyListingsQuery(db, mAuth.getUid());
 
   }
 }

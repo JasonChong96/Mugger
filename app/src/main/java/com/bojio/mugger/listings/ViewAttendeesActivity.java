@@ -8,6 +8,7 @@ import android.view.MenuItem;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.profile.ProfileListRecyclerAdapter;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -55,7 +56,7 @@ public class ViewAttendeesActivity extends LoggedInActivity {
     ownerUid = b.getString("ownerUid");
     profileIds = b.getStringArrayList("profiles");
     List<Task<?>> tasks = new ArrayList<>();
-    colRef = FirebaseFirestore.getInstance().collection("users");
+    colRef = MuggerDatabase.getAllUsersReference(db);
     profiles = new ArrayList<>();
     for (String id : profileIds) {
       tasks.add(colRef.document(id).get().addOnCompleteListener(task -> {

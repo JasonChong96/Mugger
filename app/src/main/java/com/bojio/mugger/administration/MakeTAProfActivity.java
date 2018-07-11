@@ -75,7 +75,7 @@ public class MakeTAProfActivity extends LoggedInActivity {
       return;
     }
     userUid = b.getString("userUid");
-    db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
+    MuggerDatabase.getOtherDataReference(db).get().addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         Toasty.error(this, "Error: Failed to fetch current semester", Toast.LENGTH_SHORT)
             .show();
@@ -122,7 +122,7 @@ public class MakeTAProfActivity extends LoggedInActivity {
       dialog.show();
       Boolean remove = newRole == ModuleRole.REMOVE;
       String role = newRole == ModuleRole.PROFESSOR ? "professor" : "ta";
-      DocumentReference docRef = MuggerDatabase.getUserReference(db, userUid).collection(MuggerDatabase.SEMESTER_COLLECTION)
+      DocumentReference docRef = MuggerDatabase.getUserAllSemestersDataReference(db, userUid)
           .document(semesterView.getText().toString().replace("/", "."));
       docRef.get().addOnCompleteListener(task -> {
         if (!task.isSuccessful()) {

@@ -46,6 +46,20 @@
 
         </android.support.constraint.ConstraintLayout>
 
+        <android.support.design.button.MaterialButton
+            android:id="@+id/listings_fragments_button_filter_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter Settings"
+            android:textColor="?attr/colorPrimaryDark"
+            android:visibility="gone"
+            app:icon="@drawable/ic_baseline_settings_20px"
+            app:iconTint="?attr/colorPrimaryDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/constraintLayout3" />
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout3"
             android:layout_width="wrap_content"
@@ -111,7 +125,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3"
+            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_button_filter_settings"
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/listing_card_view">
 

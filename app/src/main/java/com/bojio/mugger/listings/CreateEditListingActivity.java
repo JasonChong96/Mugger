@@ -133,71 +133,6 @@ public class CreateEditListingActivity extends LoggedInActivity {
       setTitle("Add Listing");
       endDateTime.add(Calendar.HOUR_OF_DAY, 1);
     }
-    /*if (moduleCodes == null || moduleRoles == null) {
-      AlertDialog dialog = new SpotsDialog
-          .Builder()
-          .setContext(this)
-          .setMessage("Loading modules...")
-          .setTheme(R.style.SpotsDialog)
-          .setCancelable(false)
-          .build();
-      dialog.show();
-      moduleCodes = new ArrayList<>();
-      moduleRoles = new HashMap<>();
-      db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
-        if (!task.isSuccessful()) {
-          showShortToast("Error loading current semester. Please try again later.");
-          finish();
-        } else {
-          String currentSem = ((String) task.getResult().getData().get("currentSem"));
-          MuggerDatabase.getUserReference(db, mAuth.getUid()).collection(MuggerDatabase.SEMESTER_COLLECTION).document
-              (currentSem).get().addOnCompleteListener(taskk -> {
-            if (!taskk.isSuccessful()) {
-              showShortToast("Error loading modules. Please try again later.");
-              finish();
-            } else {
-              DocumentSnapshot result = taskk.getResult();
-              if (!result.exists()) {
-                showShortToast("Modules for this sem has not been loaded, please refresh them " +
-                    "through your settings page.");
-                finish();
-              } else {
-                Map<String, Object> data = result.getData();
-                moduleCodes = new ArrayList<>();
-                List<String> mods = (List<String>) data.get("professor");
-                if (mods != null) {
-                  for (String mod : mods) {
-                    moduleCodes.add(mod);
-                    moduleRoles.put(mod, ModuleRole.PROFESSOR);
-                  }
-                }
-                mods = (List<String>) data.get("ta");
-                if (mods != null) {
-                  for (String mod : mods) {
-                    moduleCodes.add(mod);
-                    moduleRoles.put(mod, ModuleRole.TEACHING_ASSISTANT);
-                  }
-                }
-                mods = (List<String>) data.get("moduleCodes");
-                if (mods != null) {
-                  for (String mod : mods) {
-                    moduleCodes.add(mod);
-                    moduleRoles.put(mod, ModuleRole.EMPTY);
-                  }
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
-                    moduleCodes);
-                moduleCode.setAdapter(adapter);
-                if (b != null) {
-                  moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(toEdit.getModuleCode())));
-                }
-                dialog.dismiss();
-              }
-            }
-          });
-        }
-      });
-    } else {*/
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
         moduleCodes);
     moduleCode.setAdapter(adapter);
@@ -337,9 +272,10 @@ public class CreateEditListingActivity extends LoggedInActivity {
     }
     Task<?> addedDocRef;
     if (b == null) {
-      addedDocRef = db.collection("listings").add(data);
+      addedDocRef = MuggerDatabase.createListing(db, data);
     } else {
-      addedDocRef = db.collection("listings").document(toEdit.getUid()).set(data, SetOptions.merge());
+      addedDocRef = MuggerDatabase.getListingReference(db, toEdit.getUid()).set(data, SetOptions
+          .merge());
     }
     OnCompleteListener listener = new OnCompleteListener<DocumentReference>() {
       @Override
@@ -350,14 +286,6 @@ public class CreateEditListingActivity extends LoggedInActivity {
           dialog.dismiss();
           return;
         } else {
-         /* if (b == null) {
-            DocumentReference docRef = task.getResult();
-            Map<String, Object> uidToListing = new HashMap<>();
-            uidToListing.put(docRef.getId(), "");
-            db.collection("joinedListings").document(mAuth.getCurrentUser().getUid()).set
-            (uidToListing);
-
-          }*/
           if (task.getResult() != null) {
             FirebaseMessaging.getInstance().subscribeToTopic(task.getResult().getId());
           }
@@ -373,7 +301,7 @@ public class CreateEditListingActivity extends LoggedInActivity {
             notificationData.put("fromUid", mAuth.getUid());
             notificationData.put("topicUid", moduleCode.getSelectedItem().toString());
             notificationData.put("listingUid", task.getResult().getId());
-            MuggerDatabase.addNotification(db, notificationData);
+            MuggerDatabase.sendNotification(db, notificationData);
           }
           Toasty.success(CreateEditListingActivity.this, b == null ? "Listing successfully " +
               "created!" : "Listing " +

@@ -106,7 +106,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
         finish();
         return;
       }
-      Task<DocumentSnapshot> listingTask = db.collection("listings").document(listingUid).get()
+      Task<DocumentSnapshot> listingTask = MuggerDatabase.getListingReference(db, listingUid).get()
           .addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
               Toasty.error(this, "Error fetching listing data", Toast.LENGTH_SHORT).show();
@@ -127,7 +127,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
       init();
     }
 
-    //  db.collection("listings").document(listing.getUid()).addSnapshotListener(this, )
+    //  MuggerDatabase.getAllListingsReference(db).document(listing.getUid()).addSnapshotListener(this, )
 
   }
 
@@ -174,7 +174,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
           .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
-      db.collection("listings").document(listing.getUid()).delete().addOnCompleteListener(task -> {
+      MuggerDatabase.deleteListing(db, listing.getUid()).addOnCompleteListener(task -> {
         if (task.isSuccessful()) {
           Map<String, Object> notificationData = new HashMap<>();
           notificationData.put("title", "Listing Deleted");
@@ -185,7 +185,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
           notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
           notificationData.put("fromUid", mAuth.getUid());
           notificationData.put("topicUid", listing.getUid());
-          MuggerDatabase.addNotification(db, notificationData);
+          MuggerDatabase.sendNotification(db, notificationData);
           finish();
         } else {
           dialog.dismiss();
@@ -226,7 +226,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
     isAttending.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        DocumentReference listingRef = db.collection("listings").document(listing.getUid());
+        DocumentReference listingRef = MuggerDatabase.getAllListingsReference(db).document(listing.getUid());
         Map<String, Object> updates = new HashMap<>();
         if (!isChecked) {
           if (mAuth.getUid().equals(listing.getOwnerId())) {

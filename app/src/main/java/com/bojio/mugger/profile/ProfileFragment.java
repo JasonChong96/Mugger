@@ -140,9 +140,11 @@ public class ProfileFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_profile, container, false);
     ButterKnife.bind(this, view);
     Task<DocumentSnapshot> profileTask = MuggerDatabase.getUserReference(db, profileUid).get();
-    Task<DocumentSnapshot> moduleTitlesTask = db.collection("data").document("moduleTitles").get();
-    Task<QuerySnapshot> modulesTask = MuggerDatabase.getUserReference(db, profileUid)
-        .collection(MuggerDatabase.SEMESTER_COLLECTION).orderBy("semester", Query.Direction.DESCENDING).get();
+    Task<DocumentSnapshot> moduleTitlesTask = MuggerDatabase.getAllModuleTitlesRef(db).get();
+    Task<QuerySnapshot> modulesTask = MuggerDatabase
+        .getUserAllSemestersDataReference(db, mAuth.getUid())
+        .orderBy("semester", Query.Direction.DESCENDING)
+        .get();
     AlertDialog dialog = new SpotsDialog
         .Builder()
         .setContext(this.getActivity())
@@ -306,7 +308,7 @@ public class ProfileFragment extends Fragment {
                     notificationData.put("topicUid", "");
                     notificationData.put("type", hours == 0 ? "unmute" : "mute");
                     notificationData.put("until", Long.toString(until));
-                    tasks.add(MuggerDatabase.addNotification(db, notificationData));
+                    tasks.add(MuggerDatabase.sendNotification(db, notificationData));
                   }
                   Tasks.whenAll(tasks).addOnCompleteListener(task -> {
                     dialogg.dismiss();

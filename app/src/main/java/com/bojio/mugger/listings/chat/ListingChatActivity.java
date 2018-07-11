@@ -97,7 +97,7 @@ public class ListingChatActivity extends LoggedInActivity {
           .setTheme(R.style.SpotsDialog)
           .build();
       dialog.show();
-      db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {
+      MuggerDatabase.getListingReference(db, listingUid).get().addOnCompleteListener(task -> {
         Listing newListing = Listing.getListingFromSnapshot(task.getResult());
         if (newListing == null) {
           Toasty.error(this, "This listing has been deleted", Toast.LENGTH_SHORT).show();
@@ -150,7 +150,7 @@ public class ListingChatActivity extends LoggedInActivity {
       messageData.put("time", timestamp);
       messageData.put("day", dayTimestamp);
       // Add to listing chat
-      db.collection("chats").document(listingUid).collection("messages").add(messageData);
+      MuggerDatabase.sendListingChatMessage(db, listingUid, messageData);
       Map<String, Object> notificationData = new HashMap<>();
       notificationData.put("topicUid", listingUid);
       StringBuilder content = new StringBuilder("(Latest Message) ");
@@ -162,19 +162,17 @@ public class ListingChatActivity extends LoggedInActivity {
       notificationData.put("title", title.toString());
       notificationData.put("type", MessagingService.CHAT_NOTIFICATION);
       notificationData.put("fromUid", user.getUid());
-      // Add to user's chat history
-      //MuggerDatabase.getUserReference(db, userUid).collection("chatHistory").add(messageData);
       // Add to notification db
       messageData.remove("time");
       messageData.remove("day");
       messageData.put("listingOwnerUid", listing.getOwnerId());
-      MuggerDatabase.addNotification(db, notificationData);
+      MuggerDatabase.sendNotification(db, notificationData);
       toSendView.setText("");
     }
   }
 
   private void initMessages() {
-    Query mQuery = db.collection("chats").document(listingUid).collection("messages")
+    Query mQuery = MuggerDatabase.getListingChatHistory(db, listingUid)
         .orderBy("time", Query.Direction.DESCENDING);
     FirestoreRecyclerOptions<Message> options = new FirestoreRecyclerOptions.Builder<Message>()
         .setQuery(mQuery, snapshot -> new Message((String) snapshot.get("fromUid"),

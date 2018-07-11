@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,7 +46,8 @@ public class ViewAllReportsActivity extends LoggedInActivity {
   }
 
   private void initRecycler() {
-    Query mQuery = db.collection("reports").orderBy("time", Query.Direction.DESCENDING);
+    Query mQuery = MuggerDatabase.getAllReportsReference(db).orderBy("time", Query.Direction
+        .DESCENDING);
     FirestoreRecyclerOptions<Report> options = new FirestoreRecyclerOptions.Builder<Report>()
         .setQuery(mQuery, Report::getReportFromSnapshot).build();
     FirestoreRecyclerAdapter<Report, ReportViewHolder> adapter = new FirestoreRecyclerAdapter<Report, ReportViewHolder>(options) {

@@ -86,4 +86,7 @@
         <item name="android:textSize">16sp</item>
         <item name="android:singleLine">true</item>
     </style>
+    <style name="FilterChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="chipBackgroundColor">?attr/colorAccent</item>
+    </style>
 </resources>

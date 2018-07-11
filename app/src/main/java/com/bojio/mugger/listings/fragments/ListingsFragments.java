@@ -21,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.annimon.stream.function.Predicate;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
@@ -80,9 +81,13 @@ public abstract class ListingsFragments extends Fragment {
   TextInputEditText filterToDateView;
   @BindView(R.id.listings_fragments_filter_from_date)
   TextInputEditText filterFromDateView;
+  @BindView(R.id.listings_fragments_button_filter_settings)
+  MaterialButton filterSettingsButton;
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseMessaging fcm = FirebaseMessaging.getInstance();
   FirebaseAuth mAuth;
+  protected Predicate<Listing> predicateFilter;
+  protected boolean delayInitListings;
   private int mColumnCount = 1;
   private OnListingsFragmentInteractionListener mListener;
 
@@ -91,6 +96,7 @@ public abstract class ListingsFragments extends Fragment {
    * fragment (e.g. upon screen orientation changes).
    */
   public ListingsFragments() {
+    delayInitListings = false;
   }
 
 
@@ -117,8 +123,6 @@ public abstract class ListingsFragments extends Fragment {
 
     View view = inflater.inflate(R.layout.fragment_available_listings, container, false);
     ButterKnife.bind(this, view);
-
-
     Context context = view.getContext();
     if (mColumnCount <= 1) {
       mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -129,7 +133,9 @@ public abstract class ListingsFragments extends Fragment {
         .getActivity(ListingsFragments.this));
     filterFromDateView.setText(df.format(new Date()));
     filterToDateView.setText(df.format(new Date(ListingUtils.DEFAULT_TIME_FILTER_END)));
-    initListings();
+    if (!delayInitListings) {
+      initListings();
+    }
     return view;
   }
 
@@ -222,7 +228,7 @@ public abstract class ListingsFragments extends Fragment {
                   .setTheme(R.style.SpotsDialog)
                   .build();
               dialogg.show();
-              db.collection("listings").document(listing.getUid()).delete().addOnCompleteListener(task -> {
+              MuggerDatabase.deleteListing(db, listing.getUid()).addOnCompleteListener(task -> {
                 dialogg.dismiss();
                 if (task.isSuccessful()) {
                   Map<String, Object> notificationData = new HashMap<>();
@@ -234,7 +240,7 @@ public abstract class ListingsFragments extends Fragment {
                   notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
                   notificationData.put("fromUid", mAuth.getUid());
                   notificationData.put("topicUid", listing.getUid());
-                  MuggerDatabase.addNotification(db, notificationData);
+                  MuggerDatabase.sendNotification(db, notificationData);
                 } else {
                   Snacky.builder().setActivity(ListingsFragments.this.getActivity())
                       .setText("Failed to delete listing, please try again later")
@@ -254,7 +260,7 @@ public abstract class ListingsFragments extends Fragment {
       }
 
       private void onClick_join(MaterialButton button, Listing listing) {
-        DocumentReference listingRef = db.collection("listings").document(listing.getUid());
+        DocumentReference listingRef = MuggerDatabase.getAllListingsReference(db).document(listing.getUid());
         Map<String, Object> updates = new HashMap<>();
         if (listing.isAttending(uid)) {
           if (mAuth.getUid().equals(listing.getOwnerId())) {
@@ -286,7 +292,10 @@ public abstract class ListingsFragments extends Fragment {
         if (mAuth.getCurrentUser() == null) {
           return;
         }
-
+        if (predicateFilter != null && !predicateFilter.test(listing)) {
+          holder.cardView.setVisibility(View.GONE);
+          return;
+        }
         int type = listing.getType();
         String title = listing.getModuleCode();
         if (listing.isAttending(mAuth.getCurrentUser().getUid())) {
@@ -391,7 +400,6 @@ public abstract class ListingsFragments extends Fragment {
         // layout called R.layout.message for each item
         View view = LayoutInflater.from(group.getContext())
             .inflate(R.layout.listing_card_view, group, false);
-
         return new ListingsViewHolder(view);
       }
     };

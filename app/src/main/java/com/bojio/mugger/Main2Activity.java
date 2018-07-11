@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -36,6 +37,7 @@ import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.fragments.AttendingListingsFragments;
 import com.bojio.mugger.listings.fragments.AvailableListingsFragments;
+import com.bojio.mugger.listings.fragments.CustomFilterListingsFragments;
 import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.bojio.mugger.listings.fragments.MyListingsFragments;
 import com.bojio.mugger.profile.ProfileActivity;
@@ -55,7 +57,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -97,7 +98,7 @@ public class Main2Activity extends LoggedInActivity
     // Updates cached display name/email
     MuggerDatabase.getUserReference(db, user.getUid()).update("displayName", user.getDisplayName());
     MuggerDatabase.getUserReference(db, user.getUid()).update("email", user.getEmail());
-    db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
+    MuggerDatabase.getOtherDataReference(db).get().addOnCompleteListener(task -> {
       if (task.isSuccessful()) {
         long min = (Long) task.getResult().getData().get("minVersion");
         if (MuggerConstants.APP_VERSION < min) {
@@ -126,9 +127,7 @@ public class Main2Activity extends LoggedInActivity
     String instanceId = FirebaseInstanceId.getInstance().getToken();
     // Update instance id of this account in database
     if (instanceId != null) {
-      db.collection("users")
-          .document(user.getUid())
-          .update("instanceId", instanceId);
+      MuggerDatabase.getUserReference(db, user.getUid()).update("instanceId", instanceId);
     }
     // Subscribe to chat notifications
     subscribeToTopics();
@@ -142,8 +141,7 @@ public class Main2Activity extends LoggedInActivity
           .build();
       dialog.show();
       List<Task<?>> tasks = new ArrayList<>();
-      tasks.add(MuggerDatabase.getUserReference(db, user.getUid()).collection(MuggerDatabase
-          .SEMESTER_COLLECTION).get()
+      tasks.add(MuggerDatabase.getUserAllSemestersDataReference(db, user.getUid()).get()
           .addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
               Toasty.error(this, "Unable to load module data, please log in again.")
@@ -205,7 +203,7 @@ public class Main2Activity extends LoggedInActivity
     if (mAuth == null) {
       return;
     }
-    Query q = db.collection("listings")
+    Query q = MuggerDatabase.getAllListingsReference(db)
         .whereGreaterThan(mAuth.getUid(), 0);
     q.get().addOnCompleteListener(snap -> {
       List<DocumentSnapshot> results = snap.getResult().getDocuments();
@@ -250,6 +248,8 @@ public class Main2Activity extends LoggedInActivity
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main2, menu);
     FirebaseUser user = mAuth.getCurrentUser();
+    ((TextView) findViewById(R.id.username)).setText(user.getDisplayName());
+    ((TextView) findViewById(R.id.email)).setText(user.getEmail());
     if (MuggerRole.MODERATOR.check(MuggerUserCache.getInstance().getRole())) {
       MenuItem menuItem = ((NavigationView) findViewById(R.id.nav_view)).getMenu()
           .findItem(R.id.nav_admin_tools);
@@ -315,6 +315,14 @@ public class Main2Activity extends LoggedInActivity
         fab.setVisibility(View.GONE);
         ft.commit();
         setTitle("Sessions That I'm Joining");
+        break;
+      case R.id.nav_custom_filters:
+        fragment = new CustomFilterListingsFragments();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, fragment);
+        fab.setVisibility(View.VISIBLE);
+        ft.commit();
+        setTitle("Filtered Sessions");
         break;
       case R.id.nav_profile:
         Intent intent = new Intent(this, ProfileActivity.class);

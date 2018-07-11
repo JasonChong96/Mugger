@@ -126,7 +126,8 @@ public class IvleLoginActivity extends AppCompatActivity {
     }
     String nusNetId = (String) userData.get("nusNetId");
     String hashedId = Hashing.sha256().hashString(nusNetId, StandardCharsets.UTF_8).toString();
-    Task<QuerySnapshot> checkTask = db.collection("users").whereEqualTo("nusNetId", hashedId)
+    Task<QuerySnapshot> checkTask = MuggerDatabase.getAllUsersReference(db).whereEqualTo
+        ("nusNetId", hashedId)
         .get();
     try {
       Tasks.await(checkTask);
@@ -255,7 +256,6 @@ public class IvleLoginActivity extends AppCompatActivity {
             continue;
           }
           String year = dataList[i + 10];
-          year = year.replace("/", ".");
           String semesterDisplay = dataList[i + 18];
           String yearAndSem = year + " " + semesterDisplay;
           if (!modulesBySem.containsKey(yearAndSem)) {
@@ -270,12 +270,12 @@ public class IvleLoginActivity extends AppCompatActivity {
         Map<String, Object> data = new HashMap<>();
         data.put("moduleCodes", entry.getValue());
         data.put("semester", entry.getKey());
-        Task<?> task = MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid())
-            .collection(MuggerDatabase.SEMESTER_COLLECTION).document(entry.getKey()).set(data);
+        Task<?> task = MuggerDatabase.addUserSemesterData(FirebaseFirestore.getInstance(), mAuth
+            .getUid(), entry.getKey(), data);
       }
       String latestSem = Collections.max(modulesBySem.keySet());
       userData.put("latestSem", latestSem);
-      Task<?> task = db.collection("data").document("moduleTitles").set(modules, SetOptions
+      Task<?> task = MuggerDatabase.getAllModuleTitlesRef(db).set(modules, SetOptions
           .merge());
       userData.put("moduleCodes", new ArrayList<>(modules.keySet()));
       return true;

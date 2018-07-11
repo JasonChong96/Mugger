@@ -10,15 +10,11 @@ import android.widget.ArrayAdapter;
 
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.bojio.mugger.listings.ListingUtils;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 /**
  * A fragment representing a list of Items.
@@ -31,8 +27,7 @@ public class AvailableListingsFragments extends ListingsFragments {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    this.mQuery = db.collection("listings")
-        .orderBy("startTime", Query.Direction.ASCENDING);
+    this.mQuery = ListingUtils.getAvailableListingsQuery(db);
     super.onCreate(savedInstanceState);
   }
 
@@ -42,17 +37,7 @@ public class AvailableListingsFragments extends ListingsFragments {
     MuggerUserCache cache = MuggerUserCache.getInstance();
     View view = super.onCreateView(inflater, container, savedInstanceState);
     constraintLayout2.setVisibility(View.VISIBLE);
-    long unrelatedModules = 0L;
-    if (cache.getData().containsKey("showUnrelatedModules")) {
-      unrelatedModules = (long) cache.getData().get("showUnrelatedModules");
-    }
-    if (unrelatedModules != 0) {
-      modules = new ArrayList<>(cache.getAllModules());;
-    } else {
-      modules = new ArrayList<>(cache.getModules().firstEntry()
-          .getValue().keySet());
-    }
-    modules.add(0, "Show all modules");
+    modules = ListingUtils.getFilterModules(cache);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
         .simple_dropdown_item_1line, modules);
     spinner.setAdapter(adapter);
@@ -69,10 +54,10 @@ public class AvailableListingsFragments extends ListingsFragments {
 
       private void changeModule(int index) {
         if (index == 0) {
-          AvailableListingsFragments.this.mQuery = db.collection("listings")
+          AvailableListingsFragments.this.mQuery = MuggerDatabase.getAllListingsReference(db)
               .orderBy("startTime", Query.Direction.ASCENDING);
         } else {
-          AvailableListingsFragments.this.mQuery = db.collection("listings")
+          AvailableListingsFragments.this.mQuery = MuggerDatabase.getAllListingsReference(db)
               .orderBy(getMods().get(index), Query.Direction.ASCENDING);
         }
         initListings();

@@ -1,6 +1,7 @@
 package com.bojio.mugger.authentication;
 
 import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -43,7 +44,7 @@ public class MuggerUserCache {
       return 0;
     } else if (mutedTill < System.currentTimeMillis()) {
       data.remove("muted");
-      FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance()
+      MuggerDatabase.getUserReference(FirebaseFirestore.getInstance(), FirebaseAuth.getInstance()
           .getUid()).update("muted", FieldValue.delete());
       return 0;
     } else {
@@ -102,6 +103,16 @@ public class MuggerUserCache {
 
   public TreeSet<String> getAllModules() {
     return allModules;
+  }
+
+  public void updateCache(Map<String, Object> data) {
+    for (Map.Entry<String, Object> entry : data.entrySet()) {
+      if (entry.getValue() != null && entry.getValue().equals(FieldValue.delete())) {
+        getData().remove(entry.getKey());
+      } else {
+        getData().put(entry.getKey(), entry.getValue());
+      }
+    }
   }
 
   public void setAllModules(TreeSet<String> allModules) {

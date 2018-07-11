@@ -59,30 +59,7 @@ public abstract class LoggedInActivity extends AppCompatActivity {
       stopActivity = true;
       return;
     }
-/*      } else {
-        SpotsDialog.Builder dialog = new SpotsDialog
-            .Builder()
-            .setContext(this)
-            .setTheme(R.style.SpotsDialog)
-            .setMessage("Reloading data cache...")
-            .setCancelable(false);
-        MuggerDatabase.getUserReference(db, mAuth.getUid()).get().addOnCompleteListener(task_ -> {
-          if (!task_.isSuccessful()) {
-            signOut(this);
-          } else {
-            cache.setData(task_.getResult().getData());
-            MuggerDatabase.getUserReference(db, mAuth.getUid()).collection(MuggerDatabase.SEMESTER_COLLECTION).get()
-                .addOnCompleteListener(task -> {
-                  if (!task.isSuccessful()) {
-                    signOut(this);
-                  } else {
-                    cache.loadModules(task.getResult().getDocuments());
-                    recreate();
-                  }
-                });
-          }
-        });*/
-    }
+  }
 
 
   /**

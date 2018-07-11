@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -82,7 +83,7 @@ public class MakeReportActivity extends LoggedInActivity {
     reportData.put("reporterName", user.getDisplayName());
     reportData.put("time", System.currentTimeMillis());
     reportData.put("description", reportDescription);
-    db.collection("reports").add(reportData).addOnCompleteListener(task -> {
+    MuggerDatabase.sendReport(db, reportData).addOnCompleteListener(task -> {
       dialog.dismiss();
       if (!task.isSuccessful()) {
         Snacky.builder().setActivity(this).setText("Report submission failed. Please try again " +

@@ -156,7 +156,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
                       dialog.dismiss();
                       preference.setSummary(user.getDisplayName());
                     } else {
-                      Query mQuery = db.collection("listings")
+                      Query mQuery = MuggerDatabase.getAllListingsReference(db)
                           .orderBy(user.getUid());
                       mQuery.get().addOnCompleteListener(taskk -> {
                         dialog.dismiss();

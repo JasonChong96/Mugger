@@ -14,6 +14,7 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -82,7 +83,8 @@ public class ChangeMuggerRoleActivity extends LoggedInActivity {
         .build();
     dialog.show();
     long roleId = MuggerRole.valueOf((String) spinner.getSelectedItem()).getRoleId();
-    DocumentReference docRef = FirebaseFirestore.getInstance().collection("users").document(uid);
+    DocumentReference docRef = MuggerDatabase.getUserReference(FirebaseFirestore.getInstance(),
+        uid);
     docRef.update("roleId",
         roleId).addOnCompleteListener
         (task -> {
@@ -101,9 +103,8 @@ public class ChangeMuggerRoleActivity extends LoggedInActivity {
               notificationData.put("topicUid", "");
               notificationData.put("type", "role");
               notificationData.put("newRoleName", spinner.getSelectedItem());
-              FirebaseFirestore.getInstance().collection("notifications").add(notificationData);
+              MuggerDatabase.sendNotification(db, notificationData);
             });
-
             finish();
           }
         });

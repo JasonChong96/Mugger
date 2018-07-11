@@ -2,6 +2,8 @@ package com.bojio.mugger.listings.fragments;
 
 import android.os.Bundle;
 
+import com.bojio.mugger.listings.ListingUtils;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -13,7 +15,6 @@ public class AttendingListingsFragments extends ListingsFragments {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    this.mQuery = db.collection("listings")
-        .orderBy(mAuth.getUid());
+    this.mQuery = ListingUtils.getAttendingListingsQuery(db, mAuth.getUid());
   }
 }

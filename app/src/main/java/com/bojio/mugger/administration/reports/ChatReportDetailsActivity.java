@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -103,7 +104,7 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
             .setTheme(R.style.SpotsDialog)
             .build();
         dialog.show();
-        db.collection("reports").document(report.getUid()).delete().addOnCompleteListener(task
+        MuggerDatabase.deleteReport(db, report.getUid()).addOnCompleteListener(task
             -> {
           dialog.dismiss();
           if (!task.isSuccessful()) {

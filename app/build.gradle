@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.github.matecode:Snacky:1.0.3'
     implementation 'com.mikepenz:fastadapter:3.2.7'
     implementation 'com.heinrichreimersoftware:material-intro:-SNAPSHOT'
+    implementation 'com.annimon:stream:1.2.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

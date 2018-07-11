@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -87,7 +88,7 @@ public class MakeFeedbackActivity extends LoggedInActivity {
     feedback.put("userUid", user.getUid());
     feedback.put("userName", user.getDisplayName());
     feedback.put("time", System.currentTimeMillis());
-    db.collection("feedback").add(feedback).addOnCompleteListener(task -> {
+    MuggerDatabase.sendFeedback(db, feedback).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         dialog.dismiss();
         Snacky.builder().setActivity(this).setText("Failed to submit feedback, please try again" +

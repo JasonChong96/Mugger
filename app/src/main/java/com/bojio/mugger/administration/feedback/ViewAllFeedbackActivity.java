@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -51,7 +52,7 @@ public class ViewAllFeedbackActivity extends LoggedInActivity {
 
   private void initRecycler() {
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    Query mQuery = db.collection("feedback").orderBy("time", Query.Direction.DESCENDING);
+    Query mQuery = MuggerDatabase.getAllFeedbackReference(db).orderBy("time", Query.Direction.DESCENDING);
     FirestoreRecyclerOptions<Feedback> options = new FirestoreRecyclerOptions.Builder<Feedback>()
         .setQuery(mQuery, Feedback::getFeedbackFromSnapshot).build();
     FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<Feedback, FeedbackViewHolder>

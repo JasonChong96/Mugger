@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -106,8 +107,8 @@ public class ListingReportDetailsActivity extends LoggedInActivity {
             .setTheme(R.style.SpotsDialog)
             .build();
         dialog.show();
-        db.collection("reports").document(report.getUid()).delete().addOnCompleteListener(task
-            -> {
+        MuggerDatabase.deleteReport(db, report.getUid())
+            .addOnCompleteListener(task -> {
           dialog.dismiss();
           if (!task.isSuccessful()) {
             Snacky.builder()

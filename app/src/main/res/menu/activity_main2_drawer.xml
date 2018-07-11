@@ -16,6 +16,10 @@
                 android:id="@+id/nav_my_listings"
                 android:icon="@drawable/ic_baseline_filter_list_24px"
                 android:title="My Listings" />
+            <item
+                android:id="@+id/nav_custom_filters"
+                android:icon="@drawable/ic_baseline_filter_list_24px"
+                android:title="Custom Filters" />
         </group>
     </item>
     <item android:title="Community">

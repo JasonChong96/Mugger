@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -106,7 +107,7 @@ public class MakeProfTARequestActivity extends LoggedInActivity {
     request.put("role", roleSpinner.getSelectedItem().toString());
     request.put("userUid", user.getUid());
     request.put("userName", user.getDisplayName());
-    db.collection("requestsProfTA").add(request).addOnCompleteListener(task -> {
+    MuggerDatabase.sendProfTARequest(db, request).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         dialog.dismiss();
         Snackbar.make(view, "Failed to submit request, please try again later.", Snackbar
