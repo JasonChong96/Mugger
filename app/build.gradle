@@ -27,11 +27,11 @@ android {
 
     if (isRunningOnTravis) {
         // configure keystore
-        signingConfigs.release.storeFile = file("../Mugger.jks.nc")
+        signingConfigs.release.storeFile = file("../Mugger.jks")
         signingConfigs.release.storePassword = System.getenv("keystore_password")
         signingConfigs.release.keyAlias = System.getenv("keystore_alias")
         signingConfigs.release.keyPassword = System.getenv("keystore_alias_password")
-        signingConfigs.debug.storeFile = file("../Mugger.jks.enc")
+        signingConfigs.debug.storeFile = file("../Mugger.jks")
         signingConfigs.debug.storePassword = System.getenv("keystore_password")
         signingConfigs.debug.keyAlias = System.getenv("keystore_alias")
         signingConfigs.debug.keyPassword = System.getenv("keystore_alias_password")
