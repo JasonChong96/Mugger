@@ -86,24 +86,61 @@ public class Main2ActivityInstrumentalTest {
   @Test
   @SmallTest
   public void testLoggedIn() {
+    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
+    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
+    try {
+      Tasks.await(task);
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    Assert.assertNull(task.getException());
     Assert.assertNotNull(FirebaseAuth.getInstance().getCurrentUser());
   }
 
   @Test
   @SmallTest
   public void testModules() {
+    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
+    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
+    try {
+      Tasks.await(task);
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     Assert.assertNotNull(muggerUserCache.getModules());
   }
 
   @Test
   @SmallTest
   public void testAllModules() {
+    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
+    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
+    try {
+      Tasks.await(task);
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     Assert.assertNotNull(muggerUserCache.getAllModules());
   }
 
   @Test
   @SmallTest
   public void testDisplayNameView() {
+    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
+    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
+    try {
+      Tasks.await(task);
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     Assert.assertNotNull(mAuth.getCurrentUser().getDisplayName());
     Assert.assertEquals(((TextView) mActivityRule.getActivity().findViewById(R.id.username))
         .getText(), mAuth.getCurrentUser().getDisplayName());
