@@ -7,6 +7,10 @@ android:
   - build-tools-28.0.0
   - android-28
   - android-21
+  - extra-google-google_play_services
+  - extra-google-m2repository
+  - extra-android-m2repository
+  - extra-android-support
   - sys-img-armeabi-v7a-android-21
 before_install:
 - openssl aes-256-cbc -K $encrypted_f2da1cf98853_key -iv $encrypted_f2da1cf98853_iv
