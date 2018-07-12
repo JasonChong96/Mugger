@@ -18,6 +18,15 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+    def isRunningOnTravis = System.getenv("CI") == "true"
+
+    if (isRunningOnTravis) {
+        // configure keystore
+        signingConfigs.release.storeFile = file("../Mugger.jks.enc")
+        signingConfigs.release.storePassword = System.getenv("keystore_password")
+        signingConfigs.release.keyAlias = System.getenv("keystore_alias")
+        signingConfigs.release.keyPassword = System.getenv("keystore_alias_password")
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -28,15 +37,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    def isRunningOnTravis = System.getenv("CI") == "true"
 
-    if (isRunningOnTravis) {
-        // configure keystore
-        signingConfigs.release.storeFile = file("../Mugger.jks.enc")
-        signingConfigs.release.storePassword = System.getenv("keystore_password")
-        signingConfigs.release.keyAlias = System.getenv("keystore_alias")
-        signingConfigs.release.keyPassword = System.getenv("keystore_alias_password")
-    }
     buildToolsVersion '28.0.0'
 }
 
@@ -71,6 +72,7 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.3.0'
     implementation 'com.github.matecode:Snacky:1.0.3'
     implementation 'com.mikepenz:fastadapter:3.2.7'
+    //noinspection GradleDependency
     implementation 'com.heinrichreimersoftware:material-intro:-SNAPSHOT'
     implementation 'com.annimon:stream:1.2.0'
     implementation 'com.github.prolificinteractive:material-calendarview:1.6.0'
