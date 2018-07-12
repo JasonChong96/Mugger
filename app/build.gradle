@@ -18,6 +18,11 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+    signingConfigs {
+        release {
+
+        }
+    }
     def isRunningOnTravis = System.getenv("CI") == "true"
 
     if (isRunningOnTravis) {
@@ -27,6 +32,7 @@ android {
         signingConfigs.release.keyAlias = System.getenv("keystore_alias")
         signingConfigs.release.keyPassword = System.getenv("keystore_alias_password")
     }
+
     buildTypes {
         release {
             minifyEnabled false
