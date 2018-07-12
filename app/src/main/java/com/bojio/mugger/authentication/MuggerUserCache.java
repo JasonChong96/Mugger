@@ -7,7 +7,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +104,10 @@ public class MuggerUserCache {
     return allModules;
   }
 
+  public void setAllModules(TreeSet<String> allModules) {
+    this.allModules = allModules;
+  }
+
   public void updateCache(Map<String, Object> data) {
     for (Map.Entry<String, Object> entry : data.entrySet()) {
       if (entry.getValue() != null && entry.getValue().equals(FieldValue.delete())) {
@@ -113,9 +116,5 @@ public class MuggerUserCache {
         getData().put(entry.getKey(), entry.getValue());
       }
     }
-  }
-
-  public void setAllModules(TreeSet<String> allModules) {
-    this.allModules = allModules;
   }
 }

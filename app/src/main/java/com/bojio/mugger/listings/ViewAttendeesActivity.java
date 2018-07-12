@@ -14,7 +14,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,8 @@ public class ViewAttendeesActivity extends LoggedInActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_view_attendees);

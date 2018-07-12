@@ -54,7 +54,8 @@ public class MakeTAProfActivity extends LoggedInActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_make_taprof);

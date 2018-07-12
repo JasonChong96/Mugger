@@ -36,8 +36,9 @@
         <activity
             android:name=".authentication.IvleLoginActivity"
             android:label="IVLE Login (First-timer only)" />
-        <activity android:name=".listings.chat.ListingChatActivity"
-            android:label="Chat"/>
+        <activity
+            android:name=".listings.chat.ListingChatActivity"
+            android:label="Chat" />
 
         <service
             android:name=".fcm.InstanceIdService"
@@ -101,7 +102,9 @@
             android:label="Study Session Attendees" />
         <activity
             android:name=".introduction.MuggerIntroActivity"
-            android:label="Mugger Introduction"/>
+            android:label="Mugger Introduction" />
+        <activity android:name=".listings.MyScheduleActivity"
+            android:label="My Schedule"/>
     </application>
 
 </manifest>

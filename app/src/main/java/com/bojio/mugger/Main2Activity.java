@@ -85,7 +85,8 @@ public class Main2Activity extends LoggedInActivity
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     mAuth = FirebaseAuth.getInstance();

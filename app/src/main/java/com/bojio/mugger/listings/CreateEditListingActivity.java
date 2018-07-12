@@ -86,7 +86,8 @@ public class CreateEditListingActivity extends LoggedInActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     db = FirebaseFirestore.getInstance();

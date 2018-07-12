@@ -49,7 +49,8 @@ public class MakeFeedbackActivity extends LoggedInActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_make_feedback);

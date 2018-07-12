@@ -2,7 +2,6 @@ package com.bojio.mugger.listings.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.button.MaterialButton;
 import android.support.design.chip.Chip;
 import android.support.design.chip.ChipGroup;
 import android.support.design.widget.TextInputEditText;
@@ -14,29 +13,20 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.annimon.stream.function.Predicate;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.database.MuggerDatabase;
-import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingUtils;
 import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class CustomFilterListingsFragments extends ListingsFragments {
-  private MaterialDialog dialog;
-  private MuggerUserCache cache;
-  private ArrayList<String> modules;
   ChipGroup chipGroupModules;
   ChipGroup chipGroupRoles;
   Chip chipProfessor;
@@ -50,6 +40,14 @@ public class CustomFilterListingsFragments extends ListingsFragments {
   RadioButton radioButtonJoiningListings;
   RadioButton radioButtonMyListings;
   Spinner spinnerModules;
+  private MaterialDialog dialog;
+  private MuggerUserCache cache;
+  private ArrayList<String> modules;
+
+  private static <T> Predicate<T> composePredicates(Predicate<T> predicate1, Predicate<T>
+      predicate2) {
+    return x -> predicate1.test(x) && predicate2.test(x);
+  }
 
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -74,7 +72,7 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     });
     return view;
   }
-  
+
   private void bindViews(View view) {
     chipGroupModules = view.findViewById(R.id.custom_filter_chip_group_modules);
     chipGroupRoles = view.findViewById(R.id.custom_filter_chip_group_roles);
@@ -218,10 +216,5 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     MuggerDatabase.getUserReference(db, mAuth.getUid()).update(data);
     cache.updateCache(data);
     initListings();
-  }
-
-  private static <T> Predicate<T> composePredicates(Predicate<T> predicate1, Predicate<T>
-      predicate2) {
-    return x -> predicate1.test(x) && predicate2.test(x);
   }
 }

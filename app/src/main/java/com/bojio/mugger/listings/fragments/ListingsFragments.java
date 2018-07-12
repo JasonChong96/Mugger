@@ -47,12 +47,12 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,6 +69,8 @@ public abstract class ListingsFragments extends Fragment {
 
   private static final String ARG_COLUMN_COUNT = "column-count";
   protected Query mQuery;
+  protected Predicate<Listing> predicateFilter;
+  protected boolean delayInitListings;
   @BindView(R.id.list)
   RecyclerView mRecyclerView;
   @BindView(R.id.listings_fragments_spinner)
@@ -83,11 +85,11 @@ public abstract class ListingsFragments extends Fragment {
   TextInputEditText filterFromDateView;
   @BindView(R.id.listings_fragments_button_filter_settings)
   MaterialButton filterSettingsButton;
+  @BindView(R.id.listings_fragments_view_schedule_button)
+  MaterialButton myScheduleButton;
   FirebaseFirestore db = FirebaseFirestore.getInstance();
   FirebaseMessaging fcm = FirebaseMessaging.getInstance();
   FirebaseAuth mAuth;
-  protected Predicate<Listing> predicateFilter;
-  protected boolean delayInitListings;
   private int mColumnCount = 1;
   private OnListingsFragmentInteractionListener mListener;
 
@@ -408,20 +410,6 @@ public abstract class ListingsFragments extends Fragment {
 
   }
 
-  /**
-   * This interface must be implemented by activities that contain this
-   * fragment to allow an interaction in this fragment to be communicated
-   * to the activity and potentially other fragments contained in that
-   * activity.
-   * <p/>
-   * See the Android Training lesson <a href=
-   * "http://developer.android.com/training/basics/fragments/communicating.html"
-   * >Communicating with Other Fragments</a> for more information.
-   */
-  public interface OnListingsFragmentInteractionListener {
-    void onListingFragmentInteraction(Listing item);
-  }
-
   private String getStartEndTimeDisplay(long startTime, long endTime) {
     Calendar startTimeDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
     Calendar endTimeDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
@@ -489,5 +477,19 @@ public abstract class ListingsFragments extends Fragment {
         .append(endDateDisplay.isEmpty() ? "" : " ")
         .append(endTimeDisplay)
         .toString();
+  }
+
+  /**
+   * This interface must be implemented by activities that contain this
+   * fragment to allow an interaction in this fragment to be communicated
+   * to the activity and potentially other fragments contained in that
+   * activity.
+   * <p/>
+   * See the Android Training lesson <a href=
+   * "http://developer.android.com/training/basics/fragments/communicating.html"
+   * >Communicating with Other Fragments</a> for more information.
+   */
+  public interface OnListingsFragmentInteractionListener {
+    void onListingFragmentInteraction(Listing item);
   }
 }

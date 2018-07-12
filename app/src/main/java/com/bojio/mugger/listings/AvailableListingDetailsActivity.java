@@ -77,7 +77,8 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
     db = FirebaseFirestore.getInstance();
     fcm = FirebaseMessaging.getInstance();
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_available_listing_details);

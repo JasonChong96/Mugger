@@ -63,7 +63,8 @@ public class ListingChatActivity extends LoggedInActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     cache = MuggerUserCache.getInstance();

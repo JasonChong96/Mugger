@@ -23,6 +23,14 @@ public class ListingUtils {
     return calendar.getTimeInMillis();
   }
 
+  public static long getMonthTimestamp(long timestamp) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+    calendar.setTimeInMillis(getDayTimestamp(timestamp));
+    calendar.set(Calendar.DAY_OF_MONTH, 1);
+    return calendar.getTimeInMillis();
+  }
+
   public static boolean isSameDate(long timestamp1, long timestamp2) {
     return getDayTimestamp(timestamp1) == getDayTimestamp(timestamp2);
   }
@@ -39,7 +47,8 @@ public class ListingUtils {
       unrelatedModules = (long) cache.getData().get("showUnrelatedModules");
     }
     if (unrelatedModules != 0) {
-      modules = new ArrayList<>(cache.getAllModules());;
+      modules = new ArrayList<>(cache.getAllModules());
+      ;
     } else {
       modules = new ArrayList<>(cache.getModules().firstEntry()
           .getValue().keySet());
@@ -62,6 +71,10 @@ public class ListingUtils {
     return MuggerDatabase.getAllListingsReference(db)
         .orderBy("startTime")
         .whereEqualTo("ownerId", uid);
+  }
+
+  public static boolean isBetween(long check, long start, long end) {
+    return check > start && check < end;
   }
 
 }

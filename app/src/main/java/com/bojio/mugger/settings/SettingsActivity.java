@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -75,7 +74,8 @@ public class SettingsActivity extends LoggedInActivity {
         .build();
     DocumentReference userRef = MuggerDatabase.getUserReference(db, user.getUid());
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_settings);

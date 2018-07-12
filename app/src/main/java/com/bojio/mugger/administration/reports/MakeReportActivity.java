@@ -43,7 +43,8 @@ public class MakeReportActivity extends LoggedInActivity {
     db = FirebaseFirestore.getInstance();
     user = FirebaseAuth.getInstance().getCurrentUser();
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_make_report);

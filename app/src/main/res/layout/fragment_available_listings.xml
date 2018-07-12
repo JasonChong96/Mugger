@@ -50,6 +50,7 @@
             android:id="@+id/listings_fragments_button_filter_settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Filter Settings"
             android:textColor="?attr/colorPrimaryDark"
             android:visibility="gone"
@@ -125,7 +126,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_button_filter_settings"
+            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_view_schedule_button"
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/listing_card_view">
 
@@ -145,5 +146,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.design.button.MaterialButton
+            android:id="@+id/listings_fragments_view_schedule_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="View My Schedule"
+            android:textColor="?attr/colorPrimaryDark"
+            android:visibility="gone"
+            app:icon="@drawable/ic_baseline_calendar_today_24px"
+            app:iconTint="?attr/colorPrimaryDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_button_filter_settings" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

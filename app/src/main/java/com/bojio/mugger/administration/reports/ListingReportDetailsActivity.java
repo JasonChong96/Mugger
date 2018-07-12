@@ -44,7 +44,8 @@ public class ListingReportDetailsActivity extends LoggedInActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
-    if (stopActivity) {  finish();
+    if (stopActivity) {
+      finish();
       return;
     }
     setContentView(R.layout.activity_listing_report_details);
@@ -109,18 +110,18 @@ public class ListingReportDetailsActivity extends LoggedInActivity {
         dialog.show();
         MuggerDatabase.deleteReport(db, report.getUid())
             .addOnCompleteListener(task -> {
-          dialog.dismiss();
-          if (!task.isSuccessful()) {
-            Snacky.builder()
-                .setActivity(this)
-                .setText("Error deleting report. Please try again later.")
-                .error()
-                .show();
-          } else {
-            finish();
-            Toasty.success(this, "The report has been successfully deleted!").show();
-          }
-        });
+              dialog.dismiss();
+              if (!task.isSuccessful()) {
+                Snacky.builder()
+                    .setActivity(this)
+                    .setText("Error deleting report. Please try again later.")
+                    .error()
+                    .show();
+              } else {
+                finish();
+                Toasty.success(this, "The report has been successfully deleted!").show();
+              }
+            });
         break;
     }
 

@@ -45,8 +45,8 @@ public class MuggerDatabase {
   }
 
   public static Task<Void> addUserSemesterData(FirebaseFirestore db, String uid,
-                                                            String semester, Map<String, Object>
-                                                                data) {
+                                               String semester, Map<String, Object>
+                                                   data) {
     return getUserSemesterDataReference(db, uid, semester).set(data);
   }
 
