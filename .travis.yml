@@ -6,25 +6,13 @@ android:
   - platform-tools
   - build-tools-28.0.0
   - android-28
-  - android-26
-  - extra-google-google_play_services
-  - extra-google-m2repository
-  - extra-android-m2repository
-  - extra-android-support
-  - addon-google_apis-google-28
-  - sys-img-armeabi-v7a-android-26
 before_install:
 - openssl aes-256-cbc -K $encrypted_f2da1cf98853_key -iv $encrypted_f2da1cf98853_iv
   -in Mugger.jks.enc -out Mugger.jks -d
 - yes | sdkmanager "platforms;android-28"
 - chmod +x gradlew
 before_script:
-- echo no | android create avd --force --name test --target android-26
-- emulator -avd test -no-skin -no-audio -no-window -gpu off &
-- android-wait-for-emulator
-- adb devices
-- adb shell input keyevent 82 &
 script:
-- "./gradlew build connectedCheck"
+- "./gradlew build"
 jdk:
 - oraclejdk8
