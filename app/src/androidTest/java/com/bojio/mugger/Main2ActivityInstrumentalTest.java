@@ -68,11 +68,10 @@ public class Main2ActivityInstrumentalTest {
       Assert.assertNull(taskk.getException());
       muggerUserCache.setData(taskk.getResult().getData());
       // }
-    } catch (ExecutionException e) {
+    } catch (ExecutionException | InterruptedException e) {
       e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-
+    } catch (Exception e) {
+      throw e;
     }
   }
 
