@@ -50,6 +50,8 @@ public class Main2ActivityInstrumentalTest {
    // if (FirebaseApp.getApps(InstrumentationRegistry.getContext()).isEmpty()) {
       FirebaseApp.initializeApp(InstrumentationRegistry.getContext());
     mAuth = FirebaseAuth.getInstance();
+    db = FirebaseFirestore.getInstance();
+    muggerUserCache = MuggerUserCache.getInstance();
     try {
       AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
       Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
@@ -61,8 +63,6 @@ public class Main2ActivityInstrumentalTest {
           (TestUser.DISPLAY_NAME).build());
       Tasks.await(taskkk);
       Assert.assertNull(taskkk.getException());
-      db = FirebaseFirestore.getInstance();
-      muggerUserCache = MuggerUserCache.getInstance();
       Task<DocumentSnapshot> taskk = MuggerDatabase.getUserReference(db, TestUser.UID).get();
       Tasks.await(taskk);
       Assert.assertNull(taskk.getException());
@@ -74,6 +74,14 @@ public class Main2ActivityInstrumentalTest {
       e.printStackTrace();
 
     }
+  }
+
+  @Test
+  @SmallTest
+  public void testSetup() {
+    Assert.assertNotNull(db);
+    Assert.assertNotNull(mAuth);
+    Assert.assertNotNull(muggerUserCache);
   }
 
   @Test
