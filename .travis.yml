@@ -1,24 +1,25 @@
 language: android
 android:
   components:
-    - tools # to get the new `repository-11.xml`
-    - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
-    - platform-tools
-    - build-tools-28.0.0
-    - android-28
-    - android-21
-    # Specify at least one system image,
-    - sys-img-armeabi-v7a-android-21
+  - tools
+  - tools
+  - platform-tools
+  - build-tools-28.0.0
+  - android-28
+  - android-21
+  - sys-img-armeabi-v7a-android-21
 before_install:
-  - yes | sdkmanager "platforms;android-28"
-  - chmod +x gradlew
+- openssl aes-256-cbc -K $encrypted_f2da1cf98853_key -iv $encrypted_f2da1cf98853_iv
+  -in Mugger.jks.enc -out Mugger.jks -d
+- yes | sdkmanager "platforms;android-28"
+- chmod +x gradlew
 before_script:
-  - echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window -gpu off &
-  - android-wait-for-emulator
-  - adb devices
-  - adb shell input keyevent 82 &
+- echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a
+- emulator -avd test -no-skin -no-audio -no-window -gpu off &
+- android-wait-for-emulator
+- adb devices
+- adb shell input keyevent 82 &
 script:
-   - ./gradlew build connectedCheck
+- "./gradlew build connectedCheck"
 jdk:
-  - oraclejdk8
+- oraclejdk8
