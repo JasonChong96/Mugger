@@ -23,11 +23,17 @@ import java.util.List;
  * interface.
  */
 public class AvailableListingsFragments extends ListingsFragments {
+  /**
+   * ArrayList of module filters that can be selected by the user
+   **/
   ArrayList<String> modules;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    this.mQuery = ListingUtils.getAvailableListingsQuery(db);
+    this.mQuery = ListingUtils.getAvailableListingsQuery(db).orderBy("startTime");
     super.onCreate(savedInstanceState);
   }
 
@@ -66,6 +72,11 @@ public class AvailableListingsFragments extends ListingsFragments {
     return view;
   }
 
+  /**
+   * Returns the module filters that are selectable by the user
+   *
+   * @return An array list of the module filters that are selectable by the user
+   */
   private List<String> getMods() {
     return modules;
   }

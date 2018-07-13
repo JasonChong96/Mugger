@@ -201,4 +201,17 @@ public class Listing implements Parcelable {
     this.ownerName = ownerName;
   }
 
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof Listing) {
+      return this.getUid().equals(((Listing) other).getUid());
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getUid().hashCode();
+  }
 }

@@ -30,10 +30,12 @@ public class ProfileActivity extends LoggedInActivity
       finish();
       return;
     }
-    Fragment fragment = ProfileFragment.newInstance(b.getString("profileUid"));
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    ft.replace(R.id.profile_frame, fragment);
-    ft.commit();
+    if (savedInstanceState == null) {
+      Fragment fragment = ProfileFragment.newInstance(b.getString("profileUid"));
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.profile_frame, fragment);
+      ft.commit();
+    }
   }
 
   @Override

@@ -264,13 +264,13 @@ public class CreateEditListingActivity extends LoggedInActivity {
       data.put(mAuth.getUid(), startTimeMillis);
       data.put("type", (int) moduleRoles.get(moduleCode.getSelectedItem().toString()));
     }
-    data.put(moduleCode.getSelectedItem().toString(), startTimeMillis);
     if (toEdit != null) {
       for (String attendee : toEdit.getAttendees()) {
         data.put(attendee, startTimeMillis);
       }
       data.put(toEdit.getModuleCode(), FieldValue.delete());
     }
+    data.put(moduleCode.getSelectedItem().toString(), startTimeMillis);
     Task<?> addedDocRef;
     if (b == null) {
       addedDocRef = MuggerDatabase.createListing(db, data);

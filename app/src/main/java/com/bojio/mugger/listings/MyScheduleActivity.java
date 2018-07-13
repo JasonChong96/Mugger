@@ -11,17 +11,25 @@ import com.bojio.mugger.listings.fragments.MyScheduleFragment;
 
 public class MyScheduleActivity extends LoggedInActivity {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_my_schedule);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    Fragment fragment = MyScheduleFragment.newInstance();
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    ft.replace(R.id.my_schedule_activity_frame, fragment);
-    ft.commit();
+    if (savedInstanceState == null) {
+      Fragment fragment = MyScheduleFragment.newInstance();
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.my_schedule_activity_frame, fragment);
+      ft.commit();
+    }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
