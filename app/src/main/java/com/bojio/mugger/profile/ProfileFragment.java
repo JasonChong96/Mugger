@@ -142,7 +142,7 @@ public class ProfileFragment extends Fragment {
     Task<DocumentSnapshot> profileTask = MuggerDatabase.getUserReference(db, profileUid).get();
     Task<DocumentSnapshot> moduleTitlesTask = MuggerDatabase.getAllModuleTitlesRef(db).get();
     Task<QuerySnapshot> modulesTask = MuggerDatabase
-        .getUserAllSemestersDataReference(db, mAuth.getUid())
+        .getUserAllSemestersDataReference(db, profileUid)
         .orderBy("semester", Query.Direction.DESCENDING)
         .get();
     AlertDialog dialog = new SpotsDialog
@@ -360,7 +360,6 @@ public class ProfileFragment extends Fragment {
 
   }
 
-  // TODO: Rename method, update argument and hook method into UI event
   public void onButtonPressed(Uri uri) {
     if (mListener != null) {
       mListener.onProfileFragmentInteraction(uri);

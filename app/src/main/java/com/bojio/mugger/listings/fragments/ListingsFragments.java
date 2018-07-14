@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.button.MaterialButton;
 import android.support.design.widget.TextInputEditText;
@@ -22,7 +23,7 @@ import com.bojio.mugger.R;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingUtils;
 import com.bojio.mugger.listings.ListingsFirestoreAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.bojio.mugger.listings.viewmodels.ListingsFragmentsViewModel;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,6 +35,7 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import needle.Needle;
 
 /**
  * A fragment representing a list of Items.
@@ -47,6 +49,7 @@ public abstract class ListingsFragments extends Fragment {
   protected Query mQuery;
   protected Predicate<Listing> predicateFilter;
   protected boolean delayInitListings;
+  protected ListingsFragmentsViewModel mViewModel;
   @BindView(R.id.list)
   RecyclerView mRecyclerView;
   @BindView(R.id.listings_fragments_spinner)
@@ -111,10 +114,15 @@ public abstract class ListingsFragments extends Fragment {
         .getActivity(ListingsFragments.this));
     filterFromDateView.setText(df.format(new Date()));
     filterToDateView.setText(df.format(new Date(ListingUtils.DEFAULT_TIME_FILTER_END)));
+    return view;
+  }
+
+  @Override
+  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
     if (!delayInitListings) {
       initListings();
     }
-    return view;
   }
 
   @Override
@@ -155,25 +163,23 @@ public abstract class ListingsFragments extends Fragment {
   }
 
   protected void initListings() {
-    if (mRecyclerView.getAdapter() != null) {
-      ((FirestoreRecyclerAdapter) mRecyclerView.getAdapter()).stopListening();
-    }
-    FirestoreRecyclerOptions<Listing> options = new FirestoreRecyclerOptions.Builder<Listing>()
-        .setQuery(mQuery, snapshot -> {
-          if ((Long) snapshot.get("endTime") < System.currentTimeMillis()) {
-            // Delete outdated entries
-            snapshot.getReference().delete();
-          }
-          return Listing.getListingFromSnapshot(snapshot);
-        })
-        .build();
-    FirestoreRecyclerAdapter adapter = new ListingsFirestoreAdapter(options, getActivity(this)
-        .getApplicationContext(), mAuth, db, fcm, predicateFilter);
+    FirestoreRecyclerOptions<Listing> options = ListingUtils.getRecyclerOptions(mViewModel
+        .getQuery(), this);
+    ListingsFirestoreAdapter adapter = new ListingsFirestoreAdapter(options,
+        getActivity(), mAuth, db, FirebaseMessaging.getInstance(),
+        mViewModel.getPredicate(), emptyTextView);
     adapter.startListening();
     mRecyclerView.setAdapter(adapter);
-
+    Needle.onBackgroundThread().execute(() -> {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      if (mRecyclerView.getAdapter().equals(adapter))
+        Needle.onMainThread().execute(adapter::onDataChanged);
+    });
   }
-
 
   /**
    * This interface must be implemented by activities that contain this

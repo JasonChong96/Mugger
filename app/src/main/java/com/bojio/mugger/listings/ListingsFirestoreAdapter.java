@@ -1,5 +1,6 @@
 package com.bojio.mugger.listings;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.annimon.stream.function.Predicate;
@@ -54,18 +56,20 @@ public class ListingsFirestoreAdapter extends FirestoreRecyclerAdapter<Listing,
   private String uid;
   private FirebaseMessaging fcm;
   private HashSet<Listing> filtered;
+  private TextView emptyTextView;
 
-  public ListingsFirestoreAdapter(FirestoreRecyclerOptions<Listing> options, Context context,
+  public ListingsFirestoreAdapter(FirestoreRecyclerOptions<Listing> options, Activity activity,
                                   FirebaseAuth mAuth, FirebaseFirestore
                                       db, FirebaseMessaging fcm, Predicate<Listing>
-                                      predicateFilter) {
+                                      predicateFilter, TextView emptyTextView) {
     super(options);
-    this.context = context;
+    this.context = activity;
     this.mAuth = mAuth;
     this.db = db;
     this.uid = mAuth.getUid();
     this.fcm = fcm;
     this.predicateFilter = predicateFilter;
+    this.emptyTextView = emptyTextView;
     filtered = new HashSet<>();
     df = android.text.format.DateFormat.getDateFormat(context);
     df.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
@@ -75,9 +79,15 @@ public class ListingsFirestoreAdapter extends FirestoreRecyclerAdapter<Listing,
 
   @Override
   public void onDataChanged() {
-    if (this.getItemCount() == filtered.size()) {
-      Toasty.warning(context, "There are currently no listings matching the criteria.").show();
+    if (getUnfilteredItemCount() == 0) {
+      emptyTextView.setVisibility(View.VISIBLE);
+    } else if (emptyTextView.getVisibility() == View.VISIBLE) {
+      emptyTextView.setVisibility(View.GONE);
     }
+  }
+
+  public int getUnfilteredItemCount() {
+    return this.getItemCount() - filtered.size();
   }
 
   @Override

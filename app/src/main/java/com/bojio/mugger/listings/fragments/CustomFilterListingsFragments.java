@@ -1,7 +1,9 @@
 package com.bojio.mugger.listings.fragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.chip.Chip;
 import android.support.design.chip.ChipGroup;
 import android.support.design.widget.TextInputEditText;
@@ -14,13 +16,9 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.annimon.stream.function.Predicate;
 import com.bojio.mugger.R;
-import com.bojio.mugger.authentication.MuggerUserCache;
-import com.bojio.mugger.constants.ModuleRole;
-import com.bojio.mugger.database.MuggerDatabase;
-import com.bojio.mugger.listings.ListingUtils;
-import com.google.firebase.firestore.FieldValue;
+import com.bojio.mugger.lifecycle.LifecycleUtils;
+import com.bojio.mugger.listings.viewmodels.CustomFilterListingsViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,19 +39,16 @@ public class CustomFilterListingsFragments extends ListingsFragments {
   RadioButton radioButtonMyListings;
   Spinner spinnerModules;
   private MaterialDialog dialog;
-  private MuggerUserCache cache;
   private ArrayList<String> modules;
-
-  private static <T> Predicate<T> composePredicates(Predicate<T> predicate1, Predicate<T>
-      predicate2) {
-    return x -> predicate1.test(x) && predicate2.test(x);
-  }
+  private String selected;
+  private boolean dialogInitialized;
+  private CustomFilterListingsViewModel mViewModelCustom;
 
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     delayInitListings = true;
-    cache = MuggerUserCache.getInstance();
+    dialogInitialized = false;
     dialog = new MaterialDialog.Builder(this.getActivity())
         .title("Filter Settings")
         .customView(R.layout.dialog_custom_filter, true)
@@ -63,13 +58,9 @@ public class CustomFilterListingsFragments extends ListingsFragments {
         .onNegative((dialog, which) -> initDialog())
         .build();
     bindViews(dialog.getCustomView());
-    initDialog();
     View view = super.onCreateView(inflater, container, savedInstanceState);
-    updateFilter();
     filterSettingsButton.setVisibility(View.VISIBLE);
-    filterSettingsButton.setOnClickListener(v -> {
-      dialog.show();
-    });
+    filterSettingsButton.setOnClickListener(v -> dialog.show());
     return view;
   }
 
@@ -91,51 +82,48 @@ public class CustomFilterListingsFragments extends ListingsFragments {
   }
 
   private void initDialog() {
-    modules = ListingUtils.getFilterModules(cache);
-    spinnerModules.setAdapter(new ArrayAdapter<>(this.getActivity(), android.R.layout
-        .simple_dropdown_item_1line, modules));
-    if (cache.getData().containsKey("customFilterSettings")) {
-      int flags = ((Long) cache.getData().get("customFilterSettings")).intValue();
-      int category = flags & 0x3;
+    if (mViewModelCustom.hasPreviouslySetFlags()) {
+      int flags = mViewModelCustom.getCustomFilterFlags();
+      int category = flags & CustomFilterListingsViewModel.MASK_CATEGORY;
       switch (category) {
-        case 0:
+        case CustomFilterListingsViewModel.FLAG_ALL_LISTINGS:
           radioButtonAllListings.setChecked(true);
           break;
-        case 1:
+        case CustomFilterListingsViewModel.FLAG_JOINING_LISTINGS:
           radioButtonJoiningListings.setChecked(true);
           break;
-        case 2:
+        case CustomFilterListingsViewModel.FLAG_MY_LISTINGS:
           radioButtonMyListings.setChecked(true);
           break;
         default:
           throw new UnsupportedOperationException("Unknown category flag : " + Integer.toString
               (category));
       }
-      boolean student = (flags & 0x4) != 0;
-      boolean ta = (flags & 0x8) != 0;
-      boolean prof = (flags & 0x10) != 0;
+      boolean student = (flags & CustomFilterListingsViewModel.FLAG_STUDENT) != 0;
+      boolean ta = (flags & CustomFilterListingsViewModel.FLAG_TEACHING_ASSISTANT) != 0;
+      boolean prof = (flags & CustomFilterListingsViewModel.FLAG_PROFESSOR) != 0;
       chipStudent.setChecked(student);
       chipTA.setChecked(ta);
       chipProfessor.setChecked(prof);
     }
-    if (cache.getData().containsKey("customFilterModule")) {
-      String mod = (String) cache.getData().get("customFilterModule");
-      int pos = modules.indexOf(mod);
+    String filterModule = mViewModelCustom.getFilterModule();
+    if (filterModule != null) {
+      int pos = modules.indexOf(filterModule);
       if (pos > 0) {
         spinnerModules.setSelection(pos);
       }
     }
-    if (cache.getData().containsKey("customFilterCreator")) {
-      String filter = (String) cache.getData().get("customFilterCreator");
-      editTextCreator.setText(filter);
+    String filterCreator = mViewModelCustom.getFilterCreator();
+    if (filterCreator != null) {
+      editTextCreator.setText(filterCreator);
     }
-    if (cache.getData().containsKey("customFilterVenue")) {
-      String filter = (String) cache.getData().get("customFilterVenue");
-      editTextVenue.setText(filter);
+    String filterVenue = mViewModelCustom.getFilterVenue();
+    if (filterVenue != null) {
+      editTextVenue.setText(filterVenue);
     }
-    if (cache.getData().containsKey("customFilterDesc")) {
-      String filter = (String) cache.getData().get("customFilterDesc");
-      editTextDescription.setText(filter);
+    String filterDesc = mViewModelCustom.getFilterDesc();
+    if (filterDesc != null) {
+      editTextDescription.setText(filterDesc);
     }
   }
 
@@ -145,76 +133,58 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     predicateFilter = x -> true;
     switch (radioGroupCategories.getCheckedRadioButtonId()) {
       case R.id.custom_filter_radio_button_all_listings:
-        mQuery = ListingUtils.getAvailableListingsQuery(db);
-        flag |= 0;
+        flag |= CustomFilterListingsViewModel.FLAG_ALL_LISTINGS;
         break;
       case R.id.custom_filter_radio_button_joining_listings:
-        mQuery = ListingUtils.getAttendingListingsQuery(db, mAuth.getUid());
-        flag |= 1;
+        flag |= CustomFilterListingsViewModel.FLAG_JOINING_LISTINGS;
         break;
       case R.id.custom_filter_radio_button_my_listings:
-        mQuery = ListingUtils.getMyListingsQuery(db, mAuth.getUid());
-        flag |= 2;
+        flag |= CustomFilterListingsViewModel.FLAG_MY_LISTINGS;
         break;
       default:
         throw new IllegalStateException("No valid category selected");
     }
+    String moduleFilter = "";
     if (spinnerModules.getSelectedItemPosition() != 0) {
-      String mod = modules.get(spinnerModules.getSelectedItemPosition());
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getModuleCode()
-          .equals(mod));
-      data.put("customFilterModule", mod);
-    } else {
-      data.put("customFilterModule", FieldValue.delete());
+      moduleFilter = modules.get(spinnerModules.getSelectedItemPosition());
     }
-    if (!chipStudent.isChecked()) {
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getType() !=
-          ModuleRole.EMPTY);
-      flag ^= 4;
-    } else {
-      flag |= 4;
+    if (chipStudent.isChecked()) {
+      flag |= CustomFilterListingsViewModel.FLAG_STUDENT;
     }
-    if (!chipTA.isChecked()) {
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getType() !=
-          ModuleRole.TEACHING_ASSISTANT);
-      flag ^= 8;
-    } else {
-      flag |= 8;
+    if (chipTA.isChecked()) {
+      flag |= CustomFilterListingsViewModel.FLAG_TEACHING_ASSISTANT;
     }
-    if (!chipProfessor.isChecked()) {
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getType() !=
-          ModuleRole.PROFESSOR);
-      flag ^= 0x10;
-    } else {
-      flag |= 0x10;
+    if (chipProfessor.isChecked()) {
+      flag |= CustomFilterListingsViewModel.FLAG_PROFESSOR;
     }
     String creatorFilter = editTextCreator.getText().toString();
-    if (!creatorFilter.isEmpty()) {
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getOwnerName()
-          .contains(creatorFilter));
-      data.put("customFilterCreator", creatorFilter);
-    } else {
-      data.put("customFilterCreator", FieldValue.delete());
-    }
     String venueFilter = editTextVenue.getText().toString();
-    if (!venueFilter.isEmpty()) {
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getVenue()
-          .contains(venueFilter));
-      data.put("customFilterVenue", venueFilter);
-    } else {
-      data.put("customFilterVenue", FieldValue.delete());
-    }
     String descFilter = editTextDescription.getText().toString();
-    if (!descFilter.isEmpty()) {
-      predicateFilter = composePredicates(predicateFilter, listing -> listing.getDescription()
-          .contains(descFilter));
-      data.put("customFilterDesc", descFilter);
-    } else {
-      data.put("customFilterDesc", FieldValue.delete());
-    }
-    data.put("customFilterSettings", Long.valueOf(flag));
-    MuggerDatabase.getUserReference(db, mAuth.getUid()).update(data);
-    cache.updateCache(data);
+    mViewModelCustom.updateFilter(flag, moduleFilter, creatorFilter, venueFilter, descFilter);
     initListings();
+  }
+
+  @Override
+  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    mViewModelCustom = ViewModelProviders.of(this, LifecycleUtils.getAndroidViewModelFactory
+        (getActivity().getApplication())).get(CustomFilterListingsViewModel.class);
+    mViewModel = mViewModelCustom;
+    super.onActivityCreated(savedInstanceState);
+    mViewModelCustom.getShowUnrelatedModules().observe(this, show -> {
+      modules = mViewModelCustom.getModuleFilters();
+      spinnerModules.setAdapter(new ArrayAdapter<>(this.getActivity(), android.R.layout
+          .simple_dropdown_item_1line, modules));
+      if (!dialogInitialized) {
+        initDialog();
+        updateFilter();
+      }
+      if (selected == null || modules.indexOf(selected) < 0) {
+        selected = modules.get(0);
+      }
+      ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
+          .simple_dropdown_item_1line, modules);
+      spinner.setAdapter(adapter);
+      spinner.setSelection(modules.indexOf(selected));
+    });
   }
 }

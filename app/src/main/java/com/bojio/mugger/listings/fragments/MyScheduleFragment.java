@@ -13,11 +13,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.lifecycle.LifecycleUtils;
+import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.listings.ListingUtils;
 import com.bojio.mugger.listings.ListingsFirestoreAdapter;
-import com.bojio.mugger.listings.ListingsViewHolder;
+import com.bojio.mugger.listings.viewmodels.MyScheduleViewModel;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -39,6 +46,8 @@ public class MyScheduleFragment extends Fragment {
   RecyclerView mRecyclerView;
   @BindView(R.id.my_schedule_swipe_layout)
   SwipeRefreshLayout swipeLayout;
+  @BindView(R.id.my_schedule_empty_text_view)
+  TextView emptyTextView;
   private MyScheduleViewModel mViewModel;
 
   public static MyScheduleFragment newInstance() {
@@ -85,8 +94,13 @@ public class MyScheduleFragment extends Fragment {
   private void onDateChanged(@NonNull MaterialCalendarView calendar, @NonNull CalendarDay
       selectedDay, boolean selected) {
     if (selected) {
-      RecyclerView.Adapter<ListingsViewHolder> adapter = mViewModel.getRecyclerAdapter(selectedDay);
+      FirestoreRecyclerOptions<Listing> options = ListingUtils.getRecyclerOptions(mViewModel.getQuery(),
+          this);
+      ListingsFirestoreAdapter adapter = new ListingsFirestoreAdapter(options, getActivity(),
+          FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), FirebaseMessaging
+          .getInstance(), mViewModel.getFilter(selectedDay), emptyTextView);
       mRecyclerView.setAdapter(adapter);
+      adapter.startListening();
     }
   }
 
@@ -108,22 +122,6 @@ public class MyScheduleFragment extends Fragment {
             swipeLayout.setRefreshing(false);
           });
         });
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    if (mRecyclerView != null && mRecyclerView.getAdapter() != null) {
-      ((ListingsFirestoreAdapter) mRecyclerView.getAdapter()).startListening();
-    }
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    if (mRecyclerView != null && mRecyclerView.getAdapter() != null) {
-      ((ListingsFirestoreAdapter) mRecyclerView.getAdapter()).stopListening();
-    }
   }
 
   /**

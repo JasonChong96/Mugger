@@ -19,7 +19,6 @@ import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
@@ -72,9 +71,9 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
           dialog.dismiss();
           return false;
       }
+      MuggerUserCache.getInstance().getData().put(type, isChecked ? 1L : 0L);
       MuggerDatabase.getUserReference(db, user.getUid()).update(type, isChecked ? 1L : 0L)
           .addOnCompleteListener(task -> {
-            MuggerUserCache.getInstance().getData().put(type, isChecked ? 1L : 0L);
             dialog.dismiss();
           });
       return true;
@@ -251,13 +250,13 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  @Override
+  /*@Override
   public void onBackPressed() {
     Intent intent = new Intent(this, Main2Activity.class);
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
     startActivity(intent);
     finish();
-  }
+  }*/
 
   public static class MainPreferenceFragment extends PreferenceFragment {
     private FirebaseAuth mAuth;

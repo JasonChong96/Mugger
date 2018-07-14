@@ -1,5 +1,7 @@
 package com.bojio.mugger.listings;
 
+import android.arch.lifecycle.LifecycleOwner;
+
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -43,7 +45,6 @@ public class ListingUtils {
     }
     if (unrelatedModules != 0) {
       modules = new ArrayList<>(cache.getAllModules());
-      ;
     } else {
       modules = new ArrayList<>(cache.getModules().firstEntry()
           .getValue().keySet());
@@ -136,7 +137,8 @@ public class ListingUtils {
         .toString();
   }
 
-  public static FirestoreRecyclerOptions<Listing> getRecyclerOptions(Query mQuery) {
+  public static FirestoreRecyclerOptions<Listing> getRecyclerOptions(Query mQuery, LifecycleOwner
+      lifeCycleOwner) {
     return new FirestoreRecyclerOptions
         .Builder<Listing>()
         .setQuery(mQuery, snapshot -> {
@@ -146,6 +148,7 @@ public class ListingUtils {
           }
           return Listing.getListingFromSnapshot(snapshot);
         })
+        .setLifecycleOwner(lifeCycleOwner)
         .build();
   }
 }

@@ -1,6 +1,5 @@
 package com.bojio.mugger;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -63,7 +62,7 @@ public class Main2Activity extends LoggedInActivity
   FloatingActionButton fab;
   @BindView(android.R.id.content)
   View activityView;
-  private Main2ActivtyViewModel mViewModel;
+  private Main2ActivityViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,7 @@ public class Main2Activity extends LoggedInActivity
       return;
     }
     mViewModel = ViewModelProviders.of(this, LifecycleUtils.getAndroidViewModelFactory
-        (getApplication())).get(Main2ActivtyViewModel.class);
+        (getApplication())).get(Main2ActivityViewModel.class);
     AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     MuggerDatabase.getOtherDataReference(db).get().addOnCompleteListener(task -> {
       if (task.isSuccessful()) {
@@ -99,6 +98,7 @@ public class Main2Activity extends LoggedInActivity
         this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawer.addDrawerListener(toggle);
     toggle.syncState();
+    mViewModel.getLiveTitle().observe(this, this::setTitle);
     if (!mViewModel.isModulesLoaded()) {
       AlertDialog dialog = new SpotsDialog
           .Builder()
@@ -113,9 +113,10 @@ public class Main2Activity extends LoggedInActivity
           Needle.onMainThread().execute(() -> {
             NavigationView navigationView = findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
-            setTitle("Study Sessions");
-            navigationView.setCheckedItem(R.id.nav_available_listings);
-            onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+            if (savedInstanceState == null) {
+              navigationView.setCheckedItem(R.id.nav_available_listings);
+              onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+            }
             if (mViewModel.shouldShowIntro()) {
               startIntroActivity(true);
             }
@@ -130,24 +131,13 @@ public class Main2Activity extends LoggedInActivity
     } else {
       NavigationView navigationView = findViewById(R.id.nav_view);
       navigationView.setNavigationItemSelectedListener(this);
-      setTitle("Study Sessions");
-      navigationView.setCheckedItem(R.id.nav_available_listings);
-      onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+      if (savedInstanceState == null) {
+        navigationView.setCheckedItem(R.id.nav_available_listings);
+        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+      }
     }
 
 
-  }
-
-
-
-  /**
-   * Goes back to the start page of Mugger
-   */
-  private void backToHome() {
-    Intent intent = new Intent(this, MainActivity.class);
-    startActivity(intent);
-    finish();
-    return;
   }
 
   /**
@@ -174,7 +164,10 @@ public class Main2Activity extends LoggedInActivity
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main2, menu);
-    ((TextView) findViewById(R.id.username)).setText(mViewModel.getUserName());
+    // ((TextView) findViewById(R.id.username)).setText(mViewModel.getUserName());
+    mViewModel.getLiveDisplayName().observe(this, name -> {
+      ((TextView) findViewById(R.id.username)).setText(name);
+    });
     ((TextView) findViewById(R.id.email)).setText(mViewModel.getEmail());
     if (mViewModel.isModeratorToolsVisible()) {
       MenuItem menuItem = ((NavigationView) findViewById(R.id.nav_view)).getMenu()
@@ -209,7 +202,6 @@ public class Main2Activity extends LoggedInActivity
   /**
    * {@inheritDoc}
    */
-  @SuppressLint("RestrictedApi")
   @SuppressWarnings("StatementWithEmptyBody")
   @Override
   public boolean onNavigationItemSelected(MenuItem item) {
@@ -223,33 +215,29 @@ public class Main2Activity extends LoggedInActivity
         Fragment fragment = new AvailableListingsFragments();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
-        fab.setVisibility(View.VISIBLE);
         ft.commit();
-        setTitle("Study Sessions");
+        mViewModel.updateTitle("Study Sessions");
         break;
       case R.id.nav_my_listings:
         fragment = new MyListingsFragments();
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
-        fab.setVisibility(View.VISIBLE);
         ft.commit();
-        setTitle("My Listings");
+        mViewModel.updateTitle("My Listings");
         break;
       case R.id.nav_joining_listings:
         fragment = new AttendingListingsFragments();
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
-        fab.setVisibility(View.GONE);
         ft.commit();
-        setTitle("Sessions That I'm Joining");
+        mViewModel.updateTitle("Sessions I'm Joining");
         break;
       case R.id.nav_custom_filters:
         fragment = new CustomFilterListingsFragments();
         ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, fragment);
-        fab.setVisibility(View.VISIBLE);
         ft.commit();
-        setTitle("Filtered Sessions");
+        mViewModel.updateTitle("Filtered Sessions");
         break;
       case R.id.nav_profile:
         Intent intent = new Intent(this, ProfileActivity.class);
@@ -308,7 +296,6 @@ public class Main2Activity extends LoggedInActivity
   @Override
   public void onListingFragmentInteraction(Listing listing) {
   }
-
 
 
   /**
