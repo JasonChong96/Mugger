@@ -16,9 +16,8 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -27,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
-
-import javax.annotation.Nullable;
 
 public class Main2ActivityViewModel extends AndroidViewModel {
   private FirebaseAuth mAuth;
@@ -40,12 +37,20 @@ public class Main2ActivityViewModel extends AndroidViewModel {
   private MutableLiveData<String> liveDisplayName;
   private MuggerUserCache cache;
   private MutableLiveData<String> title;
+  private ListenerRegistration listener;
 
+  /**
+   * Constructor for the Main2Activity ViewModel.
+   * @param application the application that the ViewModel is in
+   */
   public Main2ActivityViewModel(@NonNull Application application) {
     super(application);
     this.init();
   }
 
+  /**
+   * Initializes the view model for Main2Activity.
+   */
   private void init() {
     this.mAuth = FirebaseAuth.getInstance();
     this.db = FirebaseFirestore.getInstance();
@@ -55,21 +60,18 @@ public class Main2ActivityViewModel extends AndroidViewModel {
     email = user.getEmail();
     cache = MuggerUserCache.getInstance();
     liveDisplayName = new MutableLiveData<>();
-    liveDisplayName.postValue(userName);
     title = new MutableLiveData<>();
     updateProfileCache();
     updateInstanceId();
     subscribeToTopics();
-    MuggerDatabase.getUserReference(db, userUid).addSnapshotListener(new
-                                                                         EventListener<DocumentSnapshot>() {
-                                                                           @Override
-                                                                           public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                                                             String displayName = (String) documentSnapshot.get("displayName");
-                                                                             if (!displayName.equals(liveDisplayName.getValue())) {
-                                                                               liveDisplayName.postValue(displayName);
-                                                                             }
-                                                                           }
-                                                                         });
+    listener =
+        MuggerDatabase.getUserReference(db, userUid).addSnapshotListener((documentSnapshot, e)
+        -> {
+      String displayName = (String) documentSnapshot.get("displayName");
+      if (!displayName.equals(liveDisplayName.getValue())) {
+        liveDisplayName.postValue(displayName);
+      }
+    });
   }
 
   private void updateProfileCache() {
@@ -102,10 +104,19 @@ public class Main2ActivityViewModel extends AndroidViewModel {
     });
   }
 
+  /**
+   * Checks if the user's modules have been loaded into the cache.
+   * @return a boolean representing whether or not the modules have been loaded
+   */
   public boolean isModulesLoaded() {
     return MuggerUserCache.getInstance().getModules() != null;
   }
 
+  /**
+   * Loads module data into cache. Has to be done on a Background thread as it awaits for results
+   * from Firestore API.
+   * @return true if the data has been loaded successfully, false if not
+   */
   public boolean loadModuleData() {
     List<Task<?>> tasks = new ArrayList<>();
     tasks.add(MuggerDatabase.getUserAllSemestersDataReference(db, user.getUid()).get()
@@ -151,19 +162,35 @@ public class Main2ActivityViewModel extends AndroidViewModel {
     MuggerUserCache.clear();
   }
 
+  /**
+   * Performs necessary operations when the user finishes viewing the introduction slides, i.e
+   * marks the intro as done for the user so that he/she is not forced to view it another time.
+   */
   public void onIntroComplete() {
     MuggerUserCache.getInstance().getData().put("introDone", 1L);
     MuggerDatabase.getUserReference(db, userUid).update("introDone", 1L);
   }
 
+  /**
+   * Checks if the user should be forced into the introduction slides.
+   * @return true if the user has to view the slides, false if not
+   */
   public boolean shouldShowIntro() {
     return MuggerUserCache.getInstance().getData().get("introDone") == null;
   }
 
+  /**
+   * Checks if the user has access to moderator tools.
+   * @return true if the user has access, false if not
+   */
   public boolean isModeratorToolsVisible() {
     return MuggerRole.MODERATOR.check(cache.getRole());
   }
 
+  /**
+   * Checks if the user has access to admin tools.
+   * @return true if the user has access, false if not
+   */
   public boolean isAdminToolsVisible() {
     return MuggerRole.ADMIN.check(cache.getRole());
   }
@@ -188,7 +215,16 @@ public class Main2ActivityViewModel extends AndroidViewModel {
     return title;
   }
 
+  /**
+   * Updates the title of the activity.
+   * @param newTitle the new title
+   */
   public void updateTitle(String newTitle) {
     title.postValue(newTitle);
+  }
+
+  @Override
+  public void onCleared() {
+    listener.remove();
   }
 }

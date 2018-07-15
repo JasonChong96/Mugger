@@ -3,22 +3,27 @@ package com.bojio.mugger.listings.viewmodels;
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
+import android.text.format.DateFormat;
 
 import com.annimon.stream.function.Predicate;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.ModuleRole;
 import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.listings.ListingUtils;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
-import javax.annotation.Nullable;
+import javax.xml.parsers.ParserConfigurationException;
+
+import es.dmoral.toasty.Toasty;
 
 public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
   public static final int MASK_CATEGORY = 0x3;
@@ -30,11 +35,14 @@ public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
   public static final int FLAG_PROFESSOR = 0x10;
   private MuggerUserCache cache;
   private MutableLiveData<Boolean> showUnrelatedModules;
+  private ListenerRegistration listener;
+  private java.text.DateFormat df;
 
   public CustomFilterListingsViewModel(@NonNull Application application) {
     super(application, null);
     this.cache = MuggerUserCache.getInstance();
     this.showUnrelatedModules = new MutableLiveData<>();
+    df = DateFormat.getDateFormat(application.getApplicationContext());
     init();
   }
 
@@ -45,16 +53,14 @@ public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
 
   public void init() {
     super.init();
-    MuggerDatabase.getUserReference(db, mAuth.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-      @Override
-      public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-        Long newValue = documentSnapshot.getLong("showUnrelatedModules");
-        Boolean newValueBoolean = newValue != null && newValue != 0;
-        if (!newValueBoolean.equals(showUnrelatedModules.getValue())) {
-          showUnrelatedModules.postValue(newValueBoolean);
-        }
-      }
-    });
+    listener =
+        MuggerDatabase.getUserReference(db, mAuth.getUid()).addSnapshotListener((documentSnapshot, e) -> {
+          Long newValue = documentSnapshot.getLong("showUnrelatedModules");
+          Boolean newValueBoolean = newValue != null && newValue != 0;
+          if (!newValueBoolean.equals(showUnrelatedModules.getValue())) {
+            showUnrelatedModules.postValue(newValueBoolean);
+          }
+        });
   }
 
   public ArrayList<String> getModuleFilters() {
@@ -89,8 +95,37 @@ public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
     return (String) cache.getData().get("customFilterDesc");
   }
 
+  public long getFilterFromDate() {
+    Long from = (Long) cache.getData().get("customFilterFromDate");
+    long cur = ListingUtils.getDayTimestamp(System.currentTimeMillis());
+    if (from == null || from < cur) {
+      return cur;
+    }
+    return from;
+  }
+
+  public String getStringFilterFromDate() {
+    return df.format(new Date(getFilterFromDate()));
+  }
+
+  public String getDateString(int year, int month, int day) {
+    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+    c.set(year, month, day);
+    return df.format(new Date(c.getTimeInMillis()));
+  }
+
+  public long getFilterToDate() {
+    Long from = (Long) cache.getData().get("customFilterToDate");
+    return from == null ? ListingUtils.DEFAULT_TIME_FILTER_END : from;
+  }
+
+  public String getStringFilterToDate() {
+    return df.format(new Date(getFilterToDate()));
+  }
+
   public void updateFilter(int flag, String moduleFilter, String creatorFilter, String
-      venueFilter, String descFilter) {
+      venueFilter, String descFilter, String fromDateFilter, String toDateFilter,
+      boolean changed) {
     Map<String, Object> data = new HashMap<>();
     predicate = x -> true;
     switch (flag & MASK_CATEGORY) {
@@ -146,8 +181,39 @@ public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
     } else {
       data.put("customFilterDesc", FieldValue.delete());
     }
+    try {
+      long fromDate = df.parse(fromDateFilter).getTime();
+      long toDate = df.parse(toDateFilter).getTime();
+      if (toDate >= fromDate) {
+        predicate = composePredicates(predicate, listing -> {
+          if (listing.getStartTime() < fromDate && listing.getEndTime() > fromDate) {
+            return true;
+          } else if (ListingUtils.isBetween(listing.getStartTime(), fromDate - 1, toDate + 24 *
+              60 * 60 * 1000)) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+        data.put("customFilterFromDate", fromDate);
+        data.put("customFilterToDate", toDate);
+      } else {
+        Toasty.warning(getApplication().getApplicationContext(), "Date filters were not applied " +
+            "as the chosen end date is earlier than the start date.").show();
+      }
+    } catch (ParseException e) {
+      Toasty.error(getApplication().getApplicationContext(), "Error including date filters, " +
+          "please try to re-input the dates.").show();
+    }
     data.put("customFilterSettings", Long.valueOf(flag));
-    MuggerDatabase.getUserReference(db, mAuth.getUid()).update(data);
-    cache.updateCache(data);
+    if (changed) {
+      MuggerDatabase.getUserReference(db, mAuth.getUid()).update(data);
+      cache.updateCache(data);
+    }
+  }
+
+  @Override
+  public void onCleared() {
+    listener.remove();
   }
 }

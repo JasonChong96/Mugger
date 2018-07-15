@@ -134,6 +134,9 @@ public class CreateEditListingActivity extends LoggedInActivity {
       setTitle("Add Listing");
       endDateTime.add(Calendar.HOUR_OF_DAY, 1);
     }
+    if (toEdit != null) {
+      moduleCodes.add(toEdit.getModuleCode());
+    }
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
         moduleCodes);
     moduleCode.setAdapter(adapter);

@@ -1,5 +1,7 @@
 package com.bojio.mugger.listings.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,10 +9,12 @@ import android.support.annotation.Nullable;
 import android.support.design.chip.Chip;
 import android.support.design.chip.ChipGroup;
 import android.support.design.widget.TextInputEditText;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -18,14 +22,16 @@ import android.widget.Spinner;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.lifecycle.LifecycleUtils;
+import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.viewmodels.CustomFilterListingsViewModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class CustomFilterListingsFragments extends ListingsFragments {
-  ChipGroup chipGroupModules;
   ChipGroup chipGroupRoles;
   Chip chipProfessor;
   Chip chipStudent;
@@ -33,6 +39,8 @@ public class CustomFilterListingsFragments extends ListingsFragments {
   TextInputEditText editTextCreator;
   TextInputEditText editTextVenue;
   TextInputEditText editTextDescription;
+  TextInputEditText editTextFromDate;
+  TextInputEditText editTextToDate;
   RadioGroup radioGroupCategories;
   RadioButton radioButtonAllListings;
   RadioButton radioButtonJoiningListings;
@@ -54,7 +62,7 @@ public class CustomFilterListingsFragments extends ListingsFragments {
         .customView(R.layout.dialog_custom_filter, true)
         .positiveText("Apply Filters")
         .negativeText("Discard Changes")
-        .onPositive((dialog, which) -> updateFilter())
+        .onPositive((dialog, which) -> updateFilter(true))
         .onNegative((dialog, which) -> initDialog())
         .build();
     bindViews(dialog.getCustomView());
@@ -65,7 +73,6 @@ public class CustomFilterListingsFragments extends ListingsFragments {
   }
 
   private void bindViews(View view) {
-    chipGroupModules = view.findViewById(R.id.custom_filter_chip_group_modules);
     chipGroupRoles = view.findViewById(R.id.custom_filter_chip_group_roles);
     chipProfessor = view.findViewById(R.id.custom_filter_chip_professor);
     chipStudent = view.findViewById(R.id.custom_filter_chip_student);
@@ -79,6 +86,8 @@ public class CustomFilterListingsFragments extends ListingsFragments {
         .custom_filter_radio_button_joining_listings);
     radioButtonMyListings = view.findViewById(R.id.custom_filter_radio_button_my_listings);
     spinnerModules = view.findViewById(R.id.custom_filter_spinner_modules);
+    editTextFromDate = view.findViewById(R.id.custom_filter_from_input);
+    editTextToDate = view.findViewById(R.id.custom_filter_to_input);
   }
 
   private void initDialog() {
@@ -125,11 +134,28 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     if (filterDesc != null) {
       editTextDescription.setText(filterDesc);
     }
+    editTextFromDate.setText(mViewModelCustom.getStringFilterFromDate());
+    editTextToDate.setText(mViewModelCustom.getStringFilterToDate());
+    DatePickerDialog.OnDateSetListener fromDateListener = (datePicker, year, month, day) ->
+        editTextFromDate.setText(mViewModelCustom.getDateString(year, month, day));
+    DatePickerDialog.OnDateSetListener toDateListener = (datePicker, year, month, day) ->
+        editTextToDate.setText(mViewModelCustom.getDateString(year, month, day));
+    editTextFromDate.setOnClickListener(view -> {
+      Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+      DatePickerDialog dpg = new DatePickerDialog(getActivity(this), fromDateListener,
+          c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+      dpg.show();
+    });
+    editTextToDate.setOnClickListener(view -> {
+      Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+      DatePickerDialog dpg = new DatePickerDialog(getActivity(this), toDateListener,
+          c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+      dpg.show();
+    });
   }
 
-  private void updateFilter() {
+  private void updateFilter(boolean changed) {
     int flag = 0;
-    Map<String, Object> data = new HashMap<>();
     predicateFilter = x -> true;
     switch (radioGroupCategories.getCheckedRadioButtonId()) {
       case R.id.custom_filter_radio_button_all_listings:
@@ -160,7 +186,10 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     String creatorFilter = editTextCreator.getText().toString();
     String venueFilter = editTextVenue.getText().toString();
     String descFilter = editTextDescription.getText().toString();
-    mViewModelCustom.updateFilter(flag, moduleFilter, creatorFilter, venueFilter, descFilter);
+    String fromDateFilter = editTextFromDate.getText().toString();
+    String toDateFilter = editTextToDate.getText().toString();
+    mViewModelCustom.updateFilter(flag, moduleFilter, creatorFilter, venueFilter, descFilter,
+        fromDateFilter, toDateFilter, changed);
     initListings();
   }
 
@@ -176,7 +205,7 @@ public class CustomFilterListingsFragments extends ListingsFragments {
           .simple_dropdown_item_1line, modules));
       if (!dialogInitialized) {
         initDialog();
-        updateFilter();
+        updateFilter(false);
       }
       if (selected == null || modules.indexOf(selected) < 0) {
         selected = modules.get(0);

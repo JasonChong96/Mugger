@@ -78,7 +78,7 @@ public class ListingUtils {
     Calendar startTimeDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
     Calendar endTimeDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
     startTimeDate.setTimeInMillis(startTime);
-    endTimeDate.setTimeInMillis(startTime);
+    endTimeDate.setTimeInMillis(endTime);
     boolean sameDate = ListingUtils.isSameDate(startTime, endTime);
     boolean isToday = ListingUtils.isSameDate(System.currentTimeMillis(), startTime);
     boolean withinWeekCurToStart = Math.abs(ListingUtils.getDayTimestamp(startTime) - ListingUtils

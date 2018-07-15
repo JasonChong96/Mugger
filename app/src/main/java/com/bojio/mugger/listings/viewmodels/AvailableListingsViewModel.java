@@ -6,16 +6,13 @@ import android.support.annotation.NonNull;
 
 import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.listings.ListingUtils;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-
-import javax.annotation.Nullable;
 
 public class AvailableListingsViewModel extends ListingsFragmentsViewModel {
   private MutableLiveData<Boolean> showUnrelatedModules;
+  private ListenerRegistration listener;
 
   public AvailableListingsViewModel(@NonNull Application application) {
     super(application, ListingUtils
@@ -29,16 +26,14 @@ public class AvailableListingsViewModel extends ListingsFragmentsViewModel {
   @Override
   public void init() {
     super.init();
-    MuggerDatabase.getUserReference(db, mAuth.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-      @Override
-      public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-        Long newValue = documentSnapshot.getLong("showUnrelatedModules");
-        Boolean newValueBoolean = newValue != null && newValue != 0;
-        if (!newValueBoolean.equals(showUnrelatedModules.getValue())) {
-          showUnrelatedModules.postValue(newValueBoolean);
-        }
-      }
-    });
+    listener =
+        MuggerDatabase.getUserReference(db, mAuth.getUid()).addSnapshotListener((documentSnapshot, e) -> {
+          Long newValue = documentSnapshot.getLong("showUnrelatedModules");
+          Boolean newValueBoolean = newValue != null && newValue != 0;
+          if (!newValueBoolean.equals(showUnrelatedModules.getValue())) {
+            showUnrelatedModules.postValue(newValueBoolean);
+          }
+        });
   }
 
   public void selectionChanged(boolean allModules, String selected) {
@@ -50,5 +45,10 @@ public class AvailableListingsViewModel extends ListingsFragmentsViewModel {
 
   public MutableLiveData<Boolean> getShowUnrelatedModules() {
     return showUnrelatedModules;
+  }
+
+  @Override
+  public void onCleared() {
+    listener.remove();
   }
 }
