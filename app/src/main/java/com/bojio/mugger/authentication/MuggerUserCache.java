@@ -76,7 +76,7 @@ public class MuggerUserCache {
     this.modules = modules;
   }
 
-  public void loadModules(List<DocumentSnapshot> docs) {
+  public void loadModules(List<? extends DocumentSnapshot> docs) {
     TreeMap<String, TreeMap<String, Byte>> modules = new TreeMap<>(Collections.reverseOrder());
     for (DocumentSnapshot doc : docs) {
       TreeMap<String, Byte> mods = new TreeMap<>();

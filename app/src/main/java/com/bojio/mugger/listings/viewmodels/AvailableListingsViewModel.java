@@ -13,6 +13,7 @@ import com.google.firebase.firestore.Query;
 public class AvailableListingsViewModel extends ListingsFragmentsViewModel {
   private MutableLiveData<Boolean> showUnrelatedModules;
   private ListenerRegistration listener;
+  private String selected;
 
   public AvailableListingsViewModel(@NonNull Application application) {
     super(application, ListingUtils
@@ -50,5 +51,13 @@ public class AvailableListingsViewModel extends ListingsFragmentsViewModel {
   @Override
   public void onCleared() {
     listener.remove();
+  }
+
+  public String getSelected() {
+    return selected;
+  }
+
+  public void setSelected(String selected) {
+    this.selected = selected;
   }
 }

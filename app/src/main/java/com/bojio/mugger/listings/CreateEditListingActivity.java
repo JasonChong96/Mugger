@@ -236,7 +236,6 @@ public class CreateEditListingActivity extends LoggedInActivity {
     }
     if (venue.getText().toString().isEmpty()) {
       showShortToast("Please fill in the venue which your study session is/will be held at.");
-
       submitButton.setClickable(true);
       return;
     }

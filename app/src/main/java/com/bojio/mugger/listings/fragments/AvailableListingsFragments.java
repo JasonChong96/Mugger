@@ -28,17 +28,12 @@ public class AvailableListingsFragments extends ListingsFragments {
   /**
    * ArrayList of module filters that can be selected by the user
    **/
-  ArrayList<String> modules;
-
-  /**
-   * Module currently selected by the user
-   **/
-  String selected;
+  private ArrayList<String> modules;
 
   /**
    * User data cache
    **/
-  MuggerUserCache cache;
+  private MuggerUserCache cache;
 
   /**
    * {@inheritDoc}
@@ -54,17 +49,17 @@ public class AvailableListingsFragments extends ListingsFragments {
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     mViewModel = ViewModelProviders.of(this, LifecycleUtils.getAndroidViewModelFactory
         (getActivity().getApplication())).get(AvailableListingsViewModel.class);
-    ((AvailableListingsViewModel) mViewModel).getShowUnrelatedModules().observe(this, show -> {
+    getViewModel().getShowUnrelatedModules().observe(this, show -> {
       modules = ListingUtils.getFilterModules(cache);
       boolean triggerChange = false;
-      if (selected == null || modules.indexOf(selected) < 0) {
-        selected = modules.get(0);
+      if (getViewModel().getSelected() == null || modules.indexOf(getViewModel().getSelected()) < 0) {
+        getViewModel().setSelected(modules.get(0));
         triggerChange = true;
       }
       ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
           .simple_dropdown_item_1line, modules);
       spinner.setAdapter(adapter);
-      spinner.setSelection(modules.indexOf(selected), triggerChange);
+      spinner.setSelection(modules.indexOf(getViewModel().getSelected()), triggerChange);
     });
     super.onActivityCreated(savedInstanceState);
   }
@@ -79,7 +74,7 @@ public class AvailableListingsFragments extends ListingsFragments {
     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        selected = modules.get(position);
+        getViewModel().setSelected(modules.get(position));
         changeModule(position);
       }
 
@@ -89,7 +84,7 @@ public class AvailableListingsFragments extends ListingsFragments {
       }
 
       private void changeModule(int index) {
-        ((AvailableListingsViewModel) mViewModel).selectionChanged(index == 0, modules.get
+        getViewModel().selectionChanged(index == 0, modules.get
             (index));
         initListings();
       }
@@ -98,11 +93,10 @@ public class AvailableListingsFragments extends ListingsFragments {
   }
 
   /**
-   * Returns the module filters that are selectable by the user
-   *
-   * @return An array list of the module filters that are selectable by the user
+   * Returns the view model type cast as an AvailableListingsViewModel
+   * @return ViewModel type cast as an AvailableListingsViewModel;
    */
-  private List<String> getMods() {
-    return modules;
+  private AvailableListingsViewModel getViewModel() {
+    return (AvailableListingsViewModel) mViewModel;
   }
 }
