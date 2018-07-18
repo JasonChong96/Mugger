@@ -173,8 +173,7 @@ public class MakeTAProfActivity extends LoggedInActivity {
               if (!taskk.isSuccessful()) {
                 Toasty.error(this, "Error, please try again", Toast.LENGTH_SHORT).show();
               } else {
-                Toasty.success(this, "Successfully updated. Please reload this profile page to " +
-                    "view changes and get the user to relogin for the effects to take place.", Toast
+                Toasty.success(this, "Successfully updated.", Toast
                     .LENGTH_SHORT).show();
                 finish();
               }

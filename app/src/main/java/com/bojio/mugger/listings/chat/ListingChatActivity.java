@@ -1,6 +1,6 @@
 package com.bojio.mugger.listings.chat;
 
-import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,9 +22,7 @@ import com.bojio.mugger.administration.reports.Report;
 import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
-import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
-import com.bojio.mugger.listings.ListingUtils;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -35,15 +33,12 @@ import com.google.firebase.firestore.Query;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
 public class ListingChatActivity extends LoggedInActivity {
@@ -54,11 +49,9 @@ public class ListingChatActivity extends LoggedInActivity {
   EditText toSendView;
   @BindView(R.id.progressBar6)
   ProgressBar progressBar;
-  private Listing listing;
-  private String listingUid;
   private FirebaseFirestore db;
   private FirebaseUser user;
-  private MuggerUserCache cache;
+  private ListingChatViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +60,7 @@ public class ListingChatActivity extends LoggedInActivity {
       finish();
       return;
     }
+    mViewModel = ViewModelProviders.of(this).get(ListingChatViewModel.class);
     cache = MuggerUserCache.getInstance();
     db = FirebaseFirestore.getInstance();
     setContentView(R.layout.activity_listing_chat);
@@ -78,46 +72,15 @@ public class ListingChatActivity extends LoggedInActivity {
       finish();
       return;
     }
-    listing = b.getParcelable("listing");
+    Listing listing = b.getParcelable("listing");
     if (listing == null) {
-      listingUid = b.getString("listingUid");
-      if (listingUid == null) {
-        Toasty.error(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
-        finish();
-        return;
-      }
-    } else {
-      listingUid = listing.getUid();
-    }
-    if (listing == null) {
-      AlertDialog dialog = new SpotsDialog
-          .Builder()
-          .setContext(this)
-          .setMessage("Loading...")
-          .setCancelable(false)
-          .setTheme(R.style.SpotsDialog)
-          .build();
-      dialog.show();
-      MuggerDatabase.getListingReference(db, listingUid).get().addOnCompleteListener(task -> {
-        Listing newListing = Listing.getListingFromSnapshot(task.getResult());
-        if (newListing == null) {
-          Toasty.error(this, "This listing has been deleted", Toast.LENGTH_SHORT).show();
-          ListingChatActivity.this.finish();
-          return;
-        }
-        ListingChatActivity.this.setListing(newListing);
-        dialog.dismiss();
-      });
-    }
-    user = FirebaseAuth.getInstance().getCurrentUser();
-    if (user == null) {
+      Toasty.error(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
       finish();
+      return;
     }
+    mViewModel.setListing(listing);
+    user = FirebaseAuth.getInstance().getCurrentUser();
     initMessages();
-  }
-
-  public void setListing(Listing newListing) {
-    listing = newListing;
   }
 
   @OnClick(R.id.activity_thread_send_fab)
@@ -125,55 +88,19 @@ public class ListingChatActivity extends LoggedInActivity {
     String message = toSendView.getText().toString().trim();
 
     if (!message.isEmpty()) {
-      if (cache.isMuted() > 0) {
-        double hours = (double) cache.isMuted() / 3600000D;
-        Toasty.error(this, "You cannot do this while muted. Time left: " + String.format("%.2f " +
-                "hours",
-            hours)).show();
+      double muteTime = mViewModel.getMuteTimeLeft();
+      if (muteTime > 0) {
+        Toasty.error(this, String.format(Locale.ENGLISH, "You cannot do this while muted. Time " +
+            "left: %.2f hours", muteTime)).show();
         return;
       }
-      if (message.equalsIgnoreCase("fuck you")) {
-        String[] wholesome = {"Wholly accept your flaws, and suddenly no one is strong enough to " +
-            "use them against you.",
-            "Remember, you have been criticizing yourself for years and it hasn’t worked. Try " +
-                "approving of yourself and see what happens.",
-            "Accepting yourself is about respecting yourself. It’s about honoring yourself right " +
-                "now, here today, in this moment. Not just who you could become somewhere down the line."};
-        message = wholesome[new Random().nextInt(wholesome.length)];
-      }
-      long timestamp = System.currentTimeMillis();
-      long dayTimestamp = ListingUtils.getDayTimestamp(timestamp);
-      String userUid = user.getUid();
-      Map<String, Object> messageData = new HashMap<>();
-      messageData.put("fromUid", userUid);
-      messageData.put("fromName", user.getDisplayName());
-      messageData.put("content", message);
-      messageData.put("time", timestamp);
-      messageData.put("day", dayTimestamp);
-      // Add to listing chat
-      MuggerDatabase.sendListingChatMessage(db, listingUid, messageData);
-      Map<String, Object> notificationData = new HashMap<>();
-      notificationData.put("topicUid", listingUid);
-      StringBuilder content = new StringBuilder("(Latest Message) ");
-      content.append(user.getDisplayName()).append(" : ").append(message);
-      notificationData.put("body", content.toString());
-      StringBuilder title = new StringBuilder();
-      title.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode()).append(" " +
-          "Listing");
-      notificationData.put("title", title.toString());
-      notificationData.put("type", MessagingService.CHAT_NOTIFICATION);
-      notificationData.put("fromUid", user.getUid());
-      // Add to notification db
-      messageData.remove("time");
-      messageData.remove("day");
-      messageData.put("listingOwnerUid", listing.getOwnerId());
-      MuggerDatabase.sendNotification(db, notificationData);
+      mViewModel.sendMessage(message);
       toSendView.setText("");
     }
   }
 
   private void initMessages() {
-    Query mQuery = MuggerDatabase.getListingChatHistory(db, listingUid)
+    Query mQuery = MuggerDatabase.getListingChatHistory(db, mViewModel.getListingUid())
         .orderBy("time", Query.Direction.DESCENDING);
     FirestoreRecyclerOptions<Message> options = new FirestoreRecyclerOptions.Builder<Message>()
         .setQuery(mQuery, snapshot -> new Message((String) snapshot.get("fromUid"),
@@ -243,7 +170,7 @@ public class ListingChatActivity extends LoggedInActivity {
                     b.putString("reportedUid", message.getFromUid());
                     b.putString("reportedName", message.getFromName());
                     b.putString("message", message.getContent());
-                    b.putString("listingUid", listingUid);
+                    b.putString("listingUid", mViewModel.getListingUid());
                     intent.putExtras(b);
                     startActivity(intent);
                     break;

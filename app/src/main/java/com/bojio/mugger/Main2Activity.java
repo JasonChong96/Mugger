@@ -63,6 +63,8 @@ public class Main2Activity extends LoggedInActivity
   FloatingActionButton fab;
   @BindView(android.R.id.content)
   View activityView;
+  @BindView(R.id.nav_view)
+  NavigationView navigationView;
   private Main2ActivityViewModel mViewModel;
 
   @Override
@@ -75,19 +77,6 @@ public class Main2Activity extends LoggedInActivity
     mViewModel = ViewModelProviders.of(this, LifecycleUtils.getAndroidViewModelFactory
         (getApplication())).get(Main2ActivityViewModel.class);
     AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    MuggerDatabase.getOtherDataReference(db).get().addOnCompleteListener(task -> {
-      if (task.isSuccessful()) {
-        long min = (Long) task.getResult().getData().get("minVersion");
-        if (MuggerConstants.APP_VERSION < min) {
-          mViewModel.signOut();
-          Toasty.error(this, "This version is outdated, please update the app through Google " +
-              "Play", Toast.LENGTH_LONG).show();
-        }
-      } else {
-        mViewModel.signOut();
-        Toasty.error(this, "Error loading application version", Toast.LENGTH_LONG).show();
-      }
-    });
     // Set behavior when logged in state changes
     setContentView(R.layout.activity_main2);
     Toolbar toolbar = findViewById(R.id.toolbar);
@@ -112,7 +101,6 @@ public class Main2Activity extends LoggedInActivity
       Needle.onBackgroundThread().execute(() -> {
         if (mViewModel.loadModuleData()) {
           Needle.onMainThread().execute(() -> {
-            NavigationView navigationView = findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
             if (savedInstanceState == null) {
               navigationView.setCheckedItem(R.id.nav_available_listings);
@@ -130,7 +118,6 @@ public class Main2Activity extends LoggedInActivity
         }
       });
     } else {
-      NavigationView navigationView = findViewById(R.id.nav_view);
       navigationView.setNavigationItemSelectedListener(this);
       if (savedInstanceState == null) {
         navigationView.setCheckedItem(R.id.nav_available_listings);
@@ -241,14 +228,14 @@ public class Main2Activity extends LoggedInActivity
         mViewModel.updateTitle("Filtered Sessions");
         break;
       case R.id.nav_profile:
-        Intent intent = new Intent(this, ProfileActivity.class);
-        Bundle b = new Bundle();
-        b.putString("profileUid", mViewModel.getUserUid());
-        intent.putExtras(b);
-        startActivity(intent);
+        fragment = ProfileFragment.newInstance(mAuth.getUid());
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, fragment);
+        ft.commit();
+        mViewModel.updateTitle("My Profile");
         break;
       case R.id.nav_submit_feedback:
-        intent = new Intent(this, MakeFeedbackActivity.class);
+        Intent intent = new Intent(this, MakeFeedbackActivity.class);
         startActivity(intent);
         break;
       case R.id.nav_request_role:

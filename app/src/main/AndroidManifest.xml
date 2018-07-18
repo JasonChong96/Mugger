@@ -31,9 +31,6 @@
             android:theme="@style/AppTheme.Main2" />
         <activity android:name=".listings.CreateEditListingActivity" />
         <activity
-            android:name=".listings.AvailableListingDetailsActivity"
-            android:label="Session Details" />
-        <activity
             android:name=".authentication.IvleLoginActivity"
             android:label="IVLE Login (First-timer only)" />
         <activity
@@ -105,6 +102,8 @@
             android:label="Mugger Introduction" />
         <activity android:name=".listings.MyScheduleActivity"
             android:label="My Schedule"/>
+        <activity android:name=".listings.AvailableListingDetailsActivity"
+            android:label="Listing Details"/>
     </application>
 
 </manifest>
