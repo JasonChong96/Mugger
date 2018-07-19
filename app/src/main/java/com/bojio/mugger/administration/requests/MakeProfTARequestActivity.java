@@ -1,6 +1,7 @@
 package com.bojio.mugger.administration.requests;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -8,20 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.database.MuggerDatabase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,10 +26,6 @@ import es.dmoral.toasty.Toasty;
 public class MakeProfTARequestActivity extends LoggedInActivity {
   private static String[] roles = {"Click here to choose a role.", "Teaching Assistant",
       "Professor"};
-  FirebaseUser user;
-  FirebaseFirestore db;
-  @BindView(R.id.request_profta_button)
-  Button submitButton;
   @BindView(R.id.request_profta_description)
   EditText descriptionView;
   @BindView(R.id.request_profta_module_code)
@@ -46,21 +35,16 @@ public class MakeProfTARequestActivity extends LoggedInActivity {
   @BindView(android.R.id.content)
   View view;
   private AlertDialog dialog;
+  private MakeProfTARequestViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    db = FirebaseFirestore.getInstance();
-    user = FirebaseAuth.getInstance().getCurrentUser();
-    if (user == null) {
-      finish();
-      Toasty.info(this, "Not logged in", Toast.LENGTH_SHORT).show();
-      return;
-    }
     super.onCreate(savedInstanceState);
     if (stopActivity) {
       finish();
       return;
     }
+    mViewModel = ViewModelProviders.of(this).get(MakeProfTARequestViewModel.class);
     setContentView(R.layout.activity_make_prof_tarequest);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     ButterKnife.bind(this);
@@ -101,14 +85,7 @@ public class MakeProfTARequestActivity extends LoggedInActivity {
       return;
     }
     dialog.show();
-    Map<String, Object> request = new HashMap<>();
-    request.put("time", System.currentTimeMillis());
-    request.put("moduleCode", moduleCode);
-    request.put("description", description);
-    request.put("role", roleSpinner.getSelectedItem().toString());
-    request.put("userUid", user.getUid());
-    request.put("userName", user.getDisplayName());
-    MuggerDatabase.sendProfTARequest(db, request).addOnCompleteListener(task -> {
+    mViewModel.submitRequest(moduleCode, description, roleSpinner.getSelectedItem().toString()).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         dialog.dismiss();
         Snackbar.make(view, "Failed to submit request, please try again later.", Snackbar

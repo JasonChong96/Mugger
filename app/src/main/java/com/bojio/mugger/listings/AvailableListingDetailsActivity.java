@@ -97,6 +97,7 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
     mViewModel.getDescription().observe(this, desc -> {
       description.setText(desc);
       if (dialog.isShowing()) {
+        moduleCode.setText(mViewModel.getModuleCode());
         dialog.dismiss();
       }
     });

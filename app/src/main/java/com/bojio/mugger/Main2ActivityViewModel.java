@@ -41,6 +41,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
 
   /**
    * Constructor for the Main2Activity ViewModel.
+   *
    * @param application the application that the ViewModel is in
    */
   public Main2ActivityViewModel(@NonNull Application application) {
@@ -66,12 +67,12 @@ public class Main2ActivityViewModel extends AndroidViewModel {
     subscribeToTopics();
     listener =
         MuggerDatabase.getUserReference(db, userUid).addSnapshotListener((documentSnapshot, e)
-        -> {
-      String displayName = (String) documentSnapshot.get("displayName");
-      if (!displayName.equals(liveDisplayName.getValue())) {
-        liveDisplayName.postValue(displayName);
-      }
-    });
+            -> {
+          String displayName = (String) documentSnapshot.get("displayName");
+          if (!displayName.equals(liveDisplayName.getValue())) {
+            liveDisplayName.postValue(displayName);
+          }
+        });
   }
 
   private void updateProfileCache() {
@@ -106,6 +107,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
 
   /**
    * Checks if the user's modules have been loaded into the cache.
+   *
    * @return a boolean representing whether or not the modules have been loaded
    */
   public boolean isModulesLoaded() {
@@ -115,6 +117,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
   /**
    * Loads module data into cache. Has to be done on a Background thread as it awaits for results
    * from Firestore API.
+   *
    * @return true if the data has been loaded successfully, false if not
    */
   public boolean loadModuleData() {
@@ -173,6 +176,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
 
   /**
    * Checks if the user should be forced into the introduction slides.
+   *
    * @return true if the user has to view the slides, false if not
    */
   public boolean shouldShowIntro() {
@@ -181,6 +185,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
 
   /**
    * Checks if the user has access to moderator tools.
+   *
    * @return true if the user has access, false if not
    */
   public boolean isModeratorToolsVisible() {
@@ -189,6 +194,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
 
   /**
    * Checks if the user has access to admin tools.
+   *
    * @return true if the user has access, false if not
    */
   public boolean isAdminToolsVisible() {
@@ -217,6 +223,7 @@ public class Main2ActivityViewModel extends AndroidViewModel {
 
   /**
    * Updates the title of the activity.
+   *
    * @param newTitle the new title
    */
   public void updateTitle(String newTitle) {

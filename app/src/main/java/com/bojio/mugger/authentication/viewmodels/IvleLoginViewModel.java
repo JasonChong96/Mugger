@@ -1,12 +1,7 @@
 package com.bojio.mugger.authentication.viewmodels;
 
 import android.arch.lifecycle.ViewModel;
-import android.content.Intent;
-import android.os.Bundle;
 
-import com.bojio.mugger.Main2Activity;
-import com.bojio.mugger.MainActivity;
-import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.Modules;
 import com.bojio.mugger.database.MuggerDatabase;
@@ -35,9 +30,11 @@ import java.util.concurrent.ExecutionException;
 import javax.net.ssl.HttpsURLConnection;
 
 public class IvleLoginViewModel extends ViewModel {
- /* private FirebaseAuth mAuth;
+  private FirebaseAuth mAuth;
   private FirebaseFirestore db;
   private MuggerUserCache cache;
+  private Map<String, Object> userData;
+  private String token;
 
   public IvleLoginViewModel() {
     mAuth = FirebaseAuth.getInstance();
@@ -45,13 +42,15 @@ public class IvleLoginViewModel extends ViewModel {
     cache = MuggerUserCache.getInstance();
   }
 
-  public boolean loadDataFromIvle(String token) {
-    Map<String, Object> userData = new HashMap<>();
-    if (!loadProfile(userData, token) || userData.get("nusNetId") == null) {
-      onError();
-      return;
-    }
+  public void init(String token) {
+    this.token = token;
+  }
+
+  public boolean checkNusNetId() {
     String nusNetId = (String) userData.get("nusNetId");
+    if (nusNetId == null) {
+      return false;
+    }
     String hashedId = Hashing.sha256().hashString(nusNetId, StandardCharsets.UTF_8).toString();
     Task<QuerySnapshot> checkTask = MuggerDatabase.getAllUsersReference(db).whereEqualTo
         ("nusNetId", hashedId)
@@ -59,66 +58,62 @@ public class IvleLoginViewModel extends ViewModel {
     try {
       Tasks.await(checkTask);
     } catch (ExecutionException | InterruptedException e) {
-      onError();
-      return;
+      return false;
     }
     if (checkTask.isSuccessful()) {
       List<DocumentSnapshot> snaps = checkTask.getResult().getDocuments();
       if (snaps.size() > 1 || (snaps.size() > 0 && !mAuth.getUid().equals(snaps.get(0).getId()))) {
-        Intent intent = new Intent(this, MainActivity.class);
-        // Clears back stack
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        Bundle b = new Bundle();
-        b.putString("errorMessage", "Your IVLE account is already tagged to another Mugger account. " +
-            "You are only allowed one account per person.");
-        intent.putExtras(b);
-        startActivity(intent);
-        finish();
-        return;
+        return false;
+      } else {
+        return true;
       }
     } else {
-      onError();
-      return;
+      return false;
     }
-    userData.put("nusNetId", hashedId);
-    if (!getModules(nusNetId, userData) && mAuth.getCurrentUser() == null) {
-      onError();
-      return;
-    }
-    MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid()).set(userData,
-        SetOptions.merge()).addOnCompleteListener(task -> {
-      if (!task.isSuccessful()) {
-        onError();
-        return;
-      } else {
-        MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid()).get()
-            .addOnCompleteListener(taskk -> {
-              if (!task.isSuccessful()) {
-                onError();
-                return;
-              } else {
-                MuggerUserCache.getInstance().setData(taskk.getResult().getData());
-                Intent intent = new Intent(this, Main2Activity.class);
-                // Clears back stack
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-              }
-            });
-
-      }
-    });
   }
 
-  private boolean loadProfile(Map<String, Object> userData, String token) {
+  public boolean saveData() {
+    String hashedId = Hashing.sha256().hashString((String) userData.get("nusNetId"),
+        StandardCharsets.UTF_8).toString();
+    userData.put("nusNetId", hashedId);
+
+    Task<Void> task = MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid()).set
+        (userData, SetOptions.merge());
+    try {
+      Tasks.await(task);
+    } catch (ExecutionException | InterruptedException e) {
+      e.printStackTrace();
+      return false;
+    }
+    if (!task.isSuccessful()) {
+      return false;
+    } else {
+      Task<DocumentSnapshot> task2 =
+          MuggerDatabase.getUserReference(db, FirebaseAuth.getInstance().getUid()).get();
+      try {
+        Tasks.await(task2);
+      } catch (ExecutionException | InterruptedException e) {
+        e.printStackTrace();
+        return false;
+      }
+      if (!task2.isSuccessful()) {
+        return false;
+      } else {
+        MuggerUserCache.getInstance().setData(task2.getResult().getData());
+        return true;
+      }
+
+    }
+  }
+
+  public boolean loadProfile() {
     String https_url =
         "https://ivle.nus.edu.sg/api/Lapi.svc/Profile_View?APIKey=OEoF4T2bHfpAn85PuAqoN&AuthToken=";
     URL url;
     try {
-
       url = new URL(https_url + token);
+      userData = new HashMap<>();
       HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-
       Scanner sc = new Scanner(con.getInputStream());
       String[] data = sc.nextLine().split("\"");
       for (int i = 0; i < data.length; i++) {
@@ -156,7 +151,8 @@ public class IvleLoginViewModel extends ViewModel {
     }
   }
 
-  private boolean getModules(String nusNetId, Map<String, Object> userData, String token) {
+  public boolean getModules() {
+    String nusNetId = (String) userData.get("nusNetId");
     String https_url_modules =
         new StringBuilder().append("https://ivle.nus.edu.sg/api/Lapi")
             .append(".svc/Modules_Taken?APIKey=OEoF4T2bHfpAn85PuAqoN&StudentID=")
@@ -213,5 +209,5 @@ public class IvleLoginViewModel extends ViewModel {
       e.printStackTrace();
       return true;
     }
-  }*/
+  }
 }

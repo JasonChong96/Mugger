@@ -1,6 +1,7 @@
 package com.bojio.mugger.administration.reports;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,11 +9,10 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.reports.viewmodels.ChatReportViewModel;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.database.MuggerDatabase;
-import com.bojio.mugger.listings.chat.ListingChatActivity;
+import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.profile.ProfileActivity;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,12 +35,10 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
   @BindView(R.id.chat_report_description)
   TextView descriptionView;
 
-  ChatReport report;
-  FirebaseFirestore db;
+  private ChatReportViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
     if (stopActivity) {
       finish();
@@ -55,18 +53,22 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
       Toasty.error(this, "Missing bundle data").show();
       return;
     }
-    report = b.getParcelable("report");
-    reportedNameView.setText(report.getReportedName());
-    reporterNameView.setText(String.format("Reported by %s", report.getReporterName()));
-    messageView.setText(report.getMessage());
-    descriptionView.setText(report.getDescription());
+    mViewModel = ViewModelProviders.of(this).get(ChatReportViewModel.class);
+    if (savedInstanceState == null) {
+      mViewModel.init(b.getParcelable("report"));
+    }
+    reportedNameView.setText(mViewModel.getReportedName());
+    reporterNameView.setText(String.format("Reported by %s", mViewModel.getReporterName()));
+    messageView.setText(mViewModel.getMessage());
+    descriptionView.setText(mViewModel.getReportDescription());
+
   }
 
   @OnClick(R.id.chat_report_chat_button)
   public void onClick_chat() {
-    Intent intent = new Intent(this, ListingChatActivity.class);
+    Intent intent = new Intent(this, AvailableListingDetailsActivity.class);
     Bundle b = new Bundle();
-    b.putString("listingUid", report.getListingUid());
+    b.putString("listingUid", mViewModel.getListingUid());
     intent.putExtras(b);
     startActivity(intent);
   }
@@ -75,7 +77,7 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
   public void onClick_reported() {
     Intent intent = new Intent(this, ProfileActivity.class);
     Bundle b = new Bundle();
-    b.putString("profileUid", report.getReportedUid());
+    b.putString("profileUid", mViewModel.getReportedUid());
     intent.putExtras(b);
     startActivity(intent);
   }
@@ -84,7 +86,7 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
   public void onClick_reporter() {
     Intent intent = new Intent(this, ProfileActivity.class);
     Bundle b = new Bundle();
-    b.putString("profileUid", report.getReporterUid());
+    b.putString("profileUid", mViewModel.getReporterUid());
     intent.putExtras(b);
     startActivity(intent);
   }
@@ -105,7 +107,7 @@ public class ChatReportDetailsActivity extends LoggedInActivity {
             .setTheme(R.style.SpotsDialog)
             .build();
         dialog.show();
-        MuggerDatabase.deleteReport(db, report.getUid()).addOnCompleteListener(task
+        mViewModel.deleteReport().addOnCompleteListener(task
             -> {
           dialog.dismiss();
           if (!task.isSuccessful()) {

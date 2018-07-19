@@ -1,7 +1,6 @@
 package com.bojio.mugger.listings.fragments;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,12 +8,10 @@ import android.support.annotation.Nullable;
 import android.support.design.chip.Chip;
 import android.support.design.chip.ChipGroup;
 import android.support.design.widget.TextInputEditText;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -22,13 +19,10 @@ import android.widget.Spinner;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.lifecycle.LifecycleUtils;
-import com.bojio.mugger.listings.CreateEditListingActivity;
 import com.bojio.mugger.listings.viewmodels.CustomFilterListingsViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class CustomFilterListingsFragments extends ListingsFragments {

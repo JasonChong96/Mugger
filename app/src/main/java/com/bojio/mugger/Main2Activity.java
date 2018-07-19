@@ -15,12 +15,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.administration.feedback.MakeFeedbackActivity;
@@ -30,8 +28,6 @@ import com.bojio.mugger.administration.requests.MakeProfTARequestActivity;
 import com.bojio.mugger.administration.requests.ViewAllProfTARequestActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
 import com.bojio.mugger.authentication.LoggedInActivity;
-import com.bojio.mugger.constants.MuggerConstants;
-import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.introduction.MuggerIntroActivity;
 import com.bojio.mugger.lifecycle.LifecycleUtils;
 import com.bojio.mugger.listings.CreateEditListingActivity;
@@ -41,7 +37,6 @@ import com.bojio.mugger.listings.fragments.AvailableListingsFragments;
 import com.bojio.mugger.listings.fragments.CustomFilterListingsFragments;
 import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.bojio.mugger.listings.fragments.MyListingsFragments;
-import com.bojio.mugger.profile.ProfileActivity;
 import com.bojio.mugger.profile.ProfileFragment;
 import com.bojio.mugger.settings.SettingsActivity2;
 
@@ -104,7 +99,11 @@ public class Main2Activity extends LoggedInActivity
             navigationView.setNavigationItemSelectedListener(this);
             if (savedInstanceState == null) {
               navigationView.setCheckedItem(R.id.nav_available_listings);
-              onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+              try {
+                onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+              } catch (IllegalStateException e) {
+                // Activity was destroyed before this step
+              }
             }
             if (mViewModel.shouldShowIntro()) {
               startIntroActivity(true);
@@ -121,7 +120,11 @@ public class Main2Activity extends LoggedInActivity
       navigationView.setNavigationItemSelectedListener(this);
       if (savedInstanceState == null) {
         navigationView.setCheckedItem(R.id.nav_available_listings);
-        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+        try {
+          onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_available_listings));
+        } catch (IllegalStateException e) {
+          // Activity was destroyed before this step
+        }
       }
     }
 

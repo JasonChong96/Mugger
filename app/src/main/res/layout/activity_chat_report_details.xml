@@ -77,8 +77,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="View Chat"
-        app:icon="@drawable/ic_baseline_chat_24px"
+        android:text="View Listing"
+        app:icon="@drawable/ic_baseline_details_24px"
         app:layout_constraintStart_toStartOf="@+id/chat_report_reporter_profile_button"
         app:layout_constraintTop_toBottomOf="@+id/chat_report_reporter_profile_button" />
 

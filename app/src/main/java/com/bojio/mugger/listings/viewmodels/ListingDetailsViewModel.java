@@ -3,8 +3,6 @@ package com.bojio.mugger.listings.viewmodels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.widget.Toast;
 
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
@@ -18,13 +16,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import es.dmoral.toasty.Toasty;
 
 public class ListingDetailsViewModel extends AndroidViewModel {
   private FirebaseAuth mAuth;
@@ -43,7 +38,7 @@ public class ListingDetailsViewModel extends AndroidViewModel {
   private MutableLiveData<Boolean> isAttending;
   private DateFormat df;
   private DateFormat dfTime;
-  
+
   public ListingDetailsViewModel(Application app) {
     super(app);
     mAuth = FirebaseAuth.getInstance();
@@ -80,7 +75,7 @@ public class ListingDetailsViewModel extends AndroidViewModel {
         }
         Long newEnd = snapshot.getLong("endTime");
         if (newEnd != null && !newEnd.equals(endTime)) {
-          Date end = new Date(endTime);
+          Date end = new Date(newEnd);
           endTimeString.setValue(new StringBuilder()
               .append(df.format(end))
               .append(" ")
@@ -186,16 +181,16 @@ public class ListingDetailsViewModel extends AndroidViewModel {
   public Task<Void> deleteListing() {
     Task<Void> task = MuggerDatabase.deleteListing(db, listing.getUid());
     task.addOnSuccessListener(taskk -> {
-        Map<String, Object> notificationData = new HashMap<>();
-        notificationData.put("title", "Listing Deleted");
-        StringBuilder body = new StringBuilder();
-        body.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode())
-            .append(" Listing has been deleted.");
-        notificationData.put("body", body.toString());
-        notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
-        notificationData.put("fromUid", mAuth.getUid());
-        notificationData.put("topicUid", listing.getUid());
-        MuggerDatabase.sendNotification(db, notificationData);
+      Map<String, Object> notificationData = new HashMap<>();
+      notificationData.put("title", "Listing Deleted");
+      StringBuilder body = new StringBuilder();
+      body.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode())
+          .append(" Listing has been deleted.");
+      notificationData.put("body", body.toString());
+      notificationData.put("type", MessagingService.DELETED_NOTIFICATION);
+      notificationData.put("fromUid", mAuth.getUid());
+      notificationData.put("topicUid", listing.getUid());
+      MuggerDatabase.sendNotification(db, notificationData);
     });
     return task;
   }

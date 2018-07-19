@@ -17,7 +17,6 @@ import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.constants.DebugSettings;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
-import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -142,7 +141,7 @@ public class MessagingService extends FirebaseMessagingService {
     String messageTitle = data.get("title");
     Intent intent;
     if (data.get("type").equals(MessagingService.CHAT_NOTIFICATION)) {
-      intent = new Intent(this, ListingChatActivity.class);
+      intent = new Intent(this, AvailableListingDetailsActivity.class);
       Bundle b = new Bundle();
       b.putString("listingUid", data.get("listingUid"));
       intent.putExtras(b);

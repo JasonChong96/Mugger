@@ -16,7 +16,6 @@ import com.bojio.mugger.listings.ListingUtils;
 import com.bojio.mugger.listings.viewmodels.AvailableListingsViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -94,6 +93,7 @@ public class AvailableListingsFragments extends ListingsFragments {
 
   /**
    * Returns the view model type cast as an AvailableListingsViewModel
+   *
    * @return ViewModel type cast as an AvailableListingsViewModel;
    */
   private AvailableListingsViewModel getViewModel() {

@@ -2,6 +2,7 @@ package com.bojio.mugger.profile;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.util.Log;
 
 import com.annimon.stream.Stream;
 import com.bojio.mugger.authentication.MuggerRole;
@@ -25,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 
 public class ProfileViewModel extends ViewModel {
   private MutableLiveData<String> status;
@@ -62,10 +62,12 @@ public class ProfileViewModel extends ViewModel {
   }
 
   public void init(String uid) {
-    this.uid = uid;
-    registerProfileListener();
-    registerModulesListener();
-    registerModuleTitlesListener();
+    if (listeners.isEmpty() && this.uid == null) {
+      this.uid = uid;
+      registerProfileListener();
+      registerModulesListener();
+      registerModuleTitlesListener();
+    }
   }
 
   public MutableLiveData<MuggerRole> getRole() {
@@ -107,9 +109,12 @@ public class ProfileViewModel extends ViewModel {
   }
 
   private void registerProfileListener() {
+    Log.e("A", "AAASdasdAS");
     listeners.add(
+
         MuggerDatabase.getUserReference(db, uid).addSnapshotListener((documentSnapshot, e) -> {
           String newEmail = documentSnapshot.getString("email");
+          Log.e("A", "AAASdasdASSS");
           if (newEmail != null && !newEmail.equals(email.getValue())) {
             email.setValue(newEmail);
           }

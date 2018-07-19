@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatDelegate;
@@ -31,12 +30,9 @@ import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
-import com.bojio.mugger.database.MuggerDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -174,54 +170,50 @@ public class ProfileFragment extends Fragment {
         muteButton.setOnClickListener((View v) -> {
           new MaterialDialog.Builder(this.getContext())
               .title("How many hours should " + nameView.getText() + " be muted for? (0 to unmute)")
-              .input("Whole numbers only", "", new MaterialDialog.InputCallback
-                  () {
-                @Override
-                public void onInput(MaterialDialog dialog, CharSequence input) {
-                  if (!mViewModel.moderatorControlsVisible()) {
-                    v.setVisibility(View.GONE);
-                    return;
-                  }
-                  AlertDialog dialogg = new SpotsDialog
-                      .Builder()
-                      .setContext(ProfileFragment.this.getContext())
-                      .setMessage("Muting...")
-                      .setCancelable(false)
-                      .setTheme(R.style.SpotsDialog)
-                      .build();
-                  dialogg.show();
-                  String hoursString = input.toString();
-                  int hours;
-                  try {
-                    hours = Integer.parseInt(hoursString);
-                  } catch (NumberFormatException nfe) {
+              .input("Whole numbers only", "", (dialog1, input) -> {
+                if (!mViewModel.moderatorControlsVisible()) {
+                  v.setVisibility(View.GONE);
+                  return;
+                }
+                AlertDialog dialogg = new SpotsDialog
+                    .Builder()
+                    .setContext(ProfileFragment.this.getContext())
+                    .setMessage("Muting...")
+                    .setCancelable(false)
+                    .setTheme(R.style.SpotsDialog)
+                    .build();
+                dialogg.show();
+                String hoursString = input.toString();
+                int hours;
+                try {
+                  hours = Integer.parseInt(hoursString);
+                } catch (NumberFormatException nfe) {
+                  dialogg.dismiss();
+                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
+                      ("Please input a valid whole number.").error().show();
+                  return;
+                }
+                if (hours >= 0) {
+                  mViewModel.muteUser(hours).addOnCompleteListener(task -> {
                     dialogg.dismiss();
-                    Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
-                        ("Please input a valid whole number.").error().show();
-                    return;
-                  }
-                  if (hours >= 0) {
-                    mViewModel.muteUser(hours).addOnCompleteListener(task -> {
-                      dialogg.dismiss();
-                      if (!task.isSuccessful()) {
-                        Snacky.builder()
-                            .setActivity(ProfileFragment.this.getActivity())
-                            .setText("Failed to mute, please try again.")
-                            .error()
-                            .show();
-                      } else {
-                        Snacky.builder()
-                            .setActivity(ProfileFragment.this.getActivity())
-                            .setText("Successfully muted! Thanks for making Mugger a better place.")
-                            .success()
-                            .show();
-                      }
-                    });
+                    if (!task.isSuccessful()) {
+                      Snacky.builder()
+                          .setActivity(ProfileFragment.this.getActivity())
+                          .setText("Failed to mute, please try again.")
+                          .error()
+                          .show();
+                    } else {
+                      Snacky.builder()
+                          .setActivity(ProfileFragment.this.getActivity())
+                          .setText("Successfully muted! Thanks for making Mugger a better place.")
+                          .success()
+                          .show();
+                    }
+                  });
 
-                  } else {
-                    Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
-                        ("Please input a valid positive whole number").error().show();
-                  }
+                } else {
+                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
+                      ("Please input a valid positive whole number").error().show();
                 }
               }).show();
         });
@@ -250,7 +242,7 @@ public class ProfileFragment extends Fragment {
       });
       if (mViewModel.getSelectedSemester() != null) {
         semesterSpinner.setSelection(Math.max(0, semesters.indexOf(mViewModel.getSelectedSemester()))
-            ,true);
+            , true);
       }
       if (dialog.isShowing() && mViewModel.isProfileLoaded()) {
         dialog.dismiss();

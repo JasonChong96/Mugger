@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import es.dmoral.toasty.Toasty;
 
 public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
@@ -125,7 +123,7 @@ public class CustomFilterListingsViewModel extends ListingsFragmentsViewModel {
 
   public void updateFilter(int flag, String moduleFilter, String creatorFilter, String
       venueFilter, String descFilter, String fromDateFilter, String toDateFilter,
-      boolean changed) {
+                           boolean changed) {
     Map<String, Object> data = new HashMap<>();
     predicate = x -> true;
     switch (flag & MASK_CATEGORY) {
