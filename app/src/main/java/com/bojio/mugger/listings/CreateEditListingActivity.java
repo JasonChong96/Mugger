@@ -130,6 +130,29 @@ public class CreateEditListingActivity extends LoggedInActivity {
       }
     });
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    initStartDateTimePicker();
+    initEndDateTimePicker();
+    submitButton.setOnClickListener(this::publishListing);
+  }
+
+  private void initEndDateTimePicker() {
+    TimePickerDialog.OnTimeSetListener endTimeListener = (timePicker, hour, minute) -> mViewModel.updateEndTime(hour, minute);
+    DatePickerDialog.OnDateSetListener endDateListener = (datePicker, year, month, day) -> {
+      Calendar c = mViewModel.getEndDateTime();
+      mViewModel.updateEndDate(year, month, day);
+      TimePickerDialog tpg = new TimePickerDialog(CreateEditListingActivity.this, endTimeListener,
+          c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), DateFormat.is24HourFormat(CreateEditListingActivity.this));
+      tpg.show();
+    };
+    endDateTimeInput.setOnClickListener(view -> {
+      Calendar c = mViewModel.getEndDateTime();
+      DatePickerDialog dpg = new DatePickerDialog(CreateEditListingActivity.this, endDateListener,
+          c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+      dpg.show();
+    });
+  }
+
+  private void initStartDateTimePicker() {
     TimePickerDialog.OnTimeSetListener startTimeListener = (timePicker, hour, minute) -> mViewModel.updateStartTime(hour, minute);
     DatePickerDialog.OnDateSetListener startDateListener = (datePicker, year, month, day) -> {
       Calendar c = mViewModel.getStartDateTime();
@@ -145,21 +168,6 @@ public class CreateEditListingActivity extends LoggedInActivity {
           c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
       dpg.show();
     });
-    TimePickerDialog.OnTimeSetListener endTimeListener = (timePicker, hour, minute) -> mViewModel.updateEndTime(hour, minute);
-    DatePickerDialog.OnDateSetListener endDateListener = (datePicker, year, month, day) -> {
-      Calendar c = mViewModel.getEndDateTime();
-      mViewModel.updateEndDate(year, month, day);
-      TimePickerDialog tpg = new TimePickerDialog(CreateEditListingActivity.this, endTimeListener,
-          c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), DateFormat.is24HourFormat(CreateEditListingActivity.this));
-      tpg.show();
-    };
-    endDateTimeInput.setOnClickListener(view -> {
-      Calendar c = mViewModel.getEndDateTime();
-      DatePickerDialog dpg = new DatePickerDialog(CreateEditListingActivity.this, endDateListener,
-          c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-      dpg.show();
-    });
-    submitButton.setOnClickListener(this::publishListing);
   }
 
   private void publishListing(View view) {

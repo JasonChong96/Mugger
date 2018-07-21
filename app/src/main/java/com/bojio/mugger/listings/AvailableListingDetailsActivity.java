@@ -189,28 +189,27 @@ public class AvailableListingDetailsActivity extends LoggedInActivity {
     return super.onOptionsItemSelected(item);
   }
 
+  /**
+   * Set the operations to carry out when the attending checkbox's state is toggled
+   */
   private void setCheckedChangeListener() {
-
-    isAttending.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-      @Override
-      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (!isChecked) {
-          if (mViewModel.isOwnListing()) {
-            Toasty.error(AvailableListingDetailsActivity.this, "You must be attending " +
-                "listings that you own.", Toast.LENGTH_SHORT).show();
-            buttonView.setChecked(true);
-          } else {
-            mViewModel.unjoinListing();
-          }
+    isAttending.setOnCheckedChangeListener((buttonView, isChecked) -> {
+      if (!isChecked) {
+        if (mViewModel.isOwnListing()) {
+          Toasty.error(AvailableListingDetailsActivity.this, "You must be attending " +
+              "listings that you own.", Toast.LENGTH_SHORT).show();
+          buttonView.setChecked(true);
         } else {
-          if (mViewModel.listingFull()) {
-            Toasty.error(AvailableListingDetailsActivity.this, "There are" +
-                "too many people attending this listing", Toast.LENGTH_SHORT)
-                .show();
-            buttonView.setChecked(false);
-          } else {
-            mViewModel.joinListing();
-          }
+          mViewModel.unjoinListing();
+        }
+      } else {
+        if (mViewModel.listingFull()) {
+          Toasty.error(AvailableListingDetailsActivity.this, "There are" +
+              "too many people attending this listing", Toast.LENGTH_SHORT)
+              .show();
+          buttonView.setChecked(false);
+        } else {
+          mViewModel.joinListing();
         }
       }
     });

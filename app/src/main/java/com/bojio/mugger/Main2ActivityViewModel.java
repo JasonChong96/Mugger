@@ -76,11 +76,18 @@ public class Main2ActivityViewModel extends AndroidViewModel {
         });
   }
 
+  /**
+   * Updates the Firestore database with the current email and display name of the user.
+   */
   private void updateProfileCache() {
     MuggerDatabase.getUserReference(db, user.getUid()).update("displayName", userName);
     MuggerDatabase.getUserReference(db, user.getUid()).update("email", email);
   }
 
+  /**
+   * Updates the Firestore database with the current device instance Id. This is used for
+   * Firebase Cloud Messaging.
+   */
   private void updateInstanceId() {
     String instanceId = FirebaseInstanceId.getInstance().getToken();
     // Update instance id of this account in database
@@ -100,8 +107,9 @@ public class Main2ActivityViewModel extends AndroidViewModel {
         .whereGreaterThan(mAuth.getUid(), 0);
     q.get().addOnCompleteListener(snap -> {
       List<DocumentSnapshot> results = snap.getResult().getDocuments();
-      Stream.of(results).map(DocumentSnapshot::getId).forEach(FirebaseMessaging.getInstance()
-          ::subscribeToTopic);
+      Stream.of(results)
+          .map(DocumentSnapshot::getId)
+          .forEach(FirebaseMessaging.getInstance()::subscribeToTopic);
     });
   }
 

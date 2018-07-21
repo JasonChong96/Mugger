@@ -29,6 +29,14 @@ public class MuggerIntroActivity extends IntroActivity {
         .scrollable(false)
         .build());
     addSlide(new SimpleSlide.Builder()
+        .title(R.string.intro_title_5)
+        .description(R.string.intro_desc_5)
+        .image(R.drawable.mugger_intro_5)
+        .background(R.color.colorBackgroundAdmin)
+        .backgroundDark(R.color.colorPrimaryAdmin)
+        .scrollable(false)
+        .build());
+    addSlide(new SimpleSlide.Builder()
         .title(R.string.intro_title_3)
         .description(R.string.intro_desc_3)
         .image(R.drawable.mugger_intro_3)
