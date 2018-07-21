@@ -94,6 +94,7 @@ public class MyScheduleFragment extends Fragment {
   private void onDateChanged(@NonNull MaterialCalendarView calendar, @NonNull CalendarDay
       selectedDay, boolean selected) {
     if (selected) {
+      mViewModel.setSelectedDay(selectedDay);
       FirestoreRecyclerOptions<Listing> options = ListingUtils.getRecyclerOptions(mViewModel.getQuery(),
           this);
       ListingsFirestoreAdapter adapter = new ListingsFirestoreAdapter(options, getActivity(),
@@ -115,12 +116,13 @@ public class MyScheduleFragment extends Fragment {
     Needle.onBackgroundThread()
         .execute(() -> {
           Collection<CalendarDay> days = mViewModel.getMarkedDays(refresh);
-          Needle.onMainThread().execute(() -> {
-            calendarView.removeDecorators();
-            calendarView.addDecorator(new EventDecorator(Color
-                .RED, days));
-            swipeLayout.setRefreshing(false);
-          });
+          if (days != null) {
+            Needle.onMainThread().execute(() -> {
+              calendarView.removeDecorators();
+              calendarView.addDecorator(new EventDecorator(Color.RED, days));
+              swipeLayout.setRefreshing(false);
+            });
+          }
         });
   }
 

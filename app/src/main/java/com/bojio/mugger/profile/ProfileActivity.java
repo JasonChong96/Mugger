@@ -12,6 +12,9 @@ import com.bojio.mugger.authentication.LoggedInActivity;
 
 import es.dmoral.toasty.Toasty;
 
+/**
+ * Activity that encapsulates the ProfileFragment when needed.
+ */
 public class ProfileActivity extends LoggedInActivity
     implements ProfileFragment.OnProfileFragmentInteractionListener {
 

@@ -51,6 +51,9 @@ public class ViewAllFeedbackActivity extends LoggedInActivity {
     initRecycler();
   }
 
+  /**
+   * Initializes the RecyclerView and it's adapter to display feedback from users.
+   */
   private void initRecycler() {
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     Query mQuery = MuggerDatabase.getAllFeedbackReference(db).orderBy("time", Query.Direction.DESCENDING);

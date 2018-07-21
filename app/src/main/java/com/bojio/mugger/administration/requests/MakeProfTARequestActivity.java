@@ -67,21 +67,17 @@ public class MakeProfTARequestActivity extends LoggedInActivity {
     String moduleCode = moduleCodeView.getText().toString();
     String description = descriptionView.getText().toString();
     if (roleSpinner.getSelectedItemPosition() == 0) {
-      Snacky.builder().setActivity(this)
+      Snacky.builder()
+          .setActivity(this)
           .setText("Please choose your role in the module.")
-          .error().show();
+          .error()
+          .show();
       return;
     }
-    if (moduleCode.isEmpty()) {
-      Snacky.builder().setActivity(this)
-          .setText("Please enter the module code.")
-          .error().show();
+    if (isFieldEmpty(moduleCode, "Please fill in the module code.")) {
       return;
     }
-    if (description.isEmpty()) {
-      Snacky.builder().setActivity(this)
-          .setText("Please fill in the description field.")
-          .error().show();
+    if (isFieldEmpty(description, "Please fill in the description field.")) {
       return;
     }
     dialog.show();
@@ -96,6 +92,16 @@ public class MakeProfTARequestActivity extends LoggedInActivity {
         finish();
       }
     });
+  }
+
+  private boolean isFieldEmpty(String toCheck, String errorMsg) {
+    if (toCheck.isEmpty()) {
+      Snacky.builder().setActivity(this)
+          .setText(errorMsg)
+          .error().show();
+      return true;
+    }
+    return false;
   }
 
   @Override

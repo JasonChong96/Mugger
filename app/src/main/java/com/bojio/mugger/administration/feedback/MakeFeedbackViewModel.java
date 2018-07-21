@@ -20,6 +20,12 @@ public class MakeFeedbackViewModel extends ViewModel {
     mAuth = FirebaseAuth.getInstance();
   }
 
+  /**
+   * Submits the feedback to database.
+   * @param title The feedback title
+   * @param description The feedback description
+   * @return a Task containing a DocumentReference for the submitting of feedback
+   */
   public Task<DocumentReference> submitFeedback(String title, String description) {
     Map<String, Object> feedback = new HashMap<>();
     feedback.put("title", title);

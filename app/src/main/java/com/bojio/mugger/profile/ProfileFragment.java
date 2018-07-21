@@ -149,6 +149,7 @@ public class ProfileFragment extends Fragment {
     });
     mViewModel.getRole().observe(this, newRole -> {
       if (mViewModel.adminControlsVisible()) {
+        // Set up admin control buttons and make them visible
         makeTAProfButton.setVisibility(View.VISIBLE);
         changeRoleButton.setVisibility(View.VISIBLE);
         changeRoleButton.setOnClickListener(view -> {
@@ -165,6 +166,7 @@ public class ProfileFragment extends Fragment {
         });
       }
       if (mViewModel.moderatorControlsVisible()) {
+        // Set up moderator control buttons and make them visible
         adminLabelView.setVisibility(View.VISIBLE);
         muteButton.setVisibility(View.VISIBLE);
         muteButton.setOnClickListener((View v) -> {
@@ -222,6 +224,7 @@ public class ProfileFragment extends Fragment {
         dialog.dismiss();
       }
     });
+    // Set up semesters spinner
     mViewModel.getModulesBySem().observe(this, modulesBySem -> {
       semesters = new ArrayList<>(modulesBySem.keySet());
       ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout
@@ -248,6 +251,7 @@ public class ProfileFragment extends Fragment {
         dialog.dismiss();
       }
     });
+    // Listen to changes in module titles and reload module display if they change
     mViewModel.getModuleTitles().observe(this, titles -> {
       if (semesterSpinner.getSelectedItem() != null) {
         modulesView.setText(mViewModel.getSemesterModulesDisplay((String) semesterSpinner
@@ -259,6 +263,7 @@ public class ProfileFragment extends Fragment {
     });
     if (mViewModel.isOwnProfile()) {
       // Viewing own profile
+      // Allow editing of own status
       statusWrapper.setVisibility(View.VISIBLE);
       statusView.setVisibility(View.GONE);
       ConstraintLayout layout;

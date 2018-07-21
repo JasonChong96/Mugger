@@ -151,4 +151,12 @@ public class ListingUtils {
         .setLifecycleOwner(lifeCycleOwner)
         .build();
   }
+
+  public static String getDateTimeDisplay(DateFormat df, DateFormat dfTime, Date time) {
+    return new StringBuilder()
+        .append(df.format(time))
+        .append(" ")
+        .append(dfTime.format(time))
+        .toString();
+  }
 }

@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Stream;
 import com.bojio.mugger.authentication.MuggerRole;
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
@@ -99,9 +100,8 @@ public class Main2ActivityViewModel extends AndroidViewModel {
         .whereGreaterThan(mAuth.getUid(), 0);
     q.get().addOnCompleteListener(snap -> {
       List<DocumentSnapshot> results = snap.getResult().getDocuments();
-      for (DocumentSnapshot doc : results) {
-        FirebaseMessaging.getInstance().subscribeToTopic(doc.getId());
-      }
+      Stream.of(results).map(DocumentSnapshot::getId).forEach(FirebaseMessaging.getInstance()
+          ::subscribeToTopic);
     });
   }
 
@@ -121,13 +121,13 @@ public class Main2ActivityViewModel extends AndroidViewModel {
    * @return true if the data has been loaded successfully, false if not
    */
   public boolean loadModuleData() {
+    Thread.dumpStack();
     List<Task<?>> tasks = new ArrayList<>();
     tasks.add(MuggerDatabase.getUserAllSemestersDataReference(db, user.getUid()).get()
         .addOnCompleteListener(task -> {
           cache.loadModules(task.getResult().getDocuments());
-          for (String mod : cache.getModules().firstEntry().getValue().keySet()) {
-            FirebaseMessaging.getInstance().subscribeToTopic(mod);
-          }
+          Stream.of(cache.getModules().firstEntry().getValue().keySet())
+              .forEach(FirebaseMessaging.getInstance()::subscribeToTopic);
         }));
     tasks.add(MuggerDatabase.getAllModuleTitlesRef(db).get().addOnSuccessListener(snapshot -> {
       if (snapshot.exists()) {

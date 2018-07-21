@@ -37,7 +37,7 @@ public class Listing implements Parcelable {
 
   private List<String> attendees;
 
-  private Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
+  public Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
                   long endTime, String description, String venue, List<String> attendees, int type) {
     this.uid = uid;
     this.ownerName = ownerName;

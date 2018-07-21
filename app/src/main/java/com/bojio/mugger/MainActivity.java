@@ -53,7 +53,10 @@ public class MainActivity extends AppCompatActivity {
       dialog.show();
     }
     Needle.onBackgroundThread().execute(() -> {
+      // ViewModel init method requires waiting for Firestore API response, done on background
+      // thread so main UI thread doesn't stall.
       if (!mViewModel.init()) {
+        // Error loading user data.
         Needle.onMainThread().execute(() -> {
           dialog.dismiss();
           Snacky.builder()
@@ -64,21 +67,29 @@ public class MainActivity extends AppCompatActivity {
         });
       } else if (mViewModel.isLoggedIn()) {
         Needle.onMainThread().execute(() -> {
-          if (mViewModel.isRedirectToIvleLogin()) {
-            // No record of nusnetid, redirect to IVLE login
-            Intent intent = new Intent(this, IvleLoginActivity.class);
-            startActivity(intent);
-          } else {
-            Toasty.normal(this, "Welcome back, " + mViewModel.getDisplayName(), Toast.LENGTH_SHORT)
-                .show();
-            mViewModel.updateCache();
-            Intent intent = new Intent(this, Main2Activity.class);
-            startActivity(intent);
-            finish();
-          }
+          dialog.dismiss();
+          startNextActivity();
         });
       }
     });
+  }
+
+  /**
+   * Starts the next activity. To be called if the user is already logged in. Checks if the user
+   * has done IVLE log in before, if he/she has, then redirects to Main2Activity, or else it
+   * redirects to IvleLoginActivity.
+   */
+  private void startNextActivity() {
+    if (mViewModel.isRedirectToIvleLogin()) {
+      // No record of nusnetid, redirect to IVLE login
+      startActivity(new Intent(this, IvleLoginActivity.class));
+    } else {
+      Toasty.normal(this, "Welcome back, " + mViewModel.getDisplayName(), Toast.LENGTH_SHORT)
+          .show();
+      mViewModel.updateCache();
+      startActivity(new Intent(this, Main2Activity.class));
+      finish();
+    }
   }
 
   /**

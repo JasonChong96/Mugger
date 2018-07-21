@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.administration.feedback.MakeFeedbackActivity;
@@ -37,12 +39,14 @@ import com.bojio.mugger.listings.fragments.AvailableListingsFragments;
 import com.bojio.mugger.listings.fragments.CustomFilterListingsFragments;
 import com.bojio.mugger.listings.fragments.ListingsFragments;
 import com.bojio.mugger.listings.fragments.MyListingsFragments;
+import com.bojio.mugger.listings.fragments.MyScheduleFragment;
 import com.bojio.mugger.profile.ProfileFragment;
 import com.bojio.mugger.settings.SettingsActivity2;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 import needle.Needle;
@@ -53,6 +57,7 @@ public class Main2Activity extends LoggedInActivity
     ProfileFragment.OnProfileFragmentInteractionListener {
 
   private static int REQUEST_CODE_INTRO = 0;
+  private static long BACK_PRESS_TIME_INTERVAL = 2000;
 
   @BindView(R.id.fab)
   FloatingActionButton fab;
@@ -61,6 +66,7 @@ public class Main2Activity extends LoggedInActivity
   @BindView(R.id.nav_view)
   NavigationView navigationView;
   private Main2ActivityViewModel mViewModel;
+  private long backPressedLastTimeStamp;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +147,13 @@ public class Main2Activity extends LoggedInActivity
     if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
     } else {
-      super.onBackPressed();
+      if (System.currentTimeMillis() - backPressedLastTimeStamp < BACK_PRESS_TIME_INTERVAL) {
+        super.onBackPressed();
+      } else {
+        backPressedLastTimeStamp = System.currentTimeMillis();
+        Snacky.builder().setActivity(this).setText("Press back again to exit the application").info
+            ().show();
+      }
     }
   }
 
@@ -229,6 +241,13 @@ public class Main2Activity extends LoggedInActivity
         ft.replace(R.id.container, fragment);
         ft.commit();
         mViewModel.updateTitle("Filtered Sessions");
+        break;
+      case R.id.nav_schedule:
+        fragment = MyScheduleFragment.newInstance();
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, fragment);
+        ft.commit();
+        mViewModel.updateTitle("My Schedule");
         break;
       case R.id.nav_profile:
         fragment = ProfileFragment.newInstance(mAuth.getUid());

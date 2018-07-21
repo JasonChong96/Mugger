@@ -44,5 +44,12 @@ public class ListingUtilsUnitTest {
     Assert.assertEquals(1, ListingUtils.daysApart(1531152000000L, 1531152000000L - 1));
   }
 
-
+  @Test
+  public void testIsBetween() {
+    Assert.assertFalse(ListingUtils.isBetween(0,0,1));
+    Assert.assertFalse(ListingUtils.isBetween(0, 0, 2));
+    Assert.assertFalse(ListingUtils.isBetween(2, 0, 2));
+    Assert.assertFalse(ListingUtils.isBetween(3, 0, 2));
+    Assert.assertTrue(ListingUtils.isBetween(1, 0, 2));
+  }
 }

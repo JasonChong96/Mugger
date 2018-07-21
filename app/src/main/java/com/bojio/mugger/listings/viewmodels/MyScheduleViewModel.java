@@ -1,13 +1,10 @@
 package com.bojio.mugger.listings.viewmodels;
 
-import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.support.v7.widget.RecyclerView;
+import android.arch.lifecycle.ViewModel;
 
 import com.annimon.stream.function.Predicate;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.listings.ListingUtils;
-import com.bojio.mugger.listings.ListingsViewHolder;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -15,7 +12,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.util.Collection;
@@ -27,7 +23,7 @@ import java.util.concurrent.ExecutionException;
  * The ViewModel for MyScheduleFragments used in the My Schedule feature. Loads appropriate data
  * from the model for the UI.
  */
-public class MyScheduleViewModel extends AndroidViewModel {
+public class MyScheduleViewModel extends ViewModel {
   /**
    * Firestore database API instance.
    **/
@@ -39,19 +35,9 @@ public class MyScheduleViewModel extends AndroidViewModel {
   private FirebaseAuth mAuth;
 
   /**
-   * Firebase Cloud Messaging API Instance.
-   **/
-  private FirebaseMessaging fcm;
-
-  /**
    * The currently selected day
    **/
   private CalendarDay selectedDay;
-
-  /**
-   * The RecyclerView adapter for listing display
-   **/
-  private RecyclerView.Adapter<ListingsViewHolder> adapter;
 
   /**
    * Collection of days that are currently marked
@@ -67,11 +53,9 @@ public class MyScheduleViewModel extends AndroidViewModel {
    * Constructor for my schedule view model. Initializes references to Firestore database and
    * Firebase Authentication.
    */
-  public MyScheduleViewModel(Application application) {
-    super(application);
+  public MyScheduleViewModel() {
     db = FirebaseFirestore.getInstance();
     mAuth = FirebaseAuth.getInstance();
-    fcm = FirebaseMessaging.getInstance();
     mQuery = ListingUtils.getAttendingListingsQuery(db, mAuth.getUid());
   }
 
@@ -109,6 +93,10 @@ public class MyScheduleViewModel extends AndroidViewModel {
 
   public CalendarDay getSelectedDay() {
     return selectedDay;
+  }
+
+  public void setSelectedDay(CalendarDay selectedDay) {
+    this.selectedDay = selectedDay;
   }
 
   /**

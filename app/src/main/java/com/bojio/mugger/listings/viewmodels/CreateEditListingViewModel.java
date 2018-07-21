@@ -3,6 +3,7 @@ package com.bojio.mugger.listings.viewmodels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.util.Log;
 
 import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CreateEditListingViewModel extends AndroidViewModel {
   private MuggerUserCache cache;
@@ -29,7 +31,7 @@ public class CreateEditListingViewModel extends AndroidViewModel {
   private Listing toEdit;
   private DateFormat df;
   private DateFormat dfTime;
-  private Map<String, Byte> moduleRoles;
+  private TreeMap<String, Byte> moduleRoles;
   private Calendar startDateTime;
   private Calendar endDateTime;
   private MutableLiveData<String> startTimeDateString;
@@ -63,6 +65,8 @@ public class CreateEditListingViewModel extends AndroidViewModel {
       startDateTime.setTimeInMillis(toEdit.getStartTime());
       endDateTime.setTimeInMillis(toEdit.getEndTime());
       moduleCode = toEdit.getModuleCode();
+    } else {
+      moduleCode = moduleRoles.firstKey();
     }
     startTimeDateString.postValue(getDateTimeString(startDateTime));
     endTimeDateString.postValue(getDateTimeString(endDateTime));
@@ -165,6 +169,8 @@ public class CreateEditListingViewModel extends AndroidViewModel {
     data.put("venue", venue);
     if (toEdit == null) {
       data.put(mAuth.getUid(), startTimeMillis);
+      Log.e("module Code", moduleCode);
+      Log.e("module Roles", Byte.toString(moduleRoles.get(moduleCode)));
       data.put("type", (int) moduleRoles.get(moduleCode));
     }
     if (toEdit != null) {

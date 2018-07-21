@@ -74,6 +74,9 @@ public class ProfileViewModel extends ViewModel {
     return role;
   }
 
+  /**
+   * Load user's modules and starts listening for any changes in them.
+   */
   private void registerModulesListener() {
     listeners.add(MuggerDatabase.getUserAllSemestersDataReference(db, uid)
         .addSnapshotListener((queryDocumentSnapshots, e) -> {
@@ -87,64 +90,45 @@ public class ProfileViewModel extends ViewModel {
                 } else {
                   TreeMap<String, Byte> mods = new TreeMap<>();
                   modules.put(doc.getId().replace(".", "/"), mods);
-                  for (String mod : (List<String>) doc.get("moduleCodes")) {
-                    mods.put(mod, ModuleRole.EMPTY);
-                  }
-                  List<String> ta = (List<String>) doc.get("ta");
-                  if (ta != null) {
-                    for (String mod : ta) {
-                      mods.put(mod, ModuleRole.TEACHING_ASSISTANT);
-                    }
-                  }
-                  List<String> prof = (List<String>) doc.get("professor");
-                  if (prof != null) {
-                    for (String mod : (List<String>) doc.get("professor")) {
-                      mods.put(mod, ModuleRole.PROFESSOR);
-                    }
-                  }
+                  loadModulesFromSnapshot(doc, "moduleCodes", mods, ModuleRole.EMPTY);
+                  loadModulesFromSnapshot(doc, "ta", mods, ModuleRole.TEACHING_ASSISTANT);
+                  loadModulesFromSnapshot(doc, "professor", mods, ModuleRole.PROFESSOR);
                 }
               });
           modulesBySem.postValue(modules);
         }));
   }
 
-  private void registerProfileListener() {
-    Log.e("A", "AAASdasdAS");
-    listeners.add(
+  /**
+   * Load modules from a list under fieldName in the DocumentSnapshot doc. The modules will be
+   * loaded into the input Map mods with the input module role.
+   * @param doc the documentsnapshot to be loaded from
+   * @param fieldName the field name of the list
+   * @param mods the map to load the modules into
+   * @param role the role of the user in these modules
+   */
+  private static void loadModulesFromSnapshot(DocumentSnapshot doc, String fieldName, Map<String,
+      Byte> mods, byte role) {
+    List<String> moduleCodes = (List<String>) doc.get(fieldName);
+    if (moduleCodes != null) {
+      for (String mod : moduleCodes) {
+        mods.put(mod, role);
+      }
+    }
+  }
 
+  /**
+   * Loads the profile of the user and starts listening to changes in data.
+   */
+  private void registerProfileListener() {
+    listeners.add(
         MuggerDatabase.getUserReference(db, uid).addSnapshotListener((documentSnapshot, e) -> {
-          String newEmail = documentSnapshot.getString("email");
-          Log.e("A", "AAASdasdASSS");
-          if (newEmail != null && !newEmail.equals(email.getValue())) {
-            email.setValue(newEmail);
-          }
-          String newFaculty = documentSnapshot.getString("faculty");
-          if (newFaculty != null && !newFaculty.equals(faculty.getValue())) {
-            faculty.setValue(newFaculty);
-          }
-          String newName = documentSnapshot.getString("displayName");
-          if (newName == null) {
-            newName = "";
-          }
-          Long muted = documentSnapshot.getLong("muted");
-          if (muted != null && muted > System.currentTimeMillis()) {
-            newName = String.format("%s (Muted)", newName);
-          }
-          if (!newName.equals(displayName.getValue())) {
-            displayName.setValue(newName);
-          }
-          String newFirstMajor = documentSnapshot.getString("firstMajor");
-          if (newFirstMajor != null && !newFirstMajor.equals(firstMajor.getValue())) {
-            firstMajor.setValue(newFirstMajor);
-          }
-          String newSecondMajor = documentSnapshot.getString("secondMajor");
-          if (newSecondMajor != null && !newSecondMajor.equals(secondMajor.getValue())) {
-            secondMajor.setValue(newSecondMajor);
-          }
-          String newStatus = documentSnapshot.getString("status");
-          if (newStatus != null && !newStatus.equals(status.getValue())) {
-            status.setValue(newStatus);
-          }
+          updateDisplayNameView(documentSnapshot);
+          updateValue(documentSnapshot, "email", email);
+          updateValue(documentSnapshot, "faculty", faculty);
+          updateValue(documentSnapshot, "firstMajor", firstMajor);
+          updateValue(documentSnapshot, "secondMajor", secondMajor);
+          updateValue(documentSnapshot, "status", status);
           MuggerRole newRole = MuggerRole.getByRoleId(documentSnapshot.getLong("roleId"));
           if (!newRole.equals(role.getValue())) {
             role.setValue(newRole);
@@ -153,13 +137,56 @@ public class ProfileViewModel extends ViewModel {
         }));
   }
 
-  private void registerModuleTitlesListener() {
-    listeners.add(MuggerDatabase.getAllModuleTitlesRef(db).addSnapshotListener((documentSnapshot, e)
-        -> {
-      moduleTitles.postValue(documentSnapshot);
-    }));
+  /**
+   * Updates the value of the LiveData input and posts the new value to observers if the data
+   * under the fieldName of the input document snapshot is different from the old value.
+   * @param documentSnapshot the document snapshot to be loaded from
+   * @param fieldName the field name of the data in the snapshot
+   * @param liveData the LiveData reference
+   */
+  private static void updateValue(DocumentSnapshot documentSnapshot, String fieldName,
+                            MutableLiveData<String> liveData) {
+    String newValue = documentSnapshot.getString(fieldName);
+    if (newValue != null && !newValue.equals(liveData.getValue())) {
+      liveData.setValue(newValue);
+    }
   }
 
+  /**
+   * Checks the input documentSnapshot if there are any changes to display name. If there are,
+   * posts the new value to all observers of the LiveData. The display name is appended with a
+   * "(Muted)" if the user is currently muted.
+   * @param documentSnapshot the document snapshot to load from
+   */
+  private void updateDisplayNameView(DocumentSnapshot documentSnapshot) {
+    String newName = documentSnapshot.getString("displayName");
+    if (newName == null) {
+      newName = "";
+    }
+    Long muted = documentSnapshot.getLong("muted");
+    if (muted != null && muted > System.currentTimeMillis()) {
+      newName = String.format("%s (Muted)", newName);
+    }
+    if (!newName.equals(displayName.getValue())) {
+      displayName.setValue(newName);
+    }
+  }
+
+  /**
+   * Loads and starts listening to changes in module titles. Posts value to observers if this is
+   * changed.
+   */
+  private void registerModuleTitlesListener() {
+    listeners.add(MuggerDatabase.getAllModuleTitlesRef(db).addSnapshotListener((documentSnapshot, e)
+        -> moduleTitles.postValue(documentSnapshot)));
+  }
+
+  /**
+   * Gets the String representation of all modules that the user is taking in the input semester.
+   * Along with labels for modules which they have a special role in.
+   * @param semester the semester to check
+   * @return the string representation of modules taken in the input semester
+   */
   public String getSemesterModulesDisplay(String semester) {
     TreeMap<String, TreeMap<String, Byte>> allModules = modulesBySem.getValue();
     DocumentSnapshot titles = moduleTitles.getValue();
@@ -174,10 +201,13 @@ public class ProfileViewModel extends ViewModel {
     for (Map.Entry<String, Byte> entry : semModules.entrySet()) {
       String moduleCode = entry.getKey();
       StringBuilder sb = new StringBuilder();
-      if (entry.getValue().equals(ModuleRole.PROFESSOR)) {
-        sb.append("(Professor) ");
-      } else if (entry.getValue().equals(ModuleRole.TEACHING_ASSISTANT)) {
-        sb.append("(TA) ");
+      switch (entry.getValue()) {
+        case ModuleRole.PROFESSOR:
+          sb.append("(Professor) ");
+          break;
+        case ModuleRole.TEACHING_ASSISTANT:
+          sb.append("(TA) ");
+          break;
       }
       sb.append(moduleCode)
           .append(" ")
@@ -192,6 +222,10 @@ public class ProfileViewModel extends ViewModel {
     Stream.of(listeners).forEach(ListenerRegistration::remove);
   }
 
+  /**
+   * Checks if the profile has been loaded.
+   * @return true if the profile has been loaded, false if not
+   */
   public boolean isProfileLoaded() {
     if (profileLoaded) {
       return true;
@@ -203,6 +237,11 @@ public class ProfileViewModel extends ViewModel {
     }
   }
 
+  /**
+   * Mutes the user for an input number of hours. If the input is 0, then the user is unmuted.
+   * @param hours the number of hours to mute the user for
+   * @return a Task reference for the muting of the user.
+   */
   public Task<Void> muteUser(int hours) {
     List<Task<?>> tasks = new ArrayList<>();
     long until = hours * 3600000 + System.currentTimeMillis();
@@ -244,10 +283,18 @@ public class ProfileViewModel extends ViewModel {
     return faculty;
   }
 
+  /**
+   * Checks if admin controls should be visible for the current user.
+   * @return true if the admin controls are visible, false if not
+   */
   public boolean adminControlsVisible() {
     return MuggerRole.ADMIN.check(userCache.getRole());
   }
 
+  /**
+   * Checks if moderator controls should be visible for the current user.
+   * @return true if the moderator controls are visible, false if not
+   */
   public boolean moderatorControlsVisible() {
     return MuggerRole.MODERATOR.check(userCache.getRole());
   }
@@ -256,6 +303,10 @@ public class ProfileViewModel extends ViewModel {
     return modulesBySem;
   }
 
+  /**
+   * Checks if the user is viewing his/her own profile.
+   * @return a boolean representing if the user is viewing his/her own profile
+   */
   public boolean isOwnProfile() {
     return FirebaseAuth.getInstance().getUid().equals(uid);
   }
@@ -264,6 +315,11 @@ public class ProfileViewModel extends ViewModel {
     return moduleTitles;
   }
 
+  /**
+   * Updates the status of this user to be shown on his/her profile with the input string.
+   * @param newStatus the new status string
+   * @return a Task reference for updating status
+   */
   public Task<Void> updateStatus(String newStatus) {
     return MuggerDatabase.getUserReference(db, uid).update("status", newStatus);
   }

@@ -87,8 +87,6 @@ public class CreateEditListingActivity extends LoggedInActivity {
     ButterKnife.bind(this);
     startDateTimeWrapper.setHelperText("Today's date: " + mViewModel.getDateString(System.currentTimeMillis()));
     if (b != null) {
-      setTitle("Edit Listing");
-      submitButton.setText("Submit Changes");
       toEdit = b.getParcelable("listing");
       if (toEdit == null) {
         showShortToast("Unable to fetch listing, please try again later.");
@@ -96,17 +94,22 @@ public class CreateEditListingActivity extends LoggedInActivity {
         return;
       }
       mViewModel.init(toEdit);
+    } else {
+      mViewModel.init(null);
+    }
+    moduleCodes = mViewModel.getModuleSelections();
+    if (b != null) {
+      setTitle("Edit Listing");
+      submitButton.setText("Submit Changes");
       moduleCode.setSelection(Math.max(0, moduleCodes.indexOf(mViewModel.getModuleCode())));
       moduleCode.setEnabled(false);
       venue.setText(mViewModel.getOriginalVenue());
       description.setText(mViewModel.getOriginalDescription());
     } else {
       setTitle("Add Listing");
-      mViewModel.init(null);
     }
     mViewModel.getStartTimeDateString().observe(this, startDateTimeInput::setText);
     mViewModel.getEndDateTimeString().observe(this, endDateTimeInput::setText);
-    moduleCodes = mViewModel.getModuleSelections();
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
         moduleCodes);
     moduleCode.setAdapter(adapter);
@@ -127,22 +130,14 @@ public class CreateEditListingActivity extends LoggedInActivity {
       }
     });
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    TimePickerDialog.OnTimeSetListener startTimeListener = new TimePickerDialog.OnTimeSetListener() {
-      @Override
-      public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-        mViewModel.updateStartTime(hour, minute);
-      }
-    };
-    DatePickerDialog.OnDateSetListener startDateListener = new DatePickerDialog.OnDateSetListener() {
-      @Override
-      public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-        Calendar c = mViewModel.getStartDateTime();
-        mViewModel.updateStartDate(year, month, day);
-        TimePickerDialog tpg = new TimePickerDialog(CreateEditListingActivity.this, startTimeListener,
-            c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), mViewModel.is24HourFormat());
-        tpg.show();
+    TimePickerDialog.OnTimeSetListener startTimeListener = (timePicker, hour, minute) -> mViewModel.updateStartTime(hour, minute);
+    DatePickerDialog.OnDateSetListener startDateListener = (datePicker, year, month, day) -> {
+      Calendar c = mViewModel.getStartDateTime();
+      mViewModel.updateStartDate(year, month, day);
+      TimePickerDialog tpg = new TimePickerDialog(CreateEditListingActivity.this, startTimeListener,
+          c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), mViewModel.is24HourFormat());
+      tpg.show();
 
-      }
     };
     startDateTimeInput.setOnClickListener(view -> {
       Calendar c = mViewModel.getStartDateTime();
@@ -150,21 +145,13 @@ public class CreateEditListingActivity extends LoggedInActivity {
           c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
       dpg.show();
     });
-    TimePickerDialog.OnTimeSetListener endTimeListener = new TimePickerDialog.OnTimeSetListener() {
-      @Override
-      public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-        mViewModel.updateEndTime(hour, minute);
-      }
-    };
-    DatePickerDialog.OnDateSetListener endDateListener = new DatePickerDialog.OnDateSetListener() {
-      @Override
-      public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-        Calendar c = mViewModel.getEndDateTime();
-        mViewModel.updateEndDate(year, month, day);
-        TimePickerDialog tpg = new TimePickerDialog(CreateEditListingActivity.this, endTimeListener,
-            c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), DateFormat.is24HourFormat(CreateEditListingActivity.this));
-        tpg.show();
-      }
+    TimePickerDialog.OnTimeSetListener endTimeListener = (timePicker, hour, minute) -> mViewModel.updateEndTime(hour, minute);
+    DatePickerDialog.OnDateSetListener endDateListener = (datePicker, year, month, day) -> {
+      Calendar c = mViewModel.getEndDateTime();
+      mViewModel.updateEndDate(year, month, day);
+      TimePickerDialog tpg = new TimePickerDialog(CreateEditListingActivity.this, endTimeListener,
+          c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), DateFormat.is24HourFormat(CreateEditListingActivity.this));
+      tpg.show();
     };
     endDateTimeInput.setOnClickListener(view -> {
       Calendar c = mViewModel.getEndDateTime();

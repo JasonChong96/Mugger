@@ -9,8 +9,10 @@ import com.bojio.mugger.authentication.MuggerUserCache;
 import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.fcm.MessagingService;
 import com.bojio.mugger.listings.Listing;
+import com.bojio.mugger.listings.ListingUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -39,6 +41,10 @@ public class ListingDetailsViewModel extends AndroidViewModel {
   private DateFormat df;
   private DateFormat dfTime;
 
+  /**
+   * Default constructor for this ViewModel.
+   * @param app the application that this is contained in
+   */
   public ListingDetailsViewModel(Application app) {
     super(app);
     mAuth = FirebaseAuth.getInstance();
@@ -56,58 +62,51 @@ public class ListingDetailsViewModel extends AndroidViewModel {
     fcm = FirebaseMessaging.getInstance();
   }
 
+  /**
+   * Initializes this ViewModel with the given listingUid. The ViewModel will start listening for
+   * changes in the data of this listing.
+   * @param listingUid
+   */
   public void init(String listingUid) {
     if (listing != null) {
       return;
     }
     MuggerDatabase.getListingReference(db, listingUid).addSnapshotListener((snapshot, e) -> {
       if (snapshot.exists()) {
+        // Module code is not included here as it cannot be edited once the listing has been made.
         listing = Listing.getListingFromSnapshot(snapshot);
-        Long newStart = snapshot.getLong("startTime");
-        if (newStart != null && !newStart.equals(startTime)) {
-          Date start = new Date(newStart);
-          startTimeString.setValue(new StringBuilder()
-              .append(df.format(start))
-              .append(" ")
-              .append(dfTime.format(start))
-              .toString());
-          startTime = newStart;
-        }
-        Long newEnd = snapshot.getLong("endTime");
-        if (newEnd != null && !newEnd.equals(endTime)) {
-          Date end = new Date(newEnd);
-          endTimeString.setValue(new StringBuilder()
-              .append(df.format(end))
-              .append(" ")
-              .append(dfTime.format(end))
-              .toString());
-          endTime = newEnd;
-        }
-        String newVenue = snapshot.getString("venue");
-        if (newVenue != null && !newVenue.equals(venue.getValue())) {
-          venue.setValue(newVenue);
-        }
+        startTime = updateTime(snapshot, "startTime", startTime, startTimeString);
+        endTime = updateTime(snapshot, "endTime", endTime, endTimeString);
+        updateString(snapshot, "venue", venue);
         if (numAttendees.getValue() == null ||
             listing.getNumAttendees() != numAttendees.getValue()) {
           numAttendees.setValue(listing.getNumAttendees());
           isAttending.setValue(listing.isAttending(mAuth.getUid()));
         }
-        String newDesc = snapshot.getString("description");
-        if (newDesc != null && !newDesc.equals(description.getValue())) {
-          description.setValue(newDesc);
-        }
+        updateString(snapshot, "description", description);
       } else {
         deleted.setValue(true);
       }
     });
   }
 
-  public long getStartTime() {
-    return startTime;
+  private long updateTime(DocumentSnapshot snapshot, String fieldName, long oldValue,
+                          MutableLiveData<String> liveData) {
+    Long newValue = snapshot.getLong(fieldName);
+    if (newValue != null && !newValue.equals(oldValue)) {
+      Date newDate = new Date(newValue);
+      liveData.setValue(ListingUtils.getDateTimeDisplay(df, dfTime, newDate));
+      return newValue;
+    }
+    return oldValue;
   }
 
-  public long getEndTime() {
-    return endTime;
+  private void updateString(DocumentSnapshot snapshot, String fieldName,
+                              MutableLiveData<String> liveData) {
+    String newValue = snapshot.getString(fieldName);
+    if (newValue != null && !newValue.equals(liveData.getValue())) {
+      liveData.setValue(newValue);
+    }
   }
 
   public MutableLiveData<String> getStartTimeString() {

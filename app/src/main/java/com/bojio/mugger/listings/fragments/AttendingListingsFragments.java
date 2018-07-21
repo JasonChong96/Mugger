@@ -29,17 +29,6 @@ public class AttendingListingsFragments extends ListingsFragments {
   }
 
   @Override
-  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    View view = super.onCreateView(inflater, container, savedInstanceState);
-    myScheduleButton.setVisibility(View.VISIBLE);
-    myScheduleButton.setOnClickListener(v -> {
-      startActivity(new Intent(getContext(), MyScheduleActivity.class));
-    });
-    return view;
-  }
-
-  @Override
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     mViewModel = ViewModelProviders.of(this, LifecycleUtils.getAndroidViewModelFactory
         (getActivity().getApplication())).get(AttendingListingsViewModel.class);

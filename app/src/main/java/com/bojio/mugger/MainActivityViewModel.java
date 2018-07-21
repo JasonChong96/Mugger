@@ -34,6 +34,7 @@ public class MainActivityViewModel extends ViewModel {
   public boolean init() {
     if (userData == null) {
       if (isLoggedIn()) {
+        // Is already logged in, proceed to load user data from database
         Task<DocumentSnapshot> task = MuggerDatabase.getUserReference(db, mAuth.getUid()).get();
         try {
           Tasks.await(task);
@@ -53,6 +54,7 @@ public class MainActivityViewModel extends ViewModel {
         return true;
       }
     } else {
+      // User data has already been loaded. No possibility for error.
       return true;
     }
   }

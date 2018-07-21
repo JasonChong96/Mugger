@@ -33,10 +33,6 @@ public class Feedback {
     return userName;
   }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-
   public long getTime() {
     return time;
   }
@@ -57,10 +53,6 @@ public class Feedback {
     return userUid;
   }
 
-  public void setUserUid(String userUid) {
-    this.userUid = userUid;
-  }
-
   public String getTitle() {
     return title;
   }
@@ -79,9 +71,5 @@ public class Feedback {
 
   public DocumentReference getDocRef() {
     return docRef;
-  }
-
-  public void setDocRef(DocumentReference docRef) {
-    this.docRef = docRef;
   }
 }

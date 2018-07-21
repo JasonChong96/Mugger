@@ -76,7 +76,6 @@ public class ViewAttendeesActivity extends LoggedInActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ProfileListRecyclerAdapter adapter = new ProfileListRecyclerAdapter(profiles, ownerUid);
         recyclerView.setAdapter(adapter);
-
       }
     });
   }

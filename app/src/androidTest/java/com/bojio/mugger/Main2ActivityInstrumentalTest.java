@@ -47,32 +47,11 @@ public class Main2ActivityInstrumentalTest {
 
   @Before
   public void setup() {
-   // if (FirebaseApp.getApps(InstrumentationRegistry.getContext()).isEmpty()) {
-      FirebaseApp.initializeApp(InstrumentationRegistry.getContext());
+    FirebaseApp.initializeApp(InstrumentationRegistry.getContext());
     mAuth = FirebaseAuth.getInstance();
     db = FirebaseFirestore.getInstance();
     muggerUserCache = MuggerUserCache.getInstance();
-    try {
-      AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
-      Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
-      Tasks.await(task);
-      Assert.assertNull(task.getException());
-      testLoggedIn();
-      Task<?> taskkk = mAuth.getCurrentUser().updateProfile(new UserProfileChangeRequest.Builder()
-          .setDisplayName
-          (TestUser.DISPLAY_NAME).build());
-      Tasks.await(taskkk);
-      Assert.assertNull(taskkk.getException());
-      Task<DocumentSnapshot> taskk = MuggerDatabase.getUserReference(db, TestUser.UID).get();
-      Tasks.await(taskk);
-      Assert.assertNull(taskk.getException());
-      muggerUserCache.setData(taskk.getResult().getData());
-      // }
-    } catch (ExecutionException | InterruptedException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      throw e;
-    }
+    TestUser.login(mAuth, db);
   }
 
   @Test
@@ -85,62 +64,19 @@ public class Main2ActivityInstrumentalTest {
 
   @Test
   @SmallTest
-  public void testLoggedIn() {
-    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
-    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
-    try {
-      Tasks.await(task);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    Assert.assertNull(task.getException());
-    Assert.assertNotNull(FirebaseAuth.getInstance().getCurrentUser());
-  }
-
-  @Test
-  @SmallTest
   public void testModules() {
-    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
-    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
-    try {
-      Tasks.await(task);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     Assert.assertNotNull(muggerUserCache.getModules());
   }
 
   @Test
   @SmallTest
   public void testAllModules() {
-    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
-    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
-    try {
-      Tasks.await(task);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     Assert.assertNotNull(muggerUserCache.getAllModules());
   }
 
   @Test
   @SmallTest
   public void testDisplayNameView() {
-    AuthCredential creds = EmailAuthProvider.getCredential(TestUser.USERNAME, TestUser.PASSWORD);
-    Task<?> task = FirebaseAuth.getInstance().signInWithCredential(creds);
-    try {
-      Tasks.await(task);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     Assert.assertNotNull(mAuth.getCurrentUser().getDisplayName());
     Assert.assertEquals(((TextView) mActivityRule.getActivity().findViewById(R.id.username))
         .getText(), mAuth.getCurrentUser().getDisplayName());
