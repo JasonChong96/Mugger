@@ -99,6 +99,9 @@ public class ListingChatActivity extends LoggedInActivity {
     }
   }
 
+  /**
+   * Initializes the view of messages in this chat.
+   */
   private void initMessages() {
     Query mQuery = MuggerDatabase.getListingChatHistory(db, mViewModel.getListingUid())
         .orderBy("time", Query.Direction.DESCENDING);

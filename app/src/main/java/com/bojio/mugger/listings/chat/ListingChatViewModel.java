@@ -47,8 +47,14 @@ public class ListingChatViewModel extends ViewModel {
     return (double) cache.isMuted() / 3600000D;
   }
 
+  /**
+   * Sends the input message into the chat along with notification to all who are joining this
+   * listing.
+   * @param message the message to be sent
+   */
   public void sendMessage(String message) {
     FirebaseUser user = mAuth.getCurrentUser();
+    // Easter egg. Entirely for fun
     if (message.equalsIgnoreCase("fuck you")) {
       String[] wholesome = {"Wholly accept your flaws, and suddenly no one is strong enough to " +
           "use them against you.",

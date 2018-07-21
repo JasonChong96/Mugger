@@ -23,6 +23,11 @@ public class Feedback {
     this.docRef = docRef;
   }
 
+  /**
+   * Loads a feedback instance from an input DocumentSnapshot and returns it.
+   * @param snapshot the document snapshot to load from
+   * @return a Feedback instance
+   */
   public static Feedback getFeedbackFromSnapshot(DocumentSnapshot snapshot) {
     return new Feedback(snapshot.getId(), (String) snapshot.get("userUid"),
         (String) snapshot.get("title"), (String) snapshot.get("description"), (String) snapshot

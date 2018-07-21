@@ -162,6 +162,9 @@ public abstract class ListingsFragments extends Fragment {
     return fragment.getActivity();
   }
 
+  /**
+   * Initialize the RecyclerView and its adapters to show relevant listings.
+   */
   protected void initListings() {
     FirestoreRecyclerOptions<Listing> options = ListingUtils.getRecyclerOptions(mViewModel
         .getQuery(), this);

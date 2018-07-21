@@ -66,6 +66,10 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     return view;
   }
 
+  /**
+   * Bind view references with the actual views in the settings dialog.
+   * @param view the View of the settings dialog
+   */
   private void bindViews(View view) {
     chipGroupRoles = view.findViewById(R.id.custom_filter_chip_group_roles);
     chipProfessor = view.findViewById(R.id.custom_filter_chip_professor);
@@ -84,6 +88,9 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     editTextToDate = view.findViewById(R.id.custom_filter_to_input);
   }
 
+  /**
+   * Initializes the custom filter settings dialog with previously saved settings.
+   */
   private void initDialog() {
     if (mViewModelCustom.hasPreviouslySetFlags()) {
       int flags = mViewModelCustom.getCustomFilterFlags();
@@ -148,6 +155,10 @@ public class CustomFilterListingsFragments extends ListingsFragments {
     });
   }
 
+  /**
+   * Update filter based on user's input settings.
+   * @param changed true if the filter has been changed from previously saved settings
+   */
   private void updateFilter(boolean changed) {
     int flag = 0;
     predicateFilter = x -> true;
