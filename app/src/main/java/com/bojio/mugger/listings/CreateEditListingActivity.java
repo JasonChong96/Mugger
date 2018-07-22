@@ -174,7 +174,7 @@ public class CreateEditListingActivity extends LoggedInActivity {
     //Check if all fields are filled
     submitButton.setClickable(false);
     if (moduleCode.getSelectedItem().toString() == null || moduleCode.getSelectedItem().toString()
-        .isEmpty()) {
+        .trim().isEmpty()) {
       showShortToast("Please select the module the study session is for.");
       submitButton.setClickable(true);
       return;
@@ -189,12 +189,14 @@ public class CreateEditListingActivity extends LoggedInActivity {
       submitButton.setClickable(true);
       return;
     }
-    if (venue.getText().toString().isEmpty()) {
+    String venueString = venue.getText().toString().trim();
+    String descriptionString = description.getText().toString().trim();
+    if (venueString.isEmpty()) {
       showShortToast("Please fill in the venue which your study session is/will be held at.");
       submitButton.setClickable(true);
       return;
     }
-    if (description.getText().toString().isEmpty()) {
+    if (descriptionString.isEmpty()) {
       showShortToast("Please fill in a short description about your study session.");
       submitButton.setClickable(true);
       return;
@@ -207,8 +209,7 @@ public class CreateEditListingActivity extends LoggedInActivity {
         .setTheme(R.style.SpotsDialog)
         .build();
     dialog.show();
-    mViewModel.publish(venue.getText().toString(), description
-        .getText().toString()).addOnCompleteListener(task -> {
+    mViewModel.publish(venueString, descriptionString).addOnCompleteListener(task -> {
       dialog.dismiss();
       if (!task.isSuccessful()) {
         CreateEditListingActivity.this.showShortToast("Failed to publish listing, please try again later.");

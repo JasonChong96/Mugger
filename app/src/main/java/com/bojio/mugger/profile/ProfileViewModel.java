@@ -242,14 +242,14 @@ public class ProfileViewModel extends ViewModel {
    * @param hours the number of hours to mute the user for
    * @return a Task reference for the muting of the user.
    */
-  public Task<Void> muteUser(int hours) {
+  public Task<Void> muteUser(double hours) {
     List<Task<?>> tasks = new ArrayList<>();
-    long until = hours * 3600000 + System.currentTimeMillis();
+    long until = (long) (hours * 3600000D) + System.currentTimeMillis();
     tasks.add(MuggerDatabase.getUserReference(db, uid).update("muted", until));
     Map<String, Object> notificationData = new HashMap<>();
     if (instanceId != null) {
       notificationData.put("instanceId", instanceId);
-      notificationData.put("duration", Integer.toString(hours));
+      notificationData.put("duration", Double.toString(hours));
       notificationData.put("fromUid", "");
       notificationData.put("topicUid", "");
       notificationData.put("type", hours == 0 ? "unmute" : "mute");

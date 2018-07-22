@@ -14,15 +14,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ListingsViewHolder extends RecyclerView.ViewHolder {
-  public TextView moduleCode;
-  public TextView dateTime;
-  public TextView venue;
-  public TextView numAttendees;
-  public CardView cardView;
-  public TextView nameView;
-  public ImageView colorCode;
-  public View view;
-
   @BindView(R.id.num_attendees_click_view)
   public View numAttendeesClickView;
 
@@ -65,18 +56,34 @@ public class ListingsViewHolder extends RecyclerView.ViewHolder {
   @BindView(R.id.listing_view_button_report)
   public MaterialButton reportButton;
 
+  @BindView(R.id.module_code)
+  public TextView moduleCode;
+
+  @BindView(R.id.date_time)
+  public TextView dateTime;
+
+  @BindView(R.id.venue)
+  public TextView venue;
+
+  @BindView(R.id.num_attendees)
+  public TextView numAttendees;
+
+  @BindView(R.id.card_view_listing)
+  public CardView cardView;
+
+  @BindView(R.id.owner_name)
+  public TextView nameView;
+
+  @BindView(R.id.color_code_drawable)
+  public ImageView colorCode;
+
+  public View view;
+
   private boolean expanded;
 
   public ListingsViewHolder(View view) {
     super(view);
     ButterKnife.bind(this, view);
-    moduleCode = view.findViewById(R.id.module_code);
-    dateTime = view.findViewById(R.id.date_time);
-    venue = view.findViewById(R.id.venue);
-    numAttendees = view.findViewById(R.id.num_attendees);
-    cardView = view.findViewById(R.id.card_view_listing);
-    nameView = view.findViewById(R.id.owner_name);
-    colorCode = view.findViewById(R.id.color_code_drawable);
     this.view = view;
   }
 

@@ -66,7 +66,7 @@ public class MakeReportActivity extends LoggedInActivity {
   public void onClick_submit() {
     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    String reportDescription = descriptionView.getText().toString();
+    String reportDescription = descriptionView.getText().toString().trim();
     if (reportDescription.isEmpty()) {
       Snacky.builder().setActivity(this).setText("Please fill in the report description.").error()
           .show();

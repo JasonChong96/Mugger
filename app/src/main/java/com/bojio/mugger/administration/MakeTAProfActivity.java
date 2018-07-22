@@ -107,7 +107,7 @@ public class MakeTAProfActivity extends LoggedInActivity {
 
   @OnClick(R.id.make_ta_prof_button_submit)
   void onClick_submit() {
-    String module = editTextModule.getText().toString();
+    String module = editTextModule.getText().toString().trim();
     if (module.isEmpty()) {
       Toasty.error(this, "Please fill in a module code.", Toast.LENGTH_SHORT).show();
     } else if (newRole == ModuleRole.EMPTY) {

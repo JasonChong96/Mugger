@@ -33,6 +33,7 @@ import com.bojio.mugger.authentication.MuggerUserCache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -122,7 +123,7 @@ public class ProfileFragment extends Fragment {
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     AlertDialog dialog = new SpotsDialog
         .Builder()
-        .setContext(this.getActivity())
+        .setContext(this.requireActivity())
         .setTheme(R.style.SpotsDialog)
         .setMessage("Loading profile...")
         .setCancelable(false)
@@ -130,6 +131,7 @@ public class ProfileFragment extends Fragment {
     dialog.show();
     mViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
     mViewModel.init(profileUid);
+    // Bind views to LiveData references. These will be updated in realtime whenever the data changes.
     mViewModel.getDisplayName().observe(this, nameView::setText);
     mViewModel.getEmail().observe(this, emailView::setText);
     mViewModel.getFaculty().observe(this, facultyView::setText);
@@ -148,105 +150,17 @@ public class ProfileFragment extends Fragment {
       }
     });
     mViewModel.getRole().observe(this, newRole -> {
-      if (mViewModel.adminControlsVisible()) {
-        // Set up admin control buttons and make them visible
-        makeTAProfButton.setVisibility(View.VISIBLE);
-        changeRoleButton.setVisibility(View.VISIBLE);
-        changeRoleButton.setOnClickListener(view -> {
-          if (!mViewModel.adminControlsVisible()) {
-            view.setVisibility(View.GONE);
-            return;
-          }
-          Intent intent = new Intent(this.getActivity(), ChangeMuggerRoleActivity.class);
-          Bundle b = new Bundle();
-          b.putString("uid", profileUid);
-          b.putInt("currentRole", mViewModel.getRole().getValue().getRoleId());
-          intent.putExtras(b);
-          getActivity().startActivity(intent);
-        });
-      }
-      if (mViewModel.moderatorControlsVisible()) {
-        // Set up moderator control buttons and make them visible
-        adminLabelView.setVisibility(View.VISIBLE);
-        muteButton.setVisibility(View.VISIBLE);
-        muteButton.setOnClickListener((View v) -> {
-          new MaterialDialog.Builder(this.getContext())
-              .title("How many hours should " + nameView.getText() + " be muted for? (0 to unmute)")
-              .input("Whole numbers only", "", (dialog1, input) -> {
-                if (!mViewModel.moderatorControlsVisible()) {
-                  v.setVisibility(View.GONE);
-                  return;
-                }
-                AlertDialog dialogg = new SpotsDialog
-                    .Builder()
-                    .setContext(ProfileFragment.this.getContext())
-                    .setMessage("Muting...")
-                    .setCancelable(false)
-                    .setTheme(R.style.SpotsDialog)
-                    .build();
-                dialogg.show();
-                String hoursString = input.toString();
-                int hours;
-                try {
-                  hours = Integer.parseInt(hoursString);
-                } catch (NumberFormatException nfe) {
-                  dialogg.dismiss();
-                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
-                      ("Please input a valid whole number.").error().show();
-                  return;
-                }
-                if (hours >= 0) {
-                  mViewModel.muteUser(hours).addOnCompleteListener(task -> {
-                    dialogg.dismiss();
-                    if (!task.isSuccessful()) {
-                      Snacky.builder()
-                          .setActivity(ProfileFragment.this.getActivity())
-                          .setText("Failed to mute, please try again.")
-                          .error()
-                          .show();
-                    } else {
-                      Snacky.builder()
-                          .setActivity(ProfileFragment.this.getActivity())
-                          .setText("Successfully muted! Thanks for making Mugger a better place.")
-                          .success()
-                          .show();
-                    }
-                  });
-
-                } else {
-                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
-                      ("Please input a valid positive whole number").error().show();
-                }
-              }).show();
-        });
-      }
+      // Set up admin control buttons and make them visible
+      enforceAdminControlsVisibility();
+      // Set up moderator control buttons and make them visible
+      enforceModeratorControlsVisibility();
       if (dialog.isShowing() && mViewModel.isProfileLoaded()) {
         dialog.dismiss();
       }
     });
     // Set up semesters spinner
     mViewModel.getModulesBySem().observe(this, modulesBySem -> {
-      semesters = new ArrayList<>(modulesBySem.keySet());
-      ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout
-          .simple_dropdown_item_1line,
-          semesters);
-      semesterSpinner.setAdapter(adapter);
-      semesterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-          mViewModel.setSelectedSemester(semesters.get(position));
-          modulesView.setText(mViewModel.getSemesterModulesDisplay(semesters.get(position)));
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-          //Shouldn't happen since the selection list never gets altered
-        }
-      });
-      if (mViewModel.getSelectedSemester() != null) {
-        semesterSpinner.setSelection(Math.max(0, semesters.indexOf(mViewModel.getSelectedSemester()))
-            , true);
-      }
+      initModulesInterface(modulesBySem);
       if (dialog.isShowing() && mViewModel.isProfileLoaded()) {
         dialog.dismiss();
       }
@@ -267,7 +181,7 @@ public class ProfileFragment extends Fragment {
       statusWrapper.setVisibility(View.VISIBLE);
       statusView.setVisibility(View.GONE);
       ConstraintLayout layout;
-      layout = getActivity().findViewById(R.id.profile_constraint_layout);
+      layout = requireActivity().findViewById(R.id.profile_constraint_layout);
       ConstraintSet constraintSet = new ConstraintSet();
       constraintSet.clone(layout);
       constraintSet.connect(R.id.divider4, ConstraintSet.TOP, R.id.profile_plain_text_status, ConstraintSet
@@ -276,6 +190,68 @@ public class ProfileFragment extends Fragment {
       updateStatusButton.setVisibility(View.VISIBLE);
     }
     super.onActivityCreated(savedInstanceState);
+  }
+
+  /**
+   * Initializes the user interface for choosing of semesters and viewing of modules.
+   * @param modulesBySem the modules taken in each semester along with his/her role in each
+   */
+  private void initModulesInterface(TreeMap<String, TreeMap<String, Byte>> modulesBySem) {
+    semesters = new ArrayList<>(modulesBySem.keySet());
+    ArrayAdapter<String> adapter = new ArrayAdapter<>(this.requireActivity(), android.R.layout
+        .simple_dropdown_item_1line,
+        semesters);
+    semesterSpinner.setAdapter(adapter);
+    semesterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mViewModel.setSelectedSemester(semesters.get(position));
+        modulesView.setText(mViewModel.getSemesterModulesDisplay(semesters.get(position)));
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+        //Shouldn't happen since the selection list never gets altered
+      }
+    });
+    if (mViewModel.getSelectedSemester() != null) {
+      semesterSpinner.setSelection(Math.max(0, semesters.indexOf(mViewModel.getSelectedSemester()))
+          , true);
+    }
+  }
+
+  /**
+   * Make moderator controls visible if the user has moderator privileges, or else it'll make
+   * them invisible. This allows moderators to mute the user through his/her profile.
+   *
+   * @return true if moderator controls have been made visible, false if not
+   */
+  private boolean enforceModeratorControlsVisibility() {
+    if (mViewModel.moderatorControlsVisible()) {
+      adminLabelView.setVisibility(View.VISIBLE);
+      muteButton.setVisibility(View.VISIBLE);
+    } else {
+      adminLabelView.setVisibility(View.GONE);
+      muteButton.setVisibility(View.GONE);
+    }
+    return mViewModel.moderatorControlsVisible();
+  }
+
+  /**
+   * Make admin controls visible if the user has admin privileges, or else it will make them
+   * invisible. The controls are make ta/prof and change role.
+   *
+   * @return true if admin controls have been made visible, false if not
+   */
+  private boolean enforceAdminControlsVisibility() {
+    if (mViewModel.adminControlsVisible()) {
+      makeTAProfButton.setVisibility(View.VISIBLE);
+      changeRoleButton.setVisibility(View.VISIBLE);
+    } else {
+      makeTAProfButton.setVisibility(View.GONE);
+      changeRoleButton.setVisibility(View.GONE);
+    }
+    return mViewModel.adminControlsVisible();
   }
 
   @Override
@@ -289,9 +265,13 @@ public class ProfileFragment extends Fragment {
     return view;
   }
 
+  /**
+   * Called when user clicks on the update status button. Replaces the status with what the user
+   * input into the edit text field.
+   */
   @OnClick(R.id.profile_button_update_status)
   void onClick_updateStatus() {
-    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context
+    InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context
         .INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(this.getView().getWindowToken(), 0);
     mViewModel.updateStatus(editStatusView.getText().toString())
@@ -312,19 +292,100 @@ public class ProfileFragment extends Fragment {
         });
   }
 
-
+  /**
+   * Called when the user clicks on the make ta/prof button. This is only available for admins.
+   * If someone without admin privileges clicks it, the button will disappear and no further
+   * operations will be done. If the user has admin privileges, opens the UI for promoting the
+   * user to a ta/prof.
+   */
   @OnClick(R.id.profile_button_make_ta_prof)
   void onClick_makeTAProf() {
-    if (!MuggerRole.ADMIN.check(MuggerUserCache.getInstance().getRole())) {
-      makeTAProfButton.setVisibility(View.GONE);
+    if (!enforceAdminControlsVisibility()) {
       return;
     }
-    Intent intent = new Intent(this.getActivity(), MakeTAProfActivity.class);
+    Intent intent = new Intent(this.requireActivity(), MakeTAProfActivity.class);
     Bundle b = new Bundle();
     b.putString("name", nameView.getText().toString());
     b.putString("userUid", profileUid);
     intent.putExtras(b);
-    getActivity().startActivity(intent);
+    requireActivity().startActivity(intent);
+  }
+
+  /**
+   * Called when user clicks on the change mugger role button.  This is only available for admins.
+   * If someone without admin privileges clicks it, the button will disappear and no further
+   * operations will be done. If the user has admin privileges, opens the UI for changing the
+   * user's role in the application.
+   */
+  @OnClick(R.id.profile_button_change_mugger_role)
+  void onClick_changeMuggerRole() {
+    if (!enforceAdminControlsVisibility()) {
+      return;
+    }
+    Intent intent = new Intent(requireActivity(), ChangeMuggerRoleActivity.class);
+    Bundle b = new Bundle();
+    b.putString("uid", profileUid);
+    b.putInt("currentRole", mViewModel.getRole().getValue().getRoleId());
+    intent.putExtras(b);
+    requireActivity().startActivity(intent);
+  }
+
+  /**
+   * Called when user clicks on the change mugger role button.  This is only available for
+   * moderators. If someone without moderator privileges clicks it, the button will disappear and
+   * no further operations will be done. If the user has moderator privileges, builds and opens
+   * the dialog for muting the user.
+   */
+  @OnClick(R.id.profile_button_mute)
+  void onClick_muteUser() {
+    if (!enforceAdminControlsVisibility()) {
+      return;
+    }
+    new MaterialDialog.Builder(requireContext())
+        .title("How many hours should " + nameView.getText() + " be muted for? (0 to unmute)")
+        .input("Positive numbers only, decimals allowed", "", (dialog1, input) -> {
+          AlertDialog dialogg = new SpotsDialog
+              .Builder()
+              .setContext(ProfileFragment.this.requireContext())
+              .setMessage("Muting...")
+              .setCancelable(false)
+              .setTheme(R.style.SpotsDialog)
+              .build();
+          dialogg.show();
+          String hoursString = input.toString();
+          double hours;
+          try {
+            hours = Double.parseDouble(hoursString);
+          } catch (NumberFormatException nfe) {
+            // Input is not a valid number
+            dialogg.dismiss();
+            Snacky.builder().setActivity(ProfileFragment.this.requireActivity()).setText
+                ("Please input a valid positive number.").error().show();
+            return;
+          }
+          if (hours >= 0) {
+            mViewModel.muteUser(hours).addOnCompleteListener(task -> {
+              dialogg.dismiss();
+              if (!task.isSuccessful()) {
+                Snacky.builder()
+                    .setActivity(requireActivity())
+                    .setText("Failed to mute, please try again.")
+                    .error()
+                    .show();
+              } else {
+                Snacky.builder()
+                    .setActivity(requireActivity())
+                    .setText("Successfully muted! Thanks for making Mugger a better place.")
+                    .success()
+                    .show();
+              }
+            });
+          } else {
+            dialogg.dismiss();
+            Snacky.builder().setActivity(ProfileFragment.this.requireActivity()).setText
+                ("Please input a valid positive number").error().show();
+          }
+        }).show();
   }
 
   @Override

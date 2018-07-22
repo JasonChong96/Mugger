@@ -62,8 +62,8 @@ public class MakeFeedbackActivity extends LoggedInActivity {
     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
-    String title = titleView.getText().toString();
-    String description = descriptionView.getText().toString();
+    String title = titleView.getText().toString().trim();
+    String description = descriptionView.getText().toString().trim();
     if (title.isEmpty()) {
       Snackbar.make(view, "Please fill in a title.", Snackbar.LENGTH_SHORT).show();
       return;

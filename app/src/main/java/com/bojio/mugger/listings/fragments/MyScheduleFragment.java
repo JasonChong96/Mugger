@@ -94,6 +94,11 @@ public class MyScheduleFragment extends Fragment {
   private void onDateChanged(@NonNull MaterialCalendarView calendar, @NonNull CalendarDay
       selectedDay, boolean selected) {
     if (selected) {
+      if (mRecyclerView.getAdapter() != null) {
+        if (mRecyclerView.getAdapter() instanceof ListingsFirestoreAdapter) {
+          ((ListingsFirestoreAdapter) mRecyclerView.getAdapter()).stopListening();
+        }
+      }
       mViewModel.setSelectedDay(selectedDay);
       FirestoreRecyclerOptions<Listing> options = ListingUtils.getRecyclerOptions(mViewModel.getQuery(),
           this);

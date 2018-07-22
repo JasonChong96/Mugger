@@ -44,8 +44,7 @@ public class ViewAttendeesActivity extends LoggedInActivity {
     setContentView(R.layout.activity_view_attendees);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    dialog = new SpotsDialog
-        .Builder()
+    dialog = new SpotsDialog.Builder()
         .setContext(this)
         .setMessage("Loading data...")
         .setCancelable(false)
@@ -53,17 +52,32 @@ public class ViewAttendeesActivity extends LoggedInActivity {
         .build();
     dialog.show();
     Bundle b = getIntent().getExtras();
+    if (b == null) {
+      Toasty.error(this, "Error, missing attendees' information.").show();
+      finish();
+      return;
+    }
     ownerUid = b.getString("ownerUid");
     profileIds = b.getStringArrayList("profiles");
-    List<Task<?>> tasks = new ArrayList<>();
     colRef = MuggerDatabase.getAllUsersReference(db);
     profiles = new ArrayList<>();
+    loadProfiles();
+  }
+
+  /**
+   * Loads profile data of all attendees and initializes the RecyclerView to display them. If it
+   * fails, the activity will be finished and a toast message will be shown to indicate an error
+   * to the user.
+   */
+  private void loadProfiles() {
+    List<Task<?>> tasks = new ArrayList<>();
     for (String id : profileIds) {
       tasks.add(colRef.document(id).get().addOnCompleteListener(task -> {
         if (task.isSuccessful()) {
           profiles.add(task.getResult());
         } else {
-          throw new RuntimeException();
+          Toasty.error(this, "Error loading attendees' data.").show();
+          return;
         }
       }));
     }
@@ -73,6 +87,7 @@ public class ViewAttendeesActivity extends LoggedInActivity {
         Toasty.error(this, "Error fetching profile data").show();
         finish();
       } else {
+        // Setup view for profile list.
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ProfileListRecyclerAdapter adapter = new ProfileListRecyclerAdapter(profiles, ownerUid);
         recyclerView.setAdapter(adapter);

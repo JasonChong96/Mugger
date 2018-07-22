@@ -64,8 +64,8 @@ public class MakeProfTARequestActivity extends LoggedInActivity {
   public void onClick_submit() {
     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    String moduleCode = moduleCodeView.getText().toString();
-    String description = descriptionView.getText().toString();
+    String moduleCode = moduleCodeView.getText().toString().trim();
+    String description = descriptionView.getText().toString().trim();
     if (roleSpinner.getSelectedItemPosition() == 0) {
       Snacky.builder()
           .setActivity(this)
