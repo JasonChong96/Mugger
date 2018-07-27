@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Mugger</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_main2">Loading</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Mugger</string>
@@ -185,5 +185,19 @@
     <string name="settings_key_toggle_delete_notifications">toggle_delete_notifications</string>
     <string name="settings_key_toggle_create_notifications">toggle_create_notifications</string>
     <string name="settings_key_toggle_chat_notifications">toggle_chat_notifications</string>
+    <string name="intro_desc_1">Study together for common modules and forge new friendships here in NUS</string>
+    <string name="intro_title_1">Welcome to Mugger!</string>
+    <string name="intro_desc_2">Choose from a wide variety of study sessions for any module
+        created by fellow students and staff</string>
+    <string name="intro_title_2">Anytime, Anywhere</string>
+    <string name="intro_desc_3">Make your own listings for others to join, as well as interact
+        with them in the chat room prior to meeting face-to-face</string>
+    <string name="intro_title_3"><![CDATA[Create & Engage]]></string>
+    <string name="intro_title_4">Your welfare matters to us</string>
+    <string name="intro_desc_4">Our dedicated admins will be happy to respond to any reports and feedback you have</string>
+    <string name="intro_title_5">Organised for Simplicity</string>
+    <string name="intro_desc_5">Keep track of all the available listings at one glance with the
+        colour-coding system</string>
+    <string name="settings_key_toggle_unrelated_modules">toggle_unrelated_modules</string>
 
 </resources>

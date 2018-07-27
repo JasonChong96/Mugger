@@ -1,24 +1,19 @@
 package com.bojio.mugger.administration.feedback;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,10 +22,7 @@ import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class MakeFeedbackActivity extends AppCompatActivity {
-
-  @BindView(R.id.make_feedback_button)
-  Button submitButton;
+public class MakeFeedbackActivity extends LoggedInActivity {
 
   @BindView(R.id.make_feedback_title)
   EditText titleView;
@@ -41,17 +33,20 @@ public class MakeFeedbackActivity extends AppCompatActivity {
   @BindView(android.R.id.content)
   View view;
 
-  FirebaseUser user;
-  FirebaseFirestore db;
-  AlertDialog dialog;
+  private MakeFeedbackViewModel mViewModel;
+  private AlertDialog dialog;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_make_feedback);
+    mViewModel = ViewModelProviders.of(this).get(MakeFeedbackViewModel.class);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    user = FirebaseAuth.getInstance().getCurrentUser();
     db = FirebaseFirestore.getInstance();
     dialog = new SpotsDialog
         .Builder()
@@ -67,8 +62,8 @@ public class MakeFeedbackActivity extends AppCompatActivity {
     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
-    String title = titleView.getText().toString();
-    String description = descriptionView.getText().toString();
+    String title = titleView.getText().toString().trim();
+    String description = descriptionView.getText().toString().trim();
     if (title.isEmpty()) {
       Snackbar.make(view, "Please fill in a title.", Snackbar.LENGTH_SHORT).show();
       return;
@@ -78,13 +73,7 @@ public class MakeFeedbackActivity extends AppCompatActivity {
       return;
     }
     dialog.show();
-    Map<String, Object> feedback = new HashMap<>();
-    feedback.put("title", title);
-    feedback.put("description", description);
-    feedback.put("userUid", user.getUid());
-    feedback.put("userName", user.getDisplayName());
-    feedback.put("time", System.currentTimeMillis());
-    db.collection("feedback").add(feedback).addOnCompleteListener(task -> {
+    mViewModel.submitFeedback(title, description).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         dialog.dismiss();
         Snacky.builder().setActivity(this).setText("Failed to submit feedback, please try again" +

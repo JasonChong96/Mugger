@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +16,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -27,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
 
-public class ViewAllProfTARequestActivity extends AppCompatActivity {
+public class ViewAllProfTARequestActivity extends LoggedInActivity {
   FirebaseFirestore db;
 
   @BindView(R.id.profta_request_view_empty_text)
@@ -43,6 +44,10 @@ public class ViewAllProfTARequestActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_view_all_prof_tarequest);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     ButterKnife.bind(this);
@@ -50,7 +55,7 @@ public class ViewAllProfTARequestActivity extends AppCompatActivity {
   }
 
   private void initRecycler() {
-    Query mQuery = db.collection("requestsProfTA").orderBy("time", Query.Direction.DESCENDING);
+    Query mQuery = MuggerDatabase.getAllProfTARequestsReference(db).orderBy("time", Query.Direction.DESCENDING);
     FirestoreRecyclerOptions<ProfTARequest> options = new FirestoreRecyclerOptions.Builder<ProfTARequest>()
         .setQuery(mQuery, ProfTARequest::getRequestFromSnapshot).build();
     FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<ProfTARequest,

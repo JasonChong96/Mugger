@@ -1,26 +1,20 @@
 package com.bojio.mugger.administration.requests;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.bojio.mugger.authentication.LoggedInActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,13 +23,9 @@ import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class MakeProfTARequestActivity extends AppCompatActivity {
+public class MakeProfTARequestActivity extends LoggedInActivity {
   private static String[] roles = {"Click here to choose a role.", "Teaching Assistant",
       "Professor"};
-  FirebaseUser user;
-  FirebaseFirestore db;
-  @BindView(R.id.request_profta_button)
-  Button submitButton;
   @BindView(R.id.request_profta_description)
   EditText descriptionView;
   @BindView(R.id.request_profta_module_code)
@@ -45,17 +35,16 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
   @BindView(android.R.id.content)
   View view;
   private AlertDialog dialog;
+  private MakeProfTARequestViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    db = FirebaseFirestore.getInstance();
-    user = FirebaseAuth.getInstance().getCurrentUser();
-    if (user == null) {
+    super.onCreate(savedInstanceState);
+    if (stopActivity) {
       finish();
-      Toasty.info(this, "Not logged in", Toast.LENGTH_SHORT).show();
       return;
     }
-    super.onCreate(savedInstanceState);
+    mViewModel = ViewModelProviders.of(this).get(MakeProfTARequestViewModel.class);
     setContentView(R.layout.activity_make_prof_tarequest);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     ButterKnife.bind(this);
@@ -75,35 +64,24 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
   public void onClick_submit() {
     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    String moduleCode = moduleCodeView.getText().toString();
-    String description = descriptionView.getText().toString();
+    String moduleCode = moduleCodeView.getText().toString().trim();
+    String description = descriptionView.getText().toString().trim();
     if (roleSpinner.getSelectedItemPosition() == 0) {
-      Snacky.builder().setActivity(this)
+      Snacky.builder()
+          .setActivity(this)
           .setText("Please choose your role in the module.")
-          .error().show();
+          .error()
+          .show();
       return;
     }
-    if (moduleCode.isEmpty()) {
-      Snacky.builder().setActivity(this)
-          .setText("Please enter the module code.")
-          .error().show();
+    if (isFieldEmpty(moduleCode, "Please fill in the module code.")) {
       return;
     }
-    if (description.isEmpty()) {
-      Snacky.builder().setActivity(this)
-          .setText("Please fill in the description field.")
-          .error().show();
+    if (isFieldEmpty(description, "Please fill in the description field.")) {
       return;
     }
     dialog.show();
-    Map<String, Object> request = new HashMap<>();
-    request.put("time", System.currentTimeMillis());
-    request.put("moduleCode", moduleCode);
-    request.put("description", description);
-    request.put("role", roleSpinner.getSelectedItem().toString());
-    request.put("userUid", user.getUid());
-    request.put("userName", user.getDisplayName());
-    db.collection("requestsProfTA").add(request).addOnCompleteListener(task -> {
+    mViewModel.submitRequest(moduleCode, description, roleSpinner.getSelectedItem().toString()).addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         dialog.dismiss();
         Snackbar.make(view, "Failed to submit request, please try again later.", Snackbar
@@ -114,6 +92,16 @@ public class MakeProfTARequestActivity extends AppCompatActivity {
         finish();
       }
     });
+  }
+
+  private boolean isFieldEmpty(String toCheck, String errorMsg) {
+    if (toCheck.isEmpty()) {
+      Snacky.builder().setActivity(this)
+          .setText(errorMsg)
+          .error().show();
+      return true;
+    }
+    return false;
   }
 
   @Override

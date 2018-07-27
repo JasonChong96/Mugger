@@ -13,11 +13,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.bojio.mugger.R;
-import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.DebugSettings;
 import com.bojio.mugger.authentication.MuggerRole;
+import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.constants.DebugSettings;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
-import com.bojio.mugger.listings.chat.ListingChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -70,14 +69,14 @@ public class MessagingService extends FirebaseMessagingService {
     if (user != null) {
       switch (data.get("type")) {
         case "mute":
-          MuggerUser.getInstance().getData().put("muted", Long.parseLong(data.get("until")));
+          MuggerUserCache.getInstance().getData().put("muted", Long.parseLong(data.get("until")));
           break;
         case "unmute":
-          MuggerUser.getInstance().getData().remove("muted");
+          MuggerUserCache.getInstance().getData().remove("muted");
           break;
         case "role":
           MuggerRole newRole = MuggerRole.valueOf(data.get("newRoleName"));
-          MuggerUser.getInstance().setRole(newRole);
+          MuggerUserCache.getInstance().setRole(newRole);
           break;
       }
     }
@@ -124,7 +123,7 @@ public class MessagingService extends FirebaseMessagingService {
   private void sendNotification(Map<String, String> data) {
     String listingUid = data.get("listingUid");
     String type = data.get("type");
-    Map<String, Object> cache = MuggerUser.getInstance().getData();
+    Map<String, Object> cache = MuggerUserCache.getInstance().getData();
     if (cache == null) {
       return;
     } else if (type.equals(CHAT_NOTIFICATION) && cache.get(CHAT_NOTIFICATION) != null && cache.get(CHAT_NOTIFICATION).equals(Long.valueOf(0))) {
@@ -142,7 +141,7 @@ public class MessagingService extends FirebaseMessagingService {
     String messageTitle = data.get("title");
     Intent intent;
     if (data.get("type").equals(MessagingService.CHAT_NOTIFICATION)) {
-      intent = new Intent(this, ListingChatActivity.class);
+      intent = new Intent(this, AvailableListingDetailsActivity.class);
       Bundle b = new Bundle();
       b.putString("listingUid", data.get("listingUid"));
       intent.putExtras(b);

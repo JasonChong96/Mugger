@@ -1,9 +1,9 @@
 package com.bojio.mugger.administration.reports;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -11,9 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.bojio.mugger.authentication.LoggedInActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +23,7 @@ import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class MakeReportActivity extends AppCompatActivity {
+public class MakeReportActivity extends LoggedInActivity {
 
   @BindView(R.id.make_report_description)
   EditText descriptionView;
@@ -33,15 +31,16 @@ public class MakeReportActivity extends AppCompatActivity {
   View view;
   private Map<String, Object> reportData;
   private Report.ReportType type;
-  private FirebaseFirestore db;
-  private FirebaseUser user;
   private AlertDialog dialog;
+  private MakeReportViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    db = FirebaseFirestore.getInstance();
-    user = FirebaseAuth.getInstance().getCurrentUser();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_make_report);
     ButterKnife.bind(this);
     Bundle b = getIntent().getExtras();
@@ -51,9 +50,8 @@ public class MakeReportActivity extends AppCompatActivity {
       finish();
       return;
     }
-    type = Report.ReportType.valueOf(b.getString("reportType"));
-    type.transferData(b, reportData);
-    reportData.put("type", type.name());
+    mViewModel = ViewModelProviders.of(this).get(MakeReportViewModel.class);
+    mViewModel.init(b);
     dialog = new SpotsDialog
         .Builder()
         .setContext(this)
@@ -68,18 +66,14 @@ public class MakeReportActivity extends AppCompatActivity {
   public void onClick_submit() {
     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    String reportDescription = descriptionView.getText().toString();
+    String reportDescription = descriptionView.getText().toString().trim();
     if (reportDescription.isEmpty()) {
       Snacky.builder().setActivity(this).setText("Please fill in the report description.").error()
           .show();
       return;
     }
     dialog.show();
-    reportData.put("reporterUid", user.getUid());
-    reportData.put("reporterName", user.getDisplayName());
-    reportData.put("time", System.currentTimeMillis());
-    reportData.put("description", reportDescription);
-    db.collection("reports").add(reportData).addOnCompleteListener(task -> {
+    mViewModel.submitReport(reportDescription).addOnCompleteListener(task -> {
       dialog.dismiss();
       if (!task.isSuccessful()) {
         Snacky.builder().setActivity(this).setText("Report submission failed. Please try again " +

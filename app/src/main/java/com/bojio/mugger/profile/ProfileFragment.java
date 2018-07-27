@@ -1,13 +1,14 @@
 package com.bojio.mugger.profile;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatDelegate;
@@ -27,20 +28,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.ChangeMuggerRoleActivity;
 import com.bojio.mugger.administration.MakeTAProfActivity;
-import com.bojio.mugger.authentication.MuggerUser;
 import com.bojio.mugger.authentication.MuggerRole;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.bojio.mugger.authentication.MuggerUserCache;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,12 +87,9 @@ public class ProfileFragment extends Fragment {
   @BindView(R.id.profile_plain_text_status_wrapper)
   TextInputLayout statusWrapper;
   private String profileUid;
-  private FirebaseFirestore db;
-  private FirebaseAuth mAuth;
-  private List<List<String>> modulesBySem, modulesBySem_ta, modulesBySem_prof;
   private List<String> semesters;
-  private Map<String, Object> moduleTitles;
   private OnProfileFragmentInteractionListener mListener;
+  private ProfileViewModel mViewModel;
 
   public ProfileFragment() {
     // Required empty public constructor
@@ -130,110 +120,93 @@ public class ProfileFragment extends Fragment {
   }
 
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    // Inflate the layout for this fragment
-    db = FirebaseFirestore.getInstance();
-    mAuth = FirebaseAuth.getInstance();
-    super.onCreate(savedInstanceState);
-    View view = inflater.inflate(R.layout.fragment_profile, container, false);
-    ButterKnife.bind(this, view);
-    Task<DocumentSnapshot> profileTask = db.collection("users").document(profileUid).get();
-    Task<DocumentSnapshot> moduleTitlesTask = db.collection("data").document("moduleTitles").get();
-    Task<QuerySnapshot> modulesTask = db.collection("users").document(profileUid)
-        .collection("semesters").orderBy("semester", Query.Direction.DESCENDING).get();
+  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     AlertDialog dialog = new SpotsDialog
         .Builder()
-        .setContext(this.getActivity())
+        .setContext(this.requireActivity())
         .setTheme(R.style.SpotsDialog)
         .setMessage("Loading profile...")
         .setCancelable(false)
         .build();
     dialog.show();
-    Tasks.whenAll(profileTask, modulesTask, moduleTitlesTask).addOnCompleteListener
-        (task -> {
-          ProfileFragment.this.moduleTitles = moduleTitlesTask.getResult().getData();
-          ProfileFragment.this.loadProfile(profileTask.getResult(), modulesTask.getResult().getDocuments
-              ());
-          dialog.dismiss();
-        });
-    return view;
+    mViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+    mViewModel.init(profileUid);
+    // Bind views to LiveData references. These will be updated in realtime whenever the data changes.
+    mViewModel.getDisplayName().observe(this, nameView::setText);
+    mViewModel.getEmail().observe(this, emailView::setText);
+    mViewModel.getFaculty().observe(this, facultyView::setText);
+    mViewModel.getFirstMajor().observe(this, firstMajorView::setText);
+    mViewModel.getStatus().observe(this, newStatus -> {
+      statusView.setText(newStatus);
+      editStatusView.setText(newStatus);
+    });
+    mViewModel.getSecondMajor().observe(this, newSecondMajor -> {
+      if (newSecondMajor == null && secondMajorView.getVisibility() == View.VISIBLE) {
+        secondMajorView.setVisibility(View.GONE);
+      } else if (newSecondMajor != null && secondMajorView.getVisibility() != View.VISIBLE) {
+        secondMajorView.setText(newSecondMajor);
+        secondMajorView.setText(newSecondMajor);
+        secondMajorView.setVisibility(View.VISIBLE);
+      }
+    });
+    mViewModel.getRole().observe(this, newRole -> {
+      // Set up admin control buttons and make them visible
+      enforceAdminControlsVisibility();
+      // Set up moderator control buttons and make them visible
+      enforceModeratorControlsVisibility();
+      if (dialog.isShowing() && mViewModel.isProfileLoaded()) {
+        dialog.dismiss();
+      }
+    });
+    // Set up semesters spinner
+    mViewModel.getModulesBySem().observe(this, modulesBySem -> {
+      initModulesInterface(modulesBySem);
+      if (dialog.isShowing() && mViewModel.isProfileLoaded()) {
+        dialog.dismiss();
+      }
+    });
+    // Listen to changes in module titles and reload module display if they change
+    mViewModel.getModuleTitles().observe(this, titles -> {
+      if (semesterSpinner.getSelectedItem() != null) {
+        modulesView.setText(mViewModel.getSemesterModulesDisplay((String) semesterSpinner
+            .getSelectedItem()));
+      }
+      if (dialog.isShowing() && mViewModel.isProfileLoaded()) {
+        dialog.dismiss();
+      }
+    });
+    if (mViewModel.isOwnProfile()) {
+      // Viewing own profile
+      // Allow editing of own status
+      statusWrapper.setVisibility(View.VISIBLE);
+      statusView.setVisibility(View.GONE);
+      ConstraintLayout layout;
+      layout = requireActivity().findViewById(R.id.profile_constraint_layout);
+      ConstraintSet constraintSet = new ConstraintSet();
+      constraintSet.clone(layout);
+      constraintSet.connect(R.id.divider4, ConstraintSet.TOP, R.id.profile_plain_text_status, ConstraintSet
+          .BOTTOM, 8);
+      constraintSet.applyTo(layout);
+      updateStatusButton.setVisibility(View.VISIBLE);
+    }
+    super.onActivityCreated(savedInstanceState);
   }
 
-  private void loadProfile(DocumentSnapshot profile, List<DocumentSnapshot> moduless) {
-    if (getActivity() == null) {
-      return;
-    }
-    Map<String, Object> profileData = profile.getData();
-    String displayName = (String) profileData.get("displayName");
-    nameView.setText(displayName);
-    if (profileData.get("muted") != null && (Long) profileData.get("muted") > System
-        .currentTimeMillis()) {
-      nameView.setText(String.format("%s (Muted)", nameView.getText().toString()));
-    }
-    getActivity().setTitle(displayName + "'s Profile");
-    emailView.setText((String) profileData.get("email"));
-    if (profileData.get("sex").equals("Female")) {
-      sexView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.gender_female));
-    }
-    facultyView.setText((String) profileData.get("faculty"));
-    firstMajorView.setText((String) profileData.get("firstMajor"));
-    String secondMajor = (String) profileData.get("secondMajor");
-    if (secondMajor == null) {
-      secondMajorView.setVisibility(View.GONE);
-    } else {
-      secondMajorView.setText((String) profileData.get("secondMajor"));
-    }
-    semesters = new ArrayList<>();
-    modulesBySem = new ArrayList<>();
-    modulesBySem_prof = new ArrayList<>();
-    modulesBySem_ta = new ArrayList<>();
-    for (DocumentSnapshot snapshot : moduless) {
-      semesters.add(snapshot.getId().replace(".", "/"));
-      modulesBySem.add((List<String>) snapshot.get("moduleCodes"));
-      List<String> ta = (List<String>) snapshot.get("ta");
-      if (ta == null) {
-        ta = new ArrayList<>();
-      }
-      modulesBySem_ta.add(ta);
-      List<String> prof = (List<String>) snapshot.get("professor");
-      if (prof == null) {
-        prof = new ArrayList<>();
-      }
-      modulesBySem_prof.add(prof);
-    }
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout
+  /**
+   * Initializes the user interface for choosing of semesters and viewing of modules.
+   * @param modulesBySem the modules taken in each semester along with his/her role in each
+   */
+  private void initModulesInterface(TreeMap<String, TreeMap<String, Byte>> modulesBySem) {
+    semesters = new ArrayList<>(modulesBySem.keySet());
+    ArrayAdapter<String> adapter = new ArrayAdapter<>(this.requireActivity(), android.R.layout
         .simple_dropdown_item_1line,
         semesters);
     semesterSpinner.setAdapter(adapter);
     semesterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        StringBuilder sb = new StringBuilder();
-        List<String> mods_prof = modulesBySem_prof.get(position);
-        for (int i = 0; i < mods_prof.size(); i++) {
-          String mod = mods_prof.get(i);
-          sb.append("(Prof)").append(mod).append(" ").append(moduleTitles.get(mod) == null ? "" : moduleTitles.get(mod));
-          sb.append("\n");
-        }
-        List<String> mods_ta = modulesBySem_ta.get(position);
-        for (int i = 0; i < mods_ta.size(); i++) {
-          String mod = mods_ta.get(i);
-          sb.append("(TA)").append(mod).append(" ").append(moduleTitles.get(mod) == null ? "" :
-              moduleTitles.get(mod));
-          sb.append("\n");
-        }
-        List<String> mods = modulesBySem.get(position);
-        for (int i = 0; i < mods.size(); i++) {
-          String mod = mods.get(i);
-          sb.append(mod).append(" ").append(moduleTitles.get(mod) == null ? "" : moduleTitles.get
-              (mod));
-          if (i < mods.size() - 1) {
-            // Not last make new line
-            sb.append("\n");
-          }
-        }
-        modulesView.setText(sb.toString());
+        mViewModel.setSelectedSemester(semesters.get(position));
+        modulesView.setText(mViewModel.getSemesterModulesDisplay(semesters.get(position)));
       }
 
       @Override
@@ -241,159 +214,178 @@ public class ProfileFragment extends Fragment {
         //Shouldn't happen since the selection list never gets altered
       }
     });
-    semesterSpinner.setSelection(0, true); // true to trigger onItemSelected
-    if (mAuth.getCurrentUser().getUid().equals(profileUid)) {
-      // Viewing own profile
-      statusWrapper.setVisibility(View.VISIBLE);
-      statusView.setVisibility(View.GONE);
-      ConstraintLayout layout;
-      layout = getActivity().findViewById(R.id.profile_constraint_layout);
-      ConstraintSet constraintSet = new ConstraintSet();
-      constraintSet.clone(layout);
-      constraintSet.connect(R.id.divider4, ConstraintSet.TOP, R.id.profile_plain_text_status, ConstraintSet
-          .BOTTOM, 8);
-      constraintSet.applyTo(layout);
-      editStatusView.setText((String) profileData.get("status"));
-      updateStatusButton.setVisibility(View.VISIBLE);
-    } else {
-      statusView.setText((String) profileData.get("status"));
+    if (mViewModel.getSelectedSemester() != null) {
+      semesterSpinner.setSelection(Math.max(0, semesters.indexOf(mViewModel.getSelectedSemester()))
+          , true);
     }
-    MuggerRole ownRole = MuggerUser.getInstance().getRole();
-    MuggerRole profileRole = MuggerRole.getByRoleId((Long) profileData.get("roleId"));
-    if (MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
+  }
+
+  /**
+   * Make moderator controls visible if the user has moderator privileges, or else it'll make
+   * them invisible. This allows moderators to mute the user through his/her profile.
+   *
+   * @return true if moderator controls have been made visible, false if not
+   */
+  private boolean enforceModeratorControlsVisibility() {
+    if (mViewModel.moderatorControlsVisible()) {
       adminLabelView.setVisibility(View.VISIBLE);
       muteButton.setVisibility(View.VISIBLE);
-      muteButton.setOnClickListener((View v) -> {
-        new MaterialDialog.Builder(this.getContext())
-            .title("How many hours should " + displayName + " be muted for? (0 to unmute)")
-            .input("Whole numbers only", "", new MaterialDialog.InputCallback
-                () {
-              @Override
-              public void onInput(MaterialDialog dialog, CharSequence input) {
-                if (!MuggerRole.MODERATOR.check(MuggerUser.getInstance().getRole())) {
-                  muteButton.setVisibility(View.GONE);
-                  return;
-                }
-                AlertDialog dialogg = new SpotsDialog
-                    .Builder()
-                    .setContext(ProfileFragment.this.getContext())
-                    .setMessage("Muting...")
-                    .setCancelable(false)
-                    .setTheme(R.style.SpotsDialog)
-                    .build();
-                dialogg.show();
-                String hoursString = input.toString();
-                int hours = 0;
-                try {
-                  hours = Integer.parseInt(hoursString);
-                } catch (NumberFormatException nfe) {
-                  dialogg.dismiss();
-                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
-                      ("Please input a valid whole number.").error().show();
-                  return;
-                }
-                if (hours >= 0) {
-                  List<Task<?>> tasks = new ArrayList<>();
-                  long until = hours * 3600000 + System.currentTimeMillis();
-                  tasks.add(profile.getReference().update("muted", until));
-                  Map<String, Object> notificationData = new HashMap<>();
-                  if (profileData.get("instanceId") != null) {
-                    int duration = Integer.parseInt(hoursString);
-                    notificationData.put("instanceId", profileData.get("instanceId"));
-                    notificationData.put("duration", Integer.toString(duration));
-                    notificationData.put("fromUid", "");
-                    notificationData.put("topicUid", "");
-                    notificationData.put("type", hours == 0 ? "unmute" : "mute");
-                    notificationData.put("until", Long.toString(until));
-                    tasks.add(db.collection("notifications").add(notificationData));
-                  }
-                  Tasks.whenAll(tasks).addOnCompleteListener(task -> {
-                    dialogg.dismiss();
-                    if (!task.isSuccessful()) {
-                      Snacky.builder()
-                          .setActivity(ProfileFragment.this.getActivity())
-                          .setText("Failed to mute, please try again.")
-                          .error()
-                          .show();
-                    } else {
-                      Snacky.builder()
-                          .setActivity(ProfileFragment.this.getActivity())
-                          .setText("Successfully muted! Thanks for making Mugger a better place.")
-                          .success()
-                          .show();
-                    }
-                  });
-
-                } else if (hours < 0) {
-                  Snacky.builder().setActivity(ProfileFragment.this.getActivity()).setText
-                      ("Please input a valid positive whole number").error().show();
-                  return;
-                }
-              }
-            }).show();
-      });
-      //  banButton.setVisibility(View.VISIBLE);
+    } else {
+      adminLabelView.setVisibility(View.GONE);
+      muteButton.setVisibility(View.GONE);
     }
-    if (MuggerRole.ADMIN.check(ownRole)) {
+    return mViewModel.moderatorControlsVisible();
+  }
+
+  /**
+   * Make admin controls visible if the user has admin privileges, or else it will make them
+   * invisible. The controls are make ta/prof and change role.
+   *
+   * @return true if admin controls have been made visible, false if not
+   */
+  private boolean enforceAdminControlsVisibility() {
+    if (mViewModel.adminControlsVisible()) {
       makeTAProfButton.setVisibility(View.VISIBLE);
-      if (true/*!profileUid.equals(mAuth.getUid()) && ownRole.checkSuperiorityTo(profileRole)*/) {
-        changeRoleButton.setVisibility(View.VISIBLE);
-        changeRoleButton.setOnClickListener(view -> {
-          if (!MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
-            view.setVisibility(View.GONE);
-            return;
-          }
-          Intent intent = new Intent(this.getActivity(), ChangeMuggerRoleActivity.class);
-          Bundle b = new Bundle();
-          b.putString("uid", profileUid);
-          b.putInt("currentRole", profileRole.getRoleId());
-          intent.putExtras(b);
-          getActivity().startActivity(intent);
-          getActivity().finish();
-        });
-      }
+      changeRoleButton.setVisibility(View.VISIBLE);
+    } else {
+      makeTAProfButton.setVisibility(View.GONE);
+      changeRoleButton.setVisibility(View.GONE);
     }
-
-
+    return mViewModel.adminControlsVisible();
   }
 
-  // TODO: Rename method, update argument and hook method into UI event
-  public void onButtonPressed(Uri uri) {
-    if (mListener != null) {
-      mListener.onProfileFragmentInteraction(uri);
-    }
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
+    // Inflate the layout for this fragment
+    super.onCreate(savedInstanceState);
+    View view = inflater.inflate(R.layout.fragment_profile, container, false);
+    ButterKnife.bind(this, view);
+
+    return view;
   }
 
+  /**
+   * Called when user clicks on the update status button. Replaces the status with what the user
+   * input into the edit text field.
+   */
   @OnClick(R.id.profile_button_update_status)
   void onClick_updateStatus() {
-    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context
+    InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context
         .INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(this.getView().getWindowToken(), 0);
-    db.collection("users").document(profileUid).update("status", editStatusView.getText()
-        .toString())
+    mViewModel.updateStatus(editStatusView.getText().toString())
         .addOnCompleteListener(task -> {
           if (!task.isSuccessful()) {
-            Snackbar.make(this.getView(), "Error updating status.", Snackbar.LENGTH_SHORT).show();
+            Snacky.builder()
+                .setActivity(requireActivity())
+                .setText("Error updating status.")
+                .error()
+                .show();
           } else {
-            Snackbar.make(this.getView(), "Your status has been updated successfully", Snackbar
-                .LENGTH_SHORT).show();
+            Snacky.builder()
+                .setActivity(requireActivity())
+                .setText("Your status has been updated successfully")
+                .success()
+                .show();
           }
         });
   }
 
-
+  /**
+   * Called when the user clicks on the make ta/prof button. This is only available for admins.
+   * If someone without admin privileges clicks it, the button will disappear and no further
+   * operations will be done. If the user has admin privileges, opens the UI for promoting the
+   * user to a ta/prof.
+   */
   @OnClick(R.id.profile_button_make_ta_prof)
   void onClick_makeTAProf() {
-    if (!MuggerRole.ADMIN.check(MuggerUser.getInstance().getRole())) {
-      makeTAProfButton.setVisibility(View.GONE);
+    if (!enforceAdminControlsVisibility()) {
       return;
     }
-    Intent intent = new Intent(this.getActivity(), MakeTAProfActivity.class);
+    Intent intent = new Intent(this.requireActivity(), MakeTAProfActivity.class);
     Bundle b = new Bundle();
     b.putString("name", nameView.getText().toString());
     b.putString("userUid", profileUid);
     intent.putExtras(b);
-    getActivity().startActivity(intent);
+    requireActivity().startActivity(intent);
+  }
+
+  /**
+   * Called when user clicks on the change mugger role button.  This is only available for admins.
+   * If someone without admin privileges clicks it, the button will disappear and no further
+   * operations will be done. If the user has admin privileges, opens the UI for changing the
+   * user's role in the application.
+   */
+  @OnClick(R.id.profile_button_change_mugger_role)
+  void onClick_changeMuggerRole() {
+    if (!enforceAdminControlsVisibility()) {
+      return;
+    }
+    Intent intent = new Intent(requireActivity(), ChangeMuggerRoleActivity.class);
+    Bundle b = new Bundle();
+    b.putString("uid", profileUid);
+    b.putInt("currentRole", mViewModel.getRole().getValue().getRoleId());
+    intent.putExtras(b);
+    requireActivity().startActivity(intent);
+  }
+
+  /**
+   * Called when user clicks on the change mugger role button.  This is only available for
+   * moderators. If someone without moderator privileges clicks it, the button will disappear and
+   * no further operations will be done. If the user has moderator privileges, builds and opens
+   * the dialog for muting the user.
+   */
+  @OnClick(R.id.profile_button_mute)
+  void onClick_muteUser() {
+    if (!enforceAdminControlsVisibility()) {
+      return;
+    }
+    new MaterialDialog.Builder(requireContext())
+        .title("How many hours should " + nameView.getText() + " be muted for? (0 to unmute)")
+        .input("Positive numbers only, decimals allowed", "", (dialog1, input) -> {
+          AlertDialog dialogg = new SpotsDialog
+              .Builder()
+              .setContext(ProfileFragment.this.requireContext())
+              .setMessage("Muting...")
+              .setCancelable(false)
+              .setTheme(R.style.SpotsDialog)
+              .build();
+          dialogg.show();
+          String hoursString = input.toString();
+          double hours;
+          try {
+            hours = Double.parseDouble(hoursString);
+          } catch (NumberFormatException nfe) {
+            // Input is not a valid number
+            dialogg.dismiss();
+            Snacky.builder().setActivity(ProfileFragment.this.requireActivity()).setText
+                ("Please input a valid positive number.").error().show();
+            return;
+          }
+          if (hours >= 0) {
+            mViewModel.muteUser(hours).addOnCompleteListener(task -> {
+              dialogg.dismiss();
+              if (!task.isSuccessful()) {
+                Snacky.builder()
+                    .setActivity(requireActivity())
+                    .setText("Failed to mute, please try again.")
+                    .error()
+                    .show();
+              } else {
+                Snacky.builder()
+                    .setActivity(requireActivity())
+                    .setText("Successfully muted! Thanks for making Mugger a better place.")
+                    .success()
+                    .show();
+              }
+            });
+          } else {
+            dialogg.dismiss();
+            Snacky.builder().setActivity(ProfileFragment.this.requireActivity()).setText
+                ("Please input a valid positive number").error().show();
+          }
+        }).show();
   }
 
   @Override

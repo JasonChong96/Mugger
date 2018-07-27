@@ -122,12 +122,14 @@
             app:layout_constraintStart_toStartOf="@+id/location"
             app:layout_constraintTop_toBottomOf="@+id/location" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/chat_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="43dp"
             android:layout_marginTop="24dp"
-            android:drawableStart="@drawable/ic_baseline_chat_24px"
+            app:icon="@drawable/ic_baseline_chat_24px"
+            app:iconTint="@color/colorPrimaryDark"
+            android:textColor="@color/colorPrimaryDark"
             android:text="Open Chat"
             app:layout_constraintStart_toStartOf="@+id/description_label"
             app:layout_constraintTop_toBottomOf="@+id/description" />
@@ -136,10 +138,11 @@
             android:id="@+id/is_attending"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginStart="32dp"
             android:text="Attending"
-            app:layout_constraintStart_toStartOf="@+id/description"
-            app:layout_constraintTop_toBottomOf="@+id/description" />
+            app:layout_constraintBottom_toBottomOf="@+id/chat_button"
+            app:layout_constraintStart_toEndOf="@+id/chat_button"
+            app:layout_constraintTop_toTopOf="@+id/chat_button" />
 
         <TextView
             android:id="@+id/num_attendees"
@@ -153,22 +156,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/module_code" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/listing_details_report"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:drawableStart="@drawable/ic_baseline_report_problem_24px"
+            app:icon="@drawable/ic_baseline_report_problem_24px"
+            app:iconTint="@color/colorPrimaryDark"
+            android:textColor="@color/colorPrimaryDark"
             android:text="Report This Listing"
             app:layout_constraintStart_toStartOf="@+id/chat_button"
             app:layout_constraintTop_toBottomOf="@+id/chat_button" />
 
-        <Button
+        <android.support.design.button.MaterialButton
             android:id="@+id/button_view_attendees"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:drawableStart="@drawable/ic_baseline_people_24px"
+            app:icon="@drawable/ic_baseline_people_24px"
+            app:iconTint="@color/colorPrimaryDark"
+            android:textColor="@color/colorPrimaryDark"
             android:text="View Attendees"
             app:layout_constraintStart_toStartOf="@+id/listing_details_report"
             app:layout_constraintTop_toBottomOf="@+id/listing_details_report" />

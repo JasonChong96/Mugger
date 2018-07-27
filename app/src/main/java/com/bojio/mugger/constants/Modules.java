@@ -21,6 +21,7 @@ public class Modules {
     }
     if (irrelevantNames.isEmpty()) {
       irrelevantNames.add("Advanced Placement");
+      irrelevantNames.add("For Poly Graduates");
     }
     if (irrelevantCodes.contains(code)) {
       return false;

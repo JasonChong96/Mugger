@@ -20,7 +20,6 @@ import butterknife.ButterKnife;
 public class ProfileListRecyclerAdapter extends RecyclerView.Adapter<ProfileListRecyclerAdapter.ProfileListViewHolder> {
   String ownerUid;
   private ArrayList<DocumentSnapshot> mCustomObjects;
-  private OnEntryClickListener mOnEntryClickListener;
 
   public ProfileListRecyclerAdapter(ArrayList<DocumentSnapshot> arrayList, String ownerUid) {
     mCustomObjects = arrayList;
@@ -44,10 +43,13 @@ public class ProfileListRecyclerAdapter extends RecyclerView.Adapter<ProfileList
     DocumentSnapshot snapshot = mCustomObjects.get(position);
 
     Map<String, Object> data = snapshot.getData();
+    // (Listing Creator) is appended to the name if this is the creator of the listing
     holder.nameView.setText(String.format("%s%s", data.get("displayName"), snapshot.getId().equals(ownerUid)
         ? " (Listing Creator)" : ""));
     holder.firstMajorView.setText((String) data.get("firstMajor"));
     if (data.containsKey("secondMajor")) {
+      // If there is a second major, which most people don't have. The view is not visible by
+      // default
       holder.secondMajorView.setText((String) data.get("secondMajor"));
       holder.secondMajorView.setVisibility(View.VISIBLE);
     }
@@ -63,14 +65,6 @@ public class ProfileListRecyclerAdapter extends RecyclerView.Adapter<ProfileList
   @Override
   public void onAttachedToRecyclerView(RecyclerView recyclerView) {
     super.onAttachedToRecyclerView(recyclerView);
-  }
-
-  public void setOnEntryClickListener(OnEntryClickListener onEntryClickListener) {
-    mOnEntryClickListener = onEntryClickListener;
-  }
-
-  public interface OnEntryClickListener {
-    void onEntryClick(View view, int position);
   }
 
   public class ProfileListViewHolder extends RecyclerView.ViewHolder {

@@ -1,10 +1,9 @@
 package com.bojio.mugger.listings.chat;
 
-import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,8 +19,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bojio.mugger.R;
 import com.bojio.mugger.administration.reports.MakeReportActivity;
 import com.bojio.mugger.administration.reports.Report;
-import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.fcm.MessagingService;
+import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.authentication.MuggerUserCache;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.bojio.mugger.listings.Listing;
 import com.bojio.mugger.profile.ProfileActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -32,21 +32,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class ListingChatActivity extends AppCompatActivity {
+public class ListingChatActivity extends LoggedInActivity {
 
   @BindView(R.id.messages)
   RecyclerView messages;
@@ -54,16 +49,19 @@ public class ListingChatActivity extends AppCompatActivity {
   EditText toSendView;
   @BindView(R.id.progressBar6)
   ProgressBar progressBar;
-  private Listing listing;
-  private String listingUid;
   private FirebaseFirestore db;
   private FirebaseUser user;
-  private MuggerUser cache;
+  private ListingChatViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    cache = MuggerUser.getInstance();
+    if (stopActivity) {
+      finish();
+      return;
+    }
+    mViewModel = ViewModelProviders.of(this).get(ListingChatViewModel.class);
+    cache = MuggerUserCache.getInstance();
     db = FirebaseFirestore.getInstance();
     setContentView(R.layout.activity_listing_chat);
     ButterKnife.bind(this);
@@ -74,46 +72,15 @@ public class ListingChatActivity extends AppCompatActivity {
       finish();
       return;
     }
-    listing = b.getParcelable("listing");
+    Listing listing = b.getParcelable("listing");
     if (listing == null) {
-      listingUid = b.getString("listingUid");
-      if (listingUid == null) {
-        Toasty.error(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
-        finish();
-        return;
-      }
-    } else {
-      listingUid = listing.getUid();
-    }
-    if (listing == null) {
-      AlertDialog dialog = new SpotsDialog
-          .Builder()
-          .setContext(this)
-          .setMessage("Loading...")
-          .setCancelable(false)
-          .setTheme(R.style.SpotsDialog)
-          .build();
-      dialog.show();
-      db.collection("listings").document(listingUid).get().addOnCompleteListener(task -> {
-        Listing newListing = Listing.getListingFromSnapshot(task.getResult());
-        if (newListing == null) {
-          Toasty.error(this, "This listing has been deleted", Toast.LENGTH_SHORT).show();
-          ListingChatActivity.this.finish();
-          return;
-        }
-        ListingChatActivity.this.setListing(newListing);
-        dialog.dismiss();
-      });
-    }
-    user = FirebaseAuth.getInstance().getCurrentUser();
-    if (user == null) {
+      Toasty.error(this, "Error: listingUid cannot be null", Toast.LENGTH_SHORT).show();
       finish();
+      return;
     }
+    mViewModel.setListing(listing);
+    user = FirebaseAuth.getInstance().getCurrentUser();
     initMessages();
-  }
-
-  public void setListing(Listing newListing) {
-    listing = newListing;
   }
 
   @OnClick(R.id.activity_thread_send_fab)
@@ -121,69 +88,22 @@ public class ListingChatActivity extends AppCompatActivity {
     String message = toSendView.getText().toString().trim();
 
     if (!message.isEmpty()) {
-      if (cache.isMuted() > 0) {
-        double hours = (double) cache.isMuted() / 3600000D;
-        Toasty.error(this, "You cannot do this while muted. Time left: " + String.format("%.2f " +
-                "hours",
-            hours)).show();
+      double muteTime = mViewModel.getMuteTimeLeft();
+      if (muteTime > 0) {
+        Toasty.error(this, String.format(Locale.ENGLISH, "You cannot do this while muted. Time " +
+            "left: %.2f hours", muteTime)).show();
         return;
       }
-      if (message.equalsIgnoreCase("fuck you")) {
-        String[] wholesome = {"Wholly accept your flaws, and suddenly no one is strong enough to " +
-            "use them against you.",
-            "Remember, you have been criticizing yourself for years and it hasn’t worked. Try " +
-                "approving of yourself and see what happens.",
-            "Accepting yourself is about respecting yourself. It’s about honoring yourself right " +
-                "now, here today, in this moment. Not just who you could become somewhere down the line."};
-        message = wholesome[new Random().nextInt(wholesome.length)];
-      }
-      long timestamp = System.currentTimeMillis();
-      long dayTimestamp = getDayTimestamp(timestamp);
-      String userUid = user.getUid();
-      Map<String, Object> messageData = new HashMap<>();
-      messageData.put("fromUid", userUid);
-      messageData.put("fromName", user.getDisplayName());
-      messageData.put("content", message);
-      messageData.put("time", timestamp);
-      messageData.put("day", dayTimestamp);
-      // Add to listing chat
-      db.collection("chats").document(listingUid).collection("messages").add(messageData);
-      Map<String, Object> notificationData = new HashMap<>();
-      notificationData.put("topicUid", listingUid);
-      StringBuilder content = new StringBuilder("(Latest Message) ");
-      content.append(user.getDisplayName()).append(" : ").append(message);
-      notificationData.put("body", content.toString());
-      StringBuilder title = new StringBuilder();
-      title.append(listing.getOwnerName()).append("'s ").append(listing.getModuleCode()).append(" " +
-          "Listing");
-      notificationData.put("title", title.toString());
-      notificationData.put("type", MessagingService.CHAT_NOTIFICATION);
-      notificationData.put("fromUid", user.getUid());
-      // Add to user's chat history
-      //db.collection("users").document(userUid).collection("chatHistory").add(messageData);
-      // Add to notification db
-      messageData.remove("time");
-      messageData.remove("day");
-      messageData.put("listingOwnerUid", listing.getOwnerId());
-      db.collection("notifications").add
-          (notificationData);
+      mViewModel.sendMessage(message);
       toSendView.setText("");
     }
   }
 
-  private long getDayTimestamp(long timestamp) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
-    calendar.setTimeInMillis(timestamp);
-    calendar.set(Calendar.MILLISECOND, 0);
-    calendar.set(Calendar.HOUR_OF_DAY, 0);
-    calendar.set(Calendar.SECOND, 0);
-    calendar.set(Calendar.MINUTE, 0);
-    return calendar.getTimeInMillis();
-  }
-
+  /**
+   * Initializes the view of messages in this chat.
+   */
   private void initMessages() {
-    Query mQuery = db.collection("chats").document(listingUid).collection("messages")
+    Query mQuery = MuggerDatabase.getListingChatHistory(db, mViewModel.getListingUid())
         .orderBy("time", Query.Direction.DESCENDING);
     FirestoreRecyclerOptions<Message> options = new FirestoreRecyclerOptions.Builder<Message>()
         .setQuery(mQuery, snapshot -> new Message((String) snapshot.get("fromUid"),
@@ -253,7 +173,7 @@ public class ListingChatActivity extends AppCompatActivity {
                     b.putString("reportedUid", message.getFromUid());
                     b.putString("reportedName", message.getFromName());
                     b.putString("message", message.getContent());
-                    b.putString("listingUid", listingUid);
+                    b.putString("listingUid", mViewModel.getListingUid());
                     intent.putExtras(b);
                     startActivity(intent);
                     break;

@@ -1,8 +1,11 @@
 package com.bojio.mugger.listings.fragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
-import com.google.firebase.firestore.Query;
+import com.bojio.mugger.lifecycle.LifecycleUtils;
+import com.bojio.mugger.listings.viewmodels.MyListingsViewModel;
 
 /**
  * A fragment representing a list of Items.
@@ -13,11 +16,10 @@ import com.google.firebase.firestore.Query;
 public class MyListingsFragments extends ListingsFragments {
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    this.mQuery = db.collection("listings")
-        .orderBy("startTime", Query.Direction.ASCENDING)
-        .whereEqualTo("ownerId", mAuth.getCurrentUser().getUid());
-
+  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    mViewModel = ViewModelProviders.of(this, LifecycleUtils.getAndroidViewModelFactory
+        (getActivity().getApplication())).get(MyListingsViewModel.class);
+    super.onActivityCreated(savedInstanceState);
   }
+
 }

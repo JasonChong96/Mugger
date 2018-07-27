@@ -1,16 +1,18 @@
 package com.bojio.mugger.administration.reports;
 
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.administration.reports.viewmodels.ListingReportViewModel;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.listings.AvailableListingDetailsActivity;
 import com.bojio.mugger.profile.ProfileActivity;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,7 +21,7 @@ import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class ListingReportDetailsActivity extends AppCompatActivity {
+public class ListingReportDetailsActivity extends LoggedInActivity {
 
   @BindView(R.id.listing_report_details_listing_description)
   TextView listingDescriptionView;
@@ -36,14 +38,17 @@ public class ListingReportDetailsActivity extends AppCompatActivity {
   @BindView(R.id.listing_report_details_venue)
   TextView venueView;
 
-  ListingReport report;
-  FirebaseFirestore db;
+  private ListingReportViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_listing_report_details);
+    mViewModel = ViewModelProviders.of(this).get(ListingReportViewModel.class);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     ButterKnife.bind(this);
     Bundle b = getIntent().getExtras();
@@ -52,19 +57,22 @@ public class ListingReportDetailsActivity extends AppCompatActivity {
       Toasty.error(this, "Bundle not found").show();
       return;
     }
-    report = b.getParcelable("report");
-    reportedNameView.setText(report.getReportedName());
-    reporterNameView.setText(String.format("Reported By %s", report.getReporterName()));
-    reportDescriptionView.setText(report.getDescription());
-    listingDescriptionView.setText(report.getListingDescription());
-    venueView.setText(report.getVenue());
+    if (savedInstanceState == null) {
+      mViewModel.init(b.getParcelable("report"));
+    }
+    reportedNameView.setText(mViewModel.getReportedName());
+    reporterNameView.setText(String.format("Reported By %s", mViewModel.getReporterName()));
+    reportDescriptionView.setText(mViewModel.getReportDescription());
+    listingDescriptionView.setText(mViewModel.getListingDescription());
+    venueView.setText(mViewModel.getListingVenue());
+
   }
 
   @OnClick(R.id.listing_report_details_listing_button)
   public void onClick_listing() {
     Intent intent = new Intent(this, AvailableListingDetailsActivity.class);
     Bundle b = new Bundle();
-    b.putString("listingUid", report.getListingUid());
+    b.putString("listingUid", mViewModel.getListingUid());
     intent.putExtras(b);
     startActivity(intent);
   }
@@ -73,7 +81,7 @@ public class ListingReportDetailsActivity extends AppCompatActivity {
   public void onClick_reported() {
     Intent intent = new Intent(this, ProfileActivity.class);
     Bundle b = new Bundle();
-    b.putString("profileUid", report.getReportedUid());
+    b.putString("profileUid", mViewModel.getReportedUid());
     intent.putExtras(b);
     startActivity(intent);
   }
@@ -82,7 +90,7 @@ public class ListingReportDetailsActivity extends AppCompatActivity {
   public void onClick_reporter() {
     Intent intent = new Intent(this, ProfileActivity.class);
     Bundle b = new Bundle();
-    b.putString("profileUid", report.getReporterUid());
+    b.putString("profileUid", mViewModel.getReporterUid());
     intent.putExtras(b);
     startActivity(intent);
   }
@@ -103,8 +111,7 @@ public class ListingReportDetailsActivity extends AppCompatActivity {
             .setTheme(R.style.SpotsDialog)
             .build();
         dialog.show();
-        db.collection("reports").document(report.getUid()).delete().addOnCompleteListener(task
-            -> {
+        mViewModel.deleteReport().addOnCompleteListener(task -> {
           dialog.dismiss();
           if (!task.isSuccessful()) {
             Snacky.builder()
@@ -121,5 +128,15 @@ public class ListingReportDetailsActivity extends AppCompatActivity {
     }
 
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+
+    getMenuInflater().inflate(R.menu.listing_menu, menu);
+    menu.findItem(R.id.edit_listing).setVisible(false);
+
+    return true;
   }
 }

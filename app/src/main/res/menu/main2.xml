@@ -7,6 +7,11 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_view_introduction"
+        android:orderInCategory="100"
+        android:title="View Introduction"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_refresh_modules"
         android:orderInCategory="100"
         android:title="Refresh Modules"

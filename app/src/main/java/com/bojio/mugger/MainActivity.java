@@ -1,5 +1,7 @@
 package com.bojio.mugger;
 
+import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -9,34 +11,27 @@ import android.widget.Toast;
 
 import com.bojio.mugger.authentication.GoogleLoginActivity;
 import com.bojio.mugger.authentication.IvleLoginActivity;
-import com.bojio.mugger.authentication.MuggerUser;
-import com.bojio.mugger.constants.DebugSettings;
 import com.google.android.gms.common.SignInButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.mateware.snacky.Snacky;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
+import needle.Needle;
 
 public class MainActivity extends AppCompatActivity {
 
   @BindView(R.id.progressBar5)
   ProgressBar progressBar;
-  private FirebaseAuth mAuth;
-  private FirebaseFirestore db;
+  private MainActivityViewModel mViewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     Toasty.Config.getInstance().setToastTypeface(Typeface.DEFAULT).apply();
     super.onCreate(savedInstanceState);
-    mAuth = FirebaseAuth.getInstance();
-    db = FirebaseFirestore.getInstance();
-    FirebaseUser acc = mAuth.getCurrentUser();
+    mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
     setContentView(R.layout.activity_main);
     initGoogleSignInButton();
     ButterKnife.bind(this);
@@ -47,17 +42,53 @@ public class MainActivity extends AppCompatActivity {
         Toasty.error(this, errMsg).show();
       }
     }
-    if (acc != null) { // Logged in
-      SpotsDialog.Builder dialog = new SpotsDialog
-          .Builder()
-          .setContext(this)
-          .setTheme(R.style.SpotsDialog)
-          .setMessage("Signing in...")
-          .setCancelable(false);
-      dialog.build().show();
-      // Checks if user has been verified as an NUS student by checking if NUSNETID has been
-      // logged before
-      checkAccount(acc);
+    AlertDialog dialog = new SpotsDialog
+        .Builder()
+        .setContext(this)
+        .setTheme(R.style.SpotsDialog)
+        .setMessage("Signing in...")
+        .setCancelable(false)
+        .build();
+    if (mViewModel.isLoggedIn()) {
+      dialog.show();
+    }
+    Needle.onBackgroundThread().execute(() -> {
+      // ViewModel init method requires waiting for Firestore API response, done on background
+      // thread so main UI thread doesn't stall.
+      if (!mViewModel.init()) {
+        // Error loading user data.
+        Needle.onMainThread().execute(() -> {
+          dialog.dismiss();
+          Snacky.builder()
+              .setActivity(this)
+              .setText("Error signing in, please try again.")
+              .error()
+              .show();
+        });
+      } else if (mViewModel.isLoggedIn()) {
+        Needle.onMainThread().execute(() -> {
+          dialog.dismiss();
+          startNextActivity();
+        });
+      }
+    });
+  }
+
+  /**
+   * Starts the next activity. To be called if the user is already logged in. Checks if the user
+   * has done IVLE log in before, if he/she has, then redirects to Main2Activity, or else it
+   * redirects to IvleLoginActivity.
+   */
+  private void startNextActivity() {
+    if (mViewModel.isRedirectToIvleLogin()) {
+      // No record of nusnetid, redirect to IVLE login
+      startActivity(new Intent(this, IvleLoginActivity.class));
+    } else {
+      Toasty.normal(this, "Welcome back, " + mViewModel.getDisplayName(), Toast.LENGTH_SHORT)
+          .show();
+      mViewModel.updateCache();
+      startActivity(new Intent(this, Main2Activity.class));
+      finish();
     }
   }
 
@@ -67,44 +98,6 @@ public class MainActivity extends AppCompatActivity {
   private void initGoogleSignInButton() {
     SignInButton signInButton = findViewById(R.id.sign_in_button);
     signInButton.setSize(SignInButton.SIZE_WIDE);
-  }
-
-  /**
-   * Checks the account and starts the appropriate activity for the account. i.e If the account
-   * has not logged in to IVLE for verification before, redirect to IVLE login. If not, redirect
-   * to the listings main page.
-   *
-   * @param acc the account to check
-   */
-  private void checkAccount(FirebaseUser acc) {
-    // Checks if user has been verified as an NUS student by checking if NUSNETID has been
-    // logged before
-    db.collection("users").document(acc.getUid()).get().addOnCompleteListener(task_ -> {
-      if (!task_.isSuccessful()) {
-        Toasty.error(this, "Error fetching user data. Please try again later.").show();
-        mAuth.signOut();
-        // Go back to login page
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-      } else {
-        DocumentSnapshot result = task_.getResult();
-        if (result.exists() && result.get("nusNetId") != null && !DebugSettings
-            .ALWAYS_REDIRECT_TO_IVLE) {
-          // Already have record of nus net id
-          // Clears back stack
-          Toasty.normal(this, "Welcome back, " + acc.getDisplayName(), Toast.LENGTH_SHORT).show();
-          MuggerUser.getInstance().setData(result.getData());
-          Intent intent = new Intent(this, Main2Activity.class);
-          startActivity(intent);
-          finish();
-        } else {
-          // No record of nusnetid, redirect to IVLE login
-          Intent intent = new Intent(this, IvleLoginActivity.class);
-          startActivity(intent);
-        }
-      }
-    });
   }
 
   /**

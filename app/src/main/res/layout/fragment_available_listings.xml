@@ -46,19 +46,87 @@
 
         </android.support.constraint.ConstraintLayout>
 
+        <android.support.design.button.MaterialButton
+            android:id="@+id/listings_fragments_button_filter_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Filter Settings"
+            android:textColor="?attr/colorPrimaryDark"
+            android:visibility="gone"
+            app:icon="@drawable/ic_baseline_settings_20px"
+            app:iconTint="?attr/colorPrimaryDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/constraintLayout3" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_constraint_layout_2">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/listings_fragments_filter_to_date_wrapper"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:hint="To"
+                app:boxStrokeColor="?attr/colorAccent"
+                app:layout_constraintBottom_toBottomOf="@+id/listings_fragments_filter_from_date_wrapper"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/listings_fragments_filter_from_date_wrapper"
+                app:layout_constraintTop_toTopOf="@+id/listings_fragments_filter_from_date_wrapper">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/listings_fragments_filter_to_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorTextPrimary" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/listings_fragments_filter_from_date_wrapper"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="From"
+                app:boxStrokeColor="?attr/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/listings_fragments_filter_from_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorTextPrimary" />
+
+            </android.support.design.widget.TextInputLayout>
+        </android.support.constraint.ConstraintLayout>
+
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/list"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_height="0dp"
             android:layout_marginBottom="16dp"
+            android:layout_marginTop="8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:isScrollContainer="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_constraint_layout_2"
+            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_view_schedule_button"
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/listing_card_view">
 
@@ -78,5 +146,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.design.button.MaterialButton
+            android:id="@+id/listings_fragments_view_schedule_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="View My Schedule"
+            android:textColor="?attr/colorPrimaryDark"
+            android:visibility="gone"
+            app:icon="@drawable/ic_baseline_calendar_today_24px"
+            app:iconTint="?attr/colorPrimaryDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listings_fragments_button_filter_settings" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -13,6 +13,7 @@ import com.bojio.mugger.Main2Activity;
 import com.bojio.mugger.MainActivity;
 import com.bojio.mugger.R;
 import com.bojio.mugger.constants.DebugSettings;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -96,8 +97,8 @@ public class GoogleLoginActivity extends AppCompatActivity {
 
       } catch (ApiException e) {
         // Google Sign In failed,
-        Log.w(TAG, "Google sign in failed", e);
-        Toasty.error(this, "Sign in failed", Toast.LENGTH_SHORT).show();
+        Log.w(TAG, "Google sign in failed.", e);
+        Toasty.error(this, "Sign in failed, Please try again", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -126,7 +127,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
       if (user != null) {
         // If signed in, check if user has been verified as an NUS student by checking if
         // hashed nusnetid has been cached
-        db.collection("users").document(user.getUid()).get().addOnCompleteListener(task_ -> {
+        MuggerDatabase.getUserReference(db, user.getUid()).get().addOnCompleteListener(task_ -> {
           if (!task_.isSuccessful()) {
             Toasty.error(this, "Error fetching user data. Please try again later.", Toast
                 .LENGTH_SHORT).show();
@@ -140,7 +141,7 @@ public class GoogleLoginActivity extends AppCompatActivity {
                 .ALWAYS_REDIRECT_TO_IVLE) {
               // If already verified, then go straight to main listings page
               Intent intent = new Intent(this, Main2Activity.class);
-              MuggerUser.getInstance().setData(result.getData());
+              MuggerUserCache.getInstance().setData(result.getData());
               // Clears back stack
               intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
               startActivity(intent);

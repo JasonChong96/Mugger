@@ -4,20 +4,27 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 
 import es.dmoral.toasty.Toasty;
 
-public class ProfileActivity extends AppCompatActivity
+/**
+ * Activity that encapsulates the ProfileFragment when needed.
+ */
+public class ProfileActivity extends LoggedInActivity
     implements ProfileFragment.OnProfileFragmentInteractionListener {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_profile);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     Bundle b = getIntent().getExtras();
@@ -26,10 +33,12 @@ public class ProfileActivity extends AppCompatActivity
       finish();
       return;
     }
-    Fragment fragment = ProfileFragment.newInstance(b.getString("profileUid"));
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    ft.replace(R.id.profile_frame, fragment);
-    ft.commit();
+    if (savedInstanceState == null) {
+      Fragment fragment = ProfileFragment.newInstance(b.getString("profileUid"));
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.profile_frame, fragment);
+      ft.commit();
+    }
   }
 
   @Override

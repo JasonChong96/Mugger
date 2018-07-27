@@ -37,7 +37,7 @@ public class Listing implements Parcelable {
 
   private List<String> attendees;
 
-  private Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
+  public Listing(String uid, String ownerName, String ownerId, String moduleCode, long startTime,
                   long endTime, String description, String venue, List<String> attendees, int type) {
     this.uid = uid;
     this.ownerName = ownerName;
@@ -201,4 +201,17 @@ public class Listing implements Parcelable {
     this.ownerName = ownerName;
   }
 
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof Listing) {
+      return this.getUid().equals(((Listing) other).getUid());
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getUid().hashCode();
+  }
 }

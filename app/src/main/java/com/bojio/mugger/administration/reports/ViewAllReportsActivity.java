@@ -2,7 +2,6 @@ package com.bojio.mugger.administration.reports;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,7 +23,7 @@ import java.text.DateFormat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ViewAllReportsActivity extends AppCompatActivity {
+public class ViewAllReportsActivity extends LoggedInActivity {
   FirebaseFirestore db;
 
   @BindView(R.id.view_all_reports_recycler)
@@ -35,6 +36,10 @@ public class ViewAllReportsActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_view_all_reports);
     ButterKnife.bind(this);
     initRecycler();
@@ -42,7 +47,8 @@ public class ViewAllReportsActivity extends AppCompatActivity {
   }
 
   private void initRecycler() {
-    Query mQuery = db.collection("reports").orderBy("time", Query.Direction.DESCENDING);
+    Query mQuery = MuggerDatabase.getAllReportsReference(db).orderBy("time", Query.Direction
+        .DESCENDING);
     FirestoreRecyclerOptions<Report> options = new FirestoreRecyclerOptions.Builder<Report>()
         .setQuery(mQuery, Report::getReportFromSnapshot).build();
     FirestoreRecyclerAdapter<Report, ReportViewHolder> adapter = new FirestoreRecyclerAdapter<Report, ReportViewHolder>(options) {

@@ -23,6 +23,11 @@ public class Feedback {
     this.docRef = docRef;
   }
 
+  /**
+   * Loads a feedback instance from an input DocumentSnapshot and returns it.
+   * @param snapshot the document snapshot to load from
+   * @return a Feedback instance
+   */
   public static Feedback getFeedbackFromSnapshot(DocumentSnapshot snapshot) {
     return new Feedback(snapshot.getId(), (String) snapshot.get("userUid"),
         (String) snapshot.get("title"), (String) snapshot.get("description"), (String) snapshot
@@ -31,10 +36,6 @@ public class Feedback {
 
   public String getUserName() {
     return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
   }
 
   public long getTime() {
@@ -57,10 +58,6 @@ public class Feedback {
     return userUid;
   }
 
-  public void setUserUid(String userUid) {
-    this.userUid = userUid;
-  }
-
   public String getTitle() {
     return title;
   }
@@ -79,9 +76,5 @@ public class Feedback {
 
   public DocumentReference getDocRef() {
     return docRef;
-  }
-
-  public void setDocRef(DocumentReference docRef) {
-    this.docRef = docRef;
   }
 }

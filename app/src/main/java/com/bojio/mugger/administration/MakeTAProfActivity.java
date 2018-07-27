@@ -2,7 +2,6 @@ package com.bojio.mugger.administration;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,7 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bojio.mugger.R;
+import com.bojio.mugger.authentication.LoggedInActivity;
 import com.bojio.mugger.constants.ModuleRole;
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -29,7 +30,7 @@ import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 import es.dmoral.toasty.Toasty;
 
-public class MakeTAProfActivity extends AppCompatActivity {
+public class MakeTAProfActivity extends LoggedInActivity {
 
   @BindView(R.id.make_ta_prof_button_submit)
   Button submitButton;
@@ -53,6 +54,10 @@ public class MakeTAProfActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     db = FirebaseFirestore.getInstance();
     super.onCreate(savedInstanceState);
+    if (stopActivity) {
+      finish();
+      return;
+    }
     setContentView(R.layout.activity_make_taprof);
     ButterKnife.bind(this);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -71,7 +76,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
       return;
     }
     userUid = b.getString("userUid");
-    db.collection("data").document("otherData").get().addOnCompleteListener(task -> {
+    MuggerDatabase.getOtherDataReference(db).get().addOnCompleteListener(task -> {
       if (!task.isSuccessful()) {
         Toasty.error(this, "Error: Failed to fetch current semester", Toast.LENGTH_SHORT)
             .show();
@@ -102,7 +107,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
 
   @OnClick(R.id.make_ta_prof_button_submit)
   void onClick_submit() {
-    String module = editTextModule.getText().toString();
+    String module = editTextModule.getText().toString().trim();
     if (module.isEmpty()) {
       Toasty.error(this, "Please fill in a module code.", Toast.LENGTH_SHORT).show();
     } else if (newRole == ModuleRole.EMPTY) {
@@ -118,7 +123,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
       dialog.show();
       Boolean remove = newRole == ModuleRole.REMOVE;
       String role = newRole == ModuleRole.PROFESSOR ? "professor" : "ta";
-      DocumentReference docRef = db.collection("users").document(userUid).collection("semesters")
+      DocumentReference docRef = MuggerDatabase.getUserAllSemestersDataReference(db, userUid)
           .document(semesterView.getText().toString().replace("/", "."));
       docRef.get().addOnCompleteListener(task -> {
         if (!task.isSuccessful()) {
@@ -168,8 +173,7 @@ public class MakeTAProfActivity extends AppCompatActivity {
               if (!taskk.isSuccessful()) {
                 Toasty.error(this, "Error, please try again", Toast.LENGTH_SHORT).show();
               } else {
-                Toasty.success(this, "Successfully updated. Please reload this profile page to " +
-                    "view changes and get the user to relogin for the effects to take place.", Toast
+                Toasty.success(this, "Successfully updated.", Toast
                     .LENGTH_SHORT).show();
                 finish();
               }

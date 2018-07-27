@@ -1,5 +1,6 @@
 package com.bojio.mugger.fcm;
 
+import com.bojio.mugger.database.MuggerDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -12,10 +13,8 @@ public class InstanceIdService extends FirebaseInstanceIdService {
     String instanceId = FirebaseInstanceId.getInstance().getToken();
     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     if (firebaseUser != null) {
-      FirebaseFirestore.getInstance()
-          .collection("users")
-          .document(firebaseUser.getUid())
-          .update("instanceId", instanceId);
+      MuggerDatabase.updateInstanceId(FirebaseFirestore.getInstance(), firebaseUser.getUid(),
+          instanceId);
     }
 
   }

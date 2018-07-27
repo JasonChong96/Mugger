@@ -1,5 +1,6 @@
 package com.bojio.mugger.settings;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -11,6 +12,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.bojio.mugger.MainActivity;
+import com.bojio.mugger.authentication.MuggerUserCache;
 
 /**
  * A {@link android.preference.PreferenceActivity} which implements and proxies the necessary calls
@@ -25,6 +29,13 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
     getDelegate().installViewFactory();
     getDelegate().onCreate(savedInstanceState);
     super.onCreate(savedInstanceState);
+    if (MuggerUserCache.getInstance().getData() == null || MuggerUserCache.getInstance().getModules() == null) {
+      Intent intent = new Intent(this, MainActivity.class);
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+          | Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(intent);
+      return;
+    }
   }
 
   @Override
