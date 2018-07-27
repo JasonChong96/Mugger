@@ -90,6 +90,15 @@ This page allows users to send feedback that is viewable only by the admins. Thi
 image::https://i.imgur.com/DPTzhdx.png[Screenshot of Prof/TA request form]
 This page allows users to request to be registered as a Professor or TA for the module that they are teaching. They'll be required to type in the module code along with proof of their position. These requests can only be viewed by admins who can approve such requests and give them their respective roles(section 3.3) so that they can make specially tagged listings as mentioned in section 3.1.
 
-=== 3.8 Logout
+=== 3.8 Custom Filters
+Users can now customise their filter settings using ‘Custom Filters’ from the navigation drawer. This allows for advanced filtering options. Under ‘Settings’, they can also enable unrelated modules to be shown to them, in case they want to attend study sessions for modules they are interested in but not officially enrolled in. These filter settings are stored in the database so that users would not have to.
+
+=== 3.9 In-App Tutorial
+This brief tutorial describing the purpose and usage of the app will be shown to first-time app users, and can subsequently be accessed anytime from ‘View Introduction’ under the three dots action bar at the top right corner.
+
+=== 3.10 My Schedule
+This intuitive display of the listings that a user is attending will help keep track of all such appointments in a way that is already familiar to the average user who uses any other calendar app. A red dot under a date indicates that there is at least one study session, and tapping on the date will reveal the listing(s) scheduled for that day. Pulling down the screen will refresh the dates that are marked with the red dot.
+
+=== 3.11 Logout
 
 After the user logs out, he/she will be brought back to the main login screen until the next time the app is opened again.
