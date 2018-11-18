@@ -19,7 +19,8 @@ It was designed with the intention to increase the number of face-to-face opport
 == 2. Quick Start
 
 1. Ensure you have a phone running Android 4.4 (KitKat) or later.
-2. Go to the https://www.google.com/url?q=https://goo.gl/Z5f3cC&sa=D&ust=1530187014671000[Mugger Playstore Listing] and install the Mugger application.
+//2. Go to the https://www.google.com/url?q=https://goo.gl/Z5f3cC&sa=D&ust=1530187014671000[Mugger Playstore Listing]Â and install the Mugger application.
+2. Download and install the apk file located on our https://github.com/JasonChong96/Mugger/releases/tag/Milestone3[release page].
 3. Open Mugger from your android device's launcher.
 4. Tap the login button to log in with your Google account. After doing so, it should redirect you to a second login page for your NUSNET account (only for first-time users).
 
@@ -41,12 +42,12 @@ Listings are used to facilitate the organising of face-to-face study sessions an
 ==== 3.1.1 Available Listings By Module
 
 image:https://i.imgur.com/o6zEFvI.png[Default Page] image:https://i.imgur.com/9cuKEqk.png[Filter by Module]
-Shows all the available study session listings created by users, including yourself. Listings created by yourself will be labelled "Yours", and listings you are att ending (including your own) will be  labelled  in orange (F2845C) at the top right hand corner. T As and professors will also have their listings labelled in cya n (97D3CA) and violet (9EB3ED) respe ctively to further differentiate the types of listings available. You can also filter out specific modules, and create your own listing directly by tapping on the orange floating action button . You can view a list of people attending a session by clicking on the icon on the top right of listings.
+Shows all the available study session listings created by users, including yourself. Listings created by yourself will be labelled "Yours",Â and listings you are att ending (including your own) will be Â labelled Â in orange (F2845C) at the top right hand corner. T As and professors will also have their listings labelled in cya n (97D3CA)Â and violet (9EB3ED) respe ctively to further differentiate the types of listings available. You can also filter out specific modules, and create your own listing directly by tapping on the orange floating action button . You can view a list of people attending a session by clicking on the icon on the top right of listings.
 
 image::https://i.imgur.com/WcdIxaC.png[Expanded Listing]
 Tapping on the 'down' arrow on a listing will expand it and give you more information about it, where you can also indicate your attendance. All listings will also have a chatroom specific to that listing, where users can interact with others attending that same listing, including the listing creator. Do note that chats serve to help users decide if they want to attend that particular listing, and are not meant to replace the end goal of a face-to-face study session.
 
-In the chat and attendees list, you can tap on a user's display name to  be redirected to their profile (refer to 3.2  below).
+In the chat and attendees list, you can tap on a user's display name to Â be redirected to their profile (refer to 3.2 Â below).
 
 ==== 3.1.2 Listings I'm Joining
 
@@ -69,7 +70,7 @@ Here you will find your personal information, like modules and current display n
 === 3.3 Administrative Tools
 
 image::https://i.imgur.com/K1qMo1h.png[Administrative Tools]
-Only admins will have this extra option in the navigation drawer to access all the reports, feedback and prof/TA requests sent by users. They can then decide to take further action, such as muting malicious users for a specific number of hours . Other profile options that are only displayed for admins include 'Make TA/Prof ' and 'Change Mugger Role ', which allows for a user to be elevated to become an admin or vice versa . This promotion or demotion of roles can only be done by a master , who oversees all admins, and the admins in turn manage the users.
+Only admins will have this extra option in the navigation drawer to access all the reports, feedback and prof/TA requests sent by users. They can then decide to take further action, such as muting malicious users for a specific number of hours . Other profile options that are only displayed for admins include 'Make TA/Prof ' and 'Change Mugger Role ', which allows for a user to be elevated to become an admin or vice versa .Â This promotion or demotion of roles can only be done by a master , who oversees all admins, and the admins in turn manage the users.
 
 === 3.4 Settings
 
@@ -91,10 +92,10 @@ image::https://i.imgur.com/DPTzhdx.png[Screenshot of Prof/TA request form]
 This page allows users to request to be registered as a Professor or TA for the module that they are teaching. They'll be required to type in the module code along with proof of their position. These requests can only be viewed by admins who can approve such requests and give them their respective roles(section 3.3) so that they can make specially tagged listings as mentioned in section 3.1.
 
 === 3.8 Custom Filters
-Users can now customise their filter settings using ‘Custom Filters’ from the navigation drawer. This allows for advanced filtering options. Under ‘Settings’, they can also enable unrelated modules to be shown to them, in case they want to attend study sessions for modules they are interested in but not officially enrolled in. These filter settings are stored in the database so that users would not have to.
+Users can now customise their filter settings using â€˜Custom Filtersâ€™ from the navigation drawer. This allows for advanced filtering options. Under â€˜Settingsâ€™, they can also enable unrelated modules to be shown to them, in case they want to attend study sessions for modules they are interested in but not officially enrolled in. These filter settings are stored in the database so that users would not have to.
 
 === 3.9 In-App Tutorial
-This brief tutorial describing the purpose and usage of the app will be shown to first-time app users, and can subsequently be accessed anytime from ‘View Introduction’ under the three dots action bar at the top right corner.
+This brief tutorial describing the purpose and usage of the app will be shown to first-time app users, and can subsequently be accessed anytime from â€˜View Introductionâ€™ under the three dots action bar at the top right corner.
 
 === 3.10 My Schedule
 This intuitive display of the listings that a user is attending will help keep track of all such appointments in a way that is already familiar to the average user who uses any other calendar app. A red dot under a date indicates that there is at least one study session, and tapping on the date will reveal the listing(s) scheduled for that day. Pulling down the screen will refresh the dates that are marked with the red dot.
